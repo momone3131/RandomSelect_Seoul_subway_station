@@ -818,7 +818,7 @@ button svg,button svg *{pointer-events:none}
         var ll=place_lat_lng(place);
         if (!ll) return;
         var distance=haversine_meters(station.lat,station.lng,ll.lat,ll.lng);
-        if (!isFinite(distance) || distance>3200) return;
+        if (!isFinite(distance) || distance>2000) return;
         candidates.push({place:place,rank:rank,distance:distance,rating:Number(place.rating),reviews:Number(place.userRatingCount)||0});
       });
       if (!candidates.length) return [];
