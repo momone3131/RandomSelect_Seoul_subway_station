@@ -25,22 +25,25 @@ Last updated: 2026-09-12
 Status: **IN PROGRESS**
 
 Working branch: `refactor/random-seoul-core`
+Working PR: `#2 refactor: modularize Random Seoul shared core`
 
 ### Immediate tasks
 
 - [x] Add Vite + TypeScript project scaffold
 - [x] Preserve current single-file baseline by leaving `main/index.html` untouched during refactor
 - [ ] Extract CSS from `index.html`
-- [ ] Extract subway line data
-- [ ] Extract food category/search data
+- [x] Extract subway line data
+- [x] Extract food category/search data
 - [x] Define shared domain types
 - [x] Extract draw engine
 - [x] Extract restaurant ranking function
+- [x] Extract station resolver / line-token matching
 - [x] Define `PlaceSearchService`
-- [ ] Move Google Web Places implementation behind service boundary
-- [ ] Extract state/storage layer
+- [x] Move Google Web Places implementation behind service boundary
+- [x] Extract state/storage boundaries
+- [x] Extract 30-day station coordinate cache behind storage boundary
 - [ ] Extract UI render modules
-- [x] Add unit tests for draw/ranking
+- [x] Add unit tests for draw/ranking/data/station resolution/cache
 - [ ] Verify mobile/desktop web parity
 - [x] Add GitHub Actions web build/test
 - [ ] Merge only after parity verification
@@ -57,11 +60,11 @@ During this phase:
 
 ## Next implementation slice
 
-1. Extract subway/food data from the single file.
-2. Extract Google Web Places adapter while keeping current behavior.
-3. Extract storage/state boundaries.
-4. Move CSS and UI renderers.
-5. Switch `index.html` from inline logic to module entrypoint only after the extracted modules are covered by tests.
+1. Extract the current visual CSS verbatim into `src/ui/styles.css` without changing appearance.
+2. Split DOM rendering into draw / restaurant / settings / history modules.
+3. Introduce a thin `src/main.ts` composition root.
+4. Create a modular Web entry page alongside the existing single-file baseline.
+5. Run parity checks before replacing the refactor branch root `index.html`.
 
 ## Next phase
 
@@ -82,5 +85,10 @@ See `docs/PROJECT_PLAN.md` for the full sequence.
 - Architecture and roadmap documentation established in repository.
 - Vite/TypeScript/Vitest scaffold added on the refactor branch.
 - Shared domain types, deterministic draw engine, platform-neutral place-search boundary, and restaurant-ranking engine extracted.
-- Unit tests added for draw and restaurant ranking behavior.
-- CI workflow added for tests and web build.
+- Full 24-line subway dataset and 36-food dataset extracted from the stable single-file app.
+- Food display labels and Google search queries are now explicit static data rather than inline script literals.
+- Shared station resolver and line search vocabulary extracted.
+- Google Maps JavaScript Places implementation moved behind `PlaceSearchService` as a Web-only adapter.
+- State store, storage interface, browser storage adapter, and 30-day station coordinate cache extracted.
+- Unit tests cover draw, ranking, static-data integrity, station resolution, and station cache behavior.
+- CI tests and TypeScript/Vite build passed after the data/service extraction slice.
