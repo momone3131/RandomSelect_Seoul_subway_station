@@ -1,0 +1,7 @@
+node_modules/
+dist/
+src/generated/legacy-shell.ts
+.env
+.env.*
+!.env.example
+.DS_Store
