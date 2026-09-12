@@ -29,3 +29,28 @@ jobs:
 
       - name: Build web
         run: npm run build
+
+      - name: Smoke test modular Web entry in headless Chrome
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/random-seoul-vite.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill $PREVIEW_PID || true' EXIT
+          for i in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:4173/modular.html > /dev/null; then
+              break
+            fi
+            sleep 0.5
+          done
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_BIN"
+          "$CHROME_BIN" \
+            --headless=new \
+            --no-sandbox \
+            --disable-gpu \
+            --virtual-time-budget=2500 \
+            --dump-dom \
+            http://127.0.0.1:4173/modular.html > /tmp/random-seoul-dom.html
+          grep -q 'data-app-ready="true"' /tmp/random-seoul-dom.html
+          grep -q 'RANDOM SEOUL' /tmp/random-seoul-dom.html
+          grep -q '노선 뽑기' /tmp/random-seoul-dom.html
