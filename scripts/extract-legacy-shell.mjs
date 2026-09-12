@@ -1,38 +1,28 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
-const sourcePath = new URL('../index.html', import.meta.url);
+const stylesPath = new URL('../src/ui/styles.css', import.meta.url);
+const shellPath = new URL('../src/ui/shell.html', import.meta.url);
 const outputDir = new URL('../src/generated/', import.meta.url);
 const outputPath = new URL('../src/generated/legacy-shell.ts', import.meta.url);
-const html = await readFile(sourcePath, 'utf8');
 
-const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/i);
-if (!styleMatch) throw new Error('Could not extract legacy <style> block.');
-
-const bodyStart = html.search(/<body[^>]*>/i);
-const bodyStartEnd = html.indexOf('>', bodyStart) + 1;
-const dataMarker = html.search(/<script\s+id=["']food_data["']/i);
-if (bodyStart < 0 || bodyStartEnd <= 0 || dataMarker < 0) {
-  throw new Error('Could not find the legacy body shell boundaries.');
-}
-
-let body = html.slice(bodyStartEnd, dataMarker).trim();
-// Branding change is intentionally applied only to the modular app while main remains stable.
-body = body.replace(/NEXT STOP/g, 'RANDOM SEOUL');
-
-const keyMatch = html.match(/(?:var|const|let)\s+GOOGLE_MAPS_API_KEY\s*=\s*['"]([^'"]+)['"]/);
-const legacyGoogleMapsApiKey = keyMatch?.[1] ?? '';
+const [styles, body] = await Promise.all([
+  readFile(stylesPath, 'utf8'),
+  readFile(shellPath, 'utf8'),
+]);
 
 await mkdir(outputDir, { recursive: true });
 await writeFile(
   outputPath,
   [
-    '// Generated from the stable single-file Web app. Do not edit by hand.',
-    `export const legacyStyles = ${JSON.stringify(styleMatch[1])};`,
+    '// Generated from permanent modular Web assets. Do not edit by hand.',
+    `export const legacyStyles = ${JSON.stringify(styles)};`,
     `export const legacyBody = ${JSON.stringify(body)};`,
-    `export const legacyGoogleMapsApiKey = ${JSON.stringify(legacyGoogleMapsApiKey)};`,
+    // The modular app gets its Web key through VITE_GOOGLE_MAPS_API_KEY.
+    // Keeping this symbol temporarily avoids a large composition-root rewrite during parity work.
+    "export const legacyGoogleMapsApiKey = '';",
     '',
   ].join('\n'),
   'utf8',
 );
 
-console.log('Generated src/generated/legacy-shell.ts from stable index.html');
+console.log('Generated src/generated/legacy-shell.ts from permanent modular assets');
