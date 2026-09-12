@@ -9,125 +9,129 @@ Last updated: 2026-09-12
 - Branch: `main`
 - Deployment: GitHub Pages
 - Public entry: root `index.html`
-- The currently deployed single-file Web app remains intentionally unchanged while native apps are built.
-- Product brand for all new modular/native work: **Random Seoul**
+- Web is a permanent supported target and remains usable during native-app development.
+- The deployed single-file Web entry has intentionally not been replaced by the Android work.
+- Product brand for modular/native work: **Random Seoul**
 - Core flow: line → station → food → restaurant recommendations
-- Main button after food: start a new course from line draw
-- Partial redraw buttons: line / station / food
-- Restaurant provider: Google Places Web
 - Restaurant hard distance limit: 2 km
 - Ranking: Bayesian rating 55% + log review count 25% + relevance 15% + distance 5%
 - Mobile restaurant cards: vertical single-column layout
 
 ## Phase 1 — Shared core + modular Web refactor
 
-Status: **COMPLETE / READY TO MERGE**
+Status: **COMPLETE / MERGED**
 
-Working branch: `refactor/random-seoul-core`
-Working PR: `#2 refactor: modularize Random Seoul shared core`
+Merged PR: `#2 refactor: modularize Random Seoul shared core`
+Main merge commit: `4d7808fd7a21c59991234d86792b141b0d02c150`
 
 ### Completed
 
-- [x] Add Vite + TypeScript + Vitest scaffold
-- [x] Preserve current single-file `main/index.html` without changing the deployed Web entry
-- [x] Promote the stable visual CSS/DOM shell into permanent modular sources
-- [x] Decouple modular build sources from the stable root `index.html`
+- [x] Vite + TypeScript + Vitest scaffold
+- [x] Preserve current deployed `main/index.html`
+- [x] Source-controlled modular CSS/DOM shell independent from stable `index.html`
 - [x] Extract all 24 subway lines and station ordering
-- [x] Extract all 36 food categories and explicit Google search queries
-- [x] Define shared domain types
-- [x] Extract deterministic draw engine
-- [x] Extract restaurant ranking engine
-- [x] Extract station resolver / line-token matching
-- [x] Define platform-neutral `PlaceSearchService`
-- [x] Put Google Maps JavaScript Places behind a Web-only adapter
-- [x] Extract state/store boundaries
-- [x] Extract storage boundary and browser adapter
-- [x] Preserve the stable Web settings/history localStorage schema
-- [x] Extract legal 30-day station-coordinate cache behind the storage boundary
-- [x] Extract draw / restaurant / settings / history UI render modules
-- [x] Extract cross-platform `RandomSeoulController`
-- [x] Restore stable 900 ms draw-preview/reveal behavior with instant/reduced-motion bypass
-- [x] Restore settings modal Escape and Tab/Shift+Tab focus behavior
-- [x] Add isolated `modular.html` and shared Web composition root
-- [x] Add unit tests for draw/ranking/data/station/cache/controller/persistence
-- [x] Add deterministic browser self-test without Google quota use
-- [x] Verify line → station → food → TOP 3 → 2 km filter → full restart in real headless Chrome
-- [x] Verify mobile restaurant grid computes to one column in real Chrome below the responsive breakpoint
-- [x] Enforce final mobile restaurant buttons at 44 px minimum height and full width
-- [x] Build both the stable and modular Web entries in CI
+- [x] Extract all 36 food categories and search queries
+- [x] Shared domain types and deterministic draw engine
+- [x] Shared station resolver and 30-day station-coordinate cache
+- [x] Platform-neutral `PlaceSearchService`
+- [x] Web Google Places adapter
+- [x] Shared restaurant ranking engine
+- [x] Shared `RandomSeoulController`
+- [x] Shared state/storage boundaries with existing Web persistence compatibility
+- [x] Typed draw / restaurant / settings / history UI modules
+- [x] Stable 900 ms draw preview/reveal behavior
+- [x] Settings modal keyboard/focus behavior
+- [x] Deterministic browser self-test without Google quota use
+- [x] Responsive one-column restaurant cards and 44 px mobile touch targets
+- [x] Web unit/build/real-Chrome parity gates
 
 ## Protected architectural requirements
 
-These remain binding for later phases:
+These remain binding:
 
-- Web is a permanent supported target, not a disposable prototype.
-- The deployed Web version must remain usable during Android/iOS development.
-- Android-specific business logic must not enter the shared domain/controller/ranking layers.
-- iOS-specific assumptions must not enter the shared domain/controller/ranking layers.
+- Web remains a permanent supported target.
+- Android-specific business logic must not enter shared draw/controller/ranking layers.
+- iOS-specific assumptions must not enter shared draw/controller/ranking layers.
 - Platform differences belong behind adapters/plugins.
-- Product behavior changes should remain separate from architecture-only changes where practical.
 - Restaurant ranking remains shared TypeScript unless a future documented decision explicitly changes it.
+- Native place providers return common `PlaceCandidate` data; shared TypeScript owns ranking and product flow.
 
-## Shared architecture now established
+## Shared architecture
 
 `static data → RandomSeoulController → PlaceSearchService → shared ranking → AppStore → typed UI`
 
-Platform adapters are intentionally thin:
+Platform adapters:
 
-- Web: Google Maps JavaScript Places + browser storage/map links
-- Android: Places SDK for Android + Capacitor/Kotlin adapter (Phase 2)
-- iOS: native Places adapter/Swift bridge (later)
+- Web: Google Maps JavaScript Places + browser map links/storage
+- Android: Places SDK for Android + Capacitor/Java plugins
+- iOS: native Places/Swift adapter later, against the same shared contracts
 
-The Android/iOS implementations should return common `PlaceCandidate` data and leave selection/ranking/product flow in shared TypeScript.
+## Phase 2 — Android app
 
-## Permanent modular visual assets
+Status: **ACTIVE — DEBUG APP BUILDS SUCCESSFULLY**
 
-The stable visual shell has been promoted to source-controlled assets:
+Working branch: `feature/random-seoul-android`
+Working PR: `#3 android: build Random Seoul native shell`
 
-- `src/ui/styles.css`
-- `src/ui/mobile-overrides.css`
-- `src/ui/shell.html`
+### Completed
 
-A small build generator currently packages those permanent assets into a TypeScript module for the existing modular composition root. It no longer reads or depends on stable `index.html`.
+- [x] Capacitor 8 Android project generated
+- [x] App name `Random Seoul`
+- [x] Application ID `io.github.momone3131.randomseoul`
+- [x] minSdk 24 / compileSdk 36 / targetSdk 36
+- [x] Java 21 Android CI toolchain
+- [x] Places SDK for Android 5.3.0 dependency
+- [x] Native `RandomSeoulPlacesPlugin` Text Search bridge
+- [x] Native `PlaceCandidate` normalization while keeping ranking in shared TypeScript
+- [x] Runtime Web / Android / iOS detection
+- [x] Native runtime automatically uses `NativePlaceSearchService`; Web keeps the Web adapter
+- [x] Separate Android Places API-key injection path; Web key is not reused
+- [x] GitHub Actions debug APK build and artifact upload
+- [x] Android CI passes shared tests → native Web build → Capacitor sync → Gradle `assembleDebug`
+- [x] Capacitor App / Haptics / Share plugins synced
+- [x] Native result sharing on Android
+- [x] Haptic feedback on finalized line/station/food results
+- [x] Android back handling: close settings first, otherwise normal back/exit behavior
+- [x] Native Google Maps / Naver Map launch adapter with Web fallback
+- [x] Restaurant-specific external Google Maps link opens outside the app
+- [x] Offline state indicator for native runtime
+- [x] Offline behavior keeps line/station/food draws usable and limits failure to restaurant recommendations
+- [x] Offline restaurant error copy clearly explains the available behavior
+- [x] Remove duplicate Android push+PR CI execution and cancel stale runs automatically
+- [x] Optional stable development-signing support via GitHub Actions secrets
+- [x] When stable development signing is configured, CI reports the SHA-1 needed for Android API-key restriction
 
-## Automated parity gates
+### Current validation
 
-CI currently validates:
+Latest shared CI and Android CI both pass on the Phase 2 branch after native sharing/haptics/back/map/offline changes.
 
-- all unit tests
-- TypeScript compilation
-- Vite build
-- stable root Web entry build
-- modular Web entry build
-- deterministic full browser flow with no Google API consumption
-- exactly 3 recommendation cards in the deterministic fixture
-- 2 km exclusion behavior
-- fourth primary action resets to a newly drawn line
-- Random Seoul branding
-- responsive one-column restaurant layout in headless Chrome
-- mobile touch-target override contract
+### Next checkpoint — stable Android identity + real device
 
-## Phase 2 — Android shell
+- [ ] Provision one stable development signing keystore outside the repository
+- [ ] Add development signing values as GitHub Actions secrets
+- [ ] Read the stable debug SHA-1 from the Android CI summary
+- [ ] Create a dedicated Android Google Places key
+- [ ] Restrict that key to:
+  - package `io.github.momone3131.randomseoul`
+  - stable development certificate SHA-1
+  - required Places API only
+- [ ] Add the Android Places key as `RANDOM_SEOUL_PLACES_API_KEY` GitHub secret
+- [ ] Build/download the key-enabled debug APK
+- [ ] Install on a real Android device
+- [ ] Verify line → station → food → live TOP 3 restaurant flow
+- [ ] Verify Google/Naver map launch, restaurant link, share, haptics, back button, and offline behavior
 
-Status: **NEXT**
+### After real-device debug validation
 
-Planned branch: `feature/random-seoul-android`
+- [ ] Decide/produce final app icon and splash assets
+- [ ] Revisit native Preferences storage if needed for stronger mobile persistence
+- [ ] Prepare release signing strategy separately from development signing
+- [ ] Build signed release AAB
+- [ ] Play Console listing / data safety / privacy policy / closed testing preparation
 
-Immediate Phase 2 sequence:
+## CI policy during Phase 2
 
-1. Add Capacitor configuration with app name `Random Seoul` and ID `io.github.momone3131.randomseoul`.
-2. Generate Android project without moving shared domain/application logic into Kotlin.
-3. Define the native place-search bridge contract matching `PlaceSearchService`.
-4. Implement Places SDK for Android adapter in Kotlin.
-5. Use a separate Android-restricted Google API key; never reuse the Web key.
-6. Add native storage/preferences adapter only where needed; preserve shared state behavior.
-7. Add native map/deep-link launcher, haptics, sharing, and Android back handling behind platform adapters.
-8. Keep GPS/location permission absent unless a future feature explicitly requires it.
-9. Add Android unit/build checks and GitHub Actions APK build.
-10. Install debug APK on a real device and verify touch/back/map/restaurant flows.
-11. Prepare release AAB only after debug validation.
-
-See `docs/PROJECT_PLAN.md` and `docs/ARCHITECTURE.md` for the longer-term plan including iOS.
+Android CI now runs once per PR update rather than once for both push and PR events. `concurrency.cancel-in-progress` cancels stale Android builds when a newer commit arrives. This reduces duplicate failure emails while keeping the current head fully validated.
 
 ## Change log
 
@@ -136,16 +140,11 @@ See `docs/PROJECT_PLAN.md` and `docs/ARCHITECTURE.md` for the longer-term plan i
 - Product name fixed as **Random Seoul**.
 - Web confirmed as a permanent supported target.
 - Cross-platform shared-core architecture adopted.
-- Android-first / iOS-second rollout retained.
-- Architecture and roadmap documentation established in repository.
-- Vite/TypeScript/Vitest scaffold created.
-- Shared data/domain/controller/ranking/state/storage boundaries extracted.
-- Google Web Places isolated behind `PlaceSearchService`.
-- 24-line / 36-food static data extracted and validated.
-- Stable Web settings/history persistence contract preserved.
-- Draw, restaurant, settings, and history UI rendering modularized.
-- Stable 900 ms draw animation and keyboard modal behavior restored.
-- Permanent modular CSS/DOM shell promoted and modular build decoupled from stable root `index.html`.
-- Deterministic browser end-to-end test added; no Google quota is consumed by CI.
-- Responsive Chrome smoke test exposed and fixed a late CSS override that had reduced mobile restaurant map buttons back to 38 px; final mobile override is now 44 px and full width.
-- Phase 1 automated parity gates pass; next work is the Capacitor Android shell.
+- Phase 1 modular refactor completed and merged to `main` without replacing the stable Web entry.
+- Capacitor Android project generated with API 36 target.
+- Places SDK for Android native bridge implemented without duplicating shared ranking/product logic.
+- Android debug APK successfully built in GitHub Actions.
+- Native Places routing, sharing, haptics, Android back handling, and map intents added.
+- Offline draw behavior preserved and restaurant-specific offline messaging added.
+- Android CI duplicate executions reduced and stale runs are automatically cancelled.
+- Stable secret-backed development signing path prepared so Android API-key SHA-1 restrictions can remain fixed across CI builds.
