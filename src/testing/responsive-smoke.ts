@@ -1,4 +1,5 @@
 import '../ui/styles.css';
+import '../ui/mobile-overrides.css';
 
 const grid = document.getElementById('responsive_restaurant_grid');
 const button = document.querySelector<HTMLElement>('.restaurant-map-link');
