@@ -1,7 +1,13 @@
 node_modules/
 dist/
+dist-app/
 src/generated/legacy-shell.ts
 .env
 .env.*
 !.env.example
 .DS_Store
+
+# Android local/build outputs
+android/.gradle/
+android/local.properties
+android/**/build/
