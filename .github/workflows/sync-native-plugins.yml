@@ -1,0 +1,49 @@
+name: Sync native plugin lockfile
+
+on:
+  push:
+    branches:
+      - feature/random-seoul-android
+    paths:
+      - package.json
+      - .github/workflows/sync-native-plugins.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: ${{ !contains(github.event.head_commit.message, '[native-plugin-sync]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Android feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/random-seoul-android
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies and refresh lockfile
+        run: npm install
+
+      - name: Build native assets
+        run: npm run build:native
+
+      - name: Sync Capacitor plugins
+        run: npx cap sync android
+
+      - name: Commit lockfile and generated Android plugin metadata
+        shell: bash
+        run: |
+          if [ -z "$(git status --porcelain -- package-lock.json android)" ]; then
+            echo "No plugin sync changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json android
+          git commit -m "android: sync Capacitor native plugins [native-plugin-sync]"
+          git push origin HEAD:feature/random-seoul-android
