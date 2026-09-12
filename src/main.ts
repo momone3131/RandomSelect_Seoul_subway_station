@@ -1,6 +1,7 @@
 import { RandomSeoulController } from './application/random-seoul-controller';
 import { AppStore } from './state/app-state';
 import { GoogleWebPlaceSearchService } from './services/places/google-web';
+import { NativePlaceSearchService } from './services/places/native-place-search';
 import {
   PlaceSearchUnavailableError,
   type PlaceSearchService,
@@ -13,6 +14,7 @@ import {
 } from './services/storage/app-persistence';
 import { WebStorageService } from './services/storage/web-storage';
 import { googleMapsSearchUrl, naverMapSearchUrl } from './services/maps/web-map-links';
+import { getRuntimePlatform } from './platform/runtime';
 import { animateDrawStage, revealDrawStage, type AnimatedDrawStage } from './ui/draw-animation';
 import { renderDrawView } from './ui/draw-view';
 import { renderHistory } from './ui/history-view';
@@ -47,6 +49,7 @@ document.head.appendChild(style);
 appRoot.innerHTML = legacyBody;
 document.title = 'Random Seoul';
 
+const runtimePlatform = getRuntimePlatform();
 const brandTitle = document.querySelector<HTMLElement>('.brand-title');
 if (brandTitle) brandTitle.textContent = 'RANDOM SEOUL';
 const brandSub = document.querySelector<HTMLElement>('.brand-sub');
@@ -54,7 +57,13 @@ if (brandSub) brandSub.textContent = '서울 랜덤 외출 코스';
 const startupNotice = document.getElementById('startup_notice');
 if (startupNotice) startupNotice.hidden = true;
 const runtimeState = document.getElementById('runtime_state');
-if (runtimeState) runtimeState.textContent = '브라우저 실행 중';
+if (runtimeState) {
+  runtimeState.textContent = runtimePlatform === 'android'
+    ? 'Android 앱 실행 중'
+    : runtimePlatform === 'ios'
+      ? 'iPhone 앱 실행 중'
+      : '브라우저 실행 중';
+}
 
 type InteractiveTarget = HTMLElement & { isContentEditable?: boolean };
 
@@ -64,9 +73,11 @@ const store = new AppStore(loadPersistedInitialState(storage));
 const apiKey = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY || legacyGoogleMapsApiKey || '').trim();
 const places: PlaceSearchService = selfTestMode
   ? new BrowserSmokePlaceSearchService()
-  : apiKey
-    ? new GoogleWebPlaceSearchService(apiKey)
-    : new UnavailablePlaceSearchService();
+  : runtimePlatform === 'android'
+    ? new NativePlaceSearchService()
+    : apiKey
+      ? new GoogleWebPlaceSearchService(apiKey)
+      : new UnavailablePlaceSearchService();
 const stationLocations = new StationLocationService(
   places,
   storage,
