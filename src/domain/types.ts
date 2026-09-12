@@ -19,6 +19,7 @@ export interface SubwayLine {
   segments: SubwaySegment[];
   stations: SubwayStation[];
   note?: string;
+  source?: string;
 }
 
 export interface FoodCategory {
@@ -30,15 +31,23 @@ export interface FoodCategory {
   searchQuery?: string;
 }
 
+export interface ProviderAttribution {
+  provider: string;
+  uri?: string;
+}
+
 export interface PlaceCandidate {
   id: string;
   name: string;
   category: string;
   latitude: number;
   longitude: number;
+  address?: string;
+  types?: readonly string[];
   rating?: number;
   userRatingCount?: number;
   mapUrl?: string;
+  attributions?: readonly ProviderAttribution[];
   searchRank: number;
 }
 
