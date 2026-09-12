@@ -31,7 +31,7 @@ jobs:
       - name: Commit promoted assets when changed
         shell: bash
         run: |
-          if git diff --quiet -- src/ui/styles.css src/ui/shell.html; then
+          if [ -z "$(git status --porcelain -- src/ui/styles.css src/ui/shell.html)" ]; then
             echo "No visual-shell changes to commit."
             exit 0
           fi
