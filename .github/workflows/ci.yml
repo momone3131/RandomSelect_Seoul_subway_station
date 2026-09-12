@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - refactor/random-seoul-core
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test
+        run: npm test
+
+      - name: Build web
+        run: npm run build
+
+      - name: Smoke test modular Web flow in headless Chrome
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/random-seoul-vite.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill $PREVIEW_PID || true' EXIT
+          for i in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:4173/modular.html > /dev/null; then
+              break
+            fi
+            sleep 0.5
+          done
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_BIN"
+          "$CHROME_BIN" \
+            --headless=new \
+            --no-sandbox \
+            --disable-gpu \
+            --virtual-time-budget=4000 \
+            --dump-dom \
+            'http://127.0.0.1:4173/modular.html?selftest=1' > /tmp/random-seoul-dom.html
+          grep -q 'data-app-ready="true"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest="passed"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-cards="3"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-cycle-reset="true"' /tmp/random-seoul-dom.html
+          grep -q 'RANDOM SEOUL' /tmp/random-seoul-dom.html
+
+          "$CHROME_BIN" \
+            --headless=new \
+            --no-sandbox \
+            --disable-gpu \
+            --window-size=390,844 \
+            --virtual-time-budget=1500 \
+            --dump-dom \
+            'http://127.0.0.1:4173/responsive-smoke.html' > /tmp/random-seoul-mobile-dom.html
+          echo 'Responsive smoke measurements:'
+          grep -o 'data-responsive[^>]*' /tmp/random-seoul-mobile-dom.html || true
+          grep -q 'data-responsive="passed"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-columns="1"' /tmp/random-seoul-mobile-dom.html
