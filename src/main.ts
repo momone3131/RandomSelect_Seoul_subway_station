@@ -13,6 +13,7 @@ import {
 } from './services/storage/app-persistence';
 import { WebStorageService } from './services/storage/web-storage';
 import { googleMapsSearchUrl, naverMapSearchUrl } from './services/maps/web-map-links';
+import { animateDrawStage, revealDrawStage, type AnimatedDrawStage } from './ui/draw-animation';
 import { renderDrawView } from './ui/draw-view';
 import { renderHistory } from './ui/history-view';
 import {
@@ -153,12 +154,22 @@ function restaurantErrorMessage(error: unknown): string {
   return 'Google Places API 연결 또는 사용 설정을 확인해주세요.';
 }
 
-async function performDraw(action: () => Promise<unknown> | unknown, loadsRestaurants: boolean): Promise<void> {
+async function performDraw(
+  action: () => Promise<unknown> | unknown,
+  loadsRestaurants: boolean,
+  animationStage?: AnimatedDrawStage,
+): Promise<void> {
   if (busy || settingsView.isOpen) return;
   busy = true;
   renderState();
 
   try {
+    if (animationStage) {
+      await animateDrawStage(animationStage, store.getSnapshot(), {
+        instant: selfTestMode || store.getSnapshot().preferences.instantDraw,
+      });
+    }
+
     const pending = Promise.resolve(action());
     if (loadsRestaurants) {
       const context = currentRestaurantContext();
@@ -167,6 +178,7 @@ async function performDraw(action: () => Promise<unknown> | unknown, loadsRestau
     await pending;
     const context = currentRestaurantContext();
     if (context && loadsRestaurants) renderRestaurants(context, store.getSnapshot().recommendations);
+    if (animationStage) revealDrawStage(animationStage);
   } catch (error) {
     const context = currentRestaurantContext();
     if (context) renderRestaurantError(context, restaurantErrorMessage(error));
@@ -180,7 +192,15 @@ async function performDraw(action: () => Promise<unknown> | unknown, loadsRestau
 
 async function runMainDraw(): Promise<void> {
   const stage = controller.getStage();
-  await performDraw(() => controller.drawNext(), stage === 'food');
+  if (stage === 'done') {
+    store.resetCourse();
+    await performDraw(() => controller.redrawLine(), false, 'line');
+    const restarted = store.getSnapshot();
+    if (restarted.currentLine) announce(`${restarted.currentLine.name}이 뽑혔습니다.`);
+    return;
+  }
+
+  await performDraw(() => controller.drawNext(), stage === 'food', stage);
   const state = store.getSnapshot();
   if (stage === 'line' && state.currentLine) announce(`${state.currentLine.name}이 뽑혔습니다.`);
   if (stage === 'station' && state.currentStation) announce(`${state.currentStation.name}역이 뽑혔습니다.`);
@@ -238,13 +258,14 @@ async function copyResult(): Promise<void> {
 
 byId<HTMLButtonElement>('draw_btn').addEventListener('click', () => { void runMainDraw(); });
 byId<HTMLButtonElement>('restart_btn').addEventListener('click', () => {
-  void performDraw(() => controller.redrawLine(), false);
+  store.resetCourse();
+  void performDraw(() => controller.redrawLine(), false, 'line');
 });
 byId<HTMLButtonElement>('station_redraw_btn').addEventListener('click', () => {
-  void performDraw(() => controller.redrawStation(), false);
+  void performDraw(() => controller.redrawStation(), false, 'station');
 });
 byId<HTMLButtonElement>('food_redraw_btn').addEventListener('click', () => {
-  void performDraw(() => controller.redrawFood(), true);
+  void performDraw(() => controller.redrawFood(), true, 'food');
 });
 byId<HTMLButtonElement>('copy_btn').addEventListener('click', () => { void copyResult(); });
 byId<HTMLInputElement>('instant').addEventListener('change', (event) => {
