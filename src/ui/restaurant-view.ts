@@ -78,6 +78,7 @@ export function renderRestaurantLoading(context: RestaurantViewContext): void {
 
 export function renderRestaurantError(context: RestaurantViewContext, message: string): void {
   const section = byId<HTMLElement>('restaurant_section');
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
   section.hidden = false;
   section.setAttribute('aria-busy', 'false');
   setContext(context);
@@ -85,9 +86,13 @@ export function renderRestaurantError(context: RestaurantViewContext, message: s
   byId<HTMLElement>('restaurant_cards').hidden = true;
   byId<HTMLElement>('restaurant_empty').hidden = false;
   byId<HTMLElement>('restaurant_count').hidden = true;
-  byId<HTMLElement>('restaurant_empty_title').textContent = '추천 정보를 불러오지 못했어요.';
-  byId<HTMLElement>('restaurant_empty_context').textContent = message;
-  byId<HTMLElement>('restaurant_extra_actions').hidden = false;
+  byId<HTMLElement>('restaurant_empty_title').textContent = offline
+    ? '인터넷 연결이 필요해요.'
+    : '추천 정보를 불러오지 못했어요.';
+  byId<HTMLElement>('restaurant_empty_context').textContent = offline
+    ? '노선·역·음식 추첨은 그대로 사용할 수 있어요. 연결 후 음식만 다시 뽑으면 추천 식당을 불러옵니다.'
+    : message;
+  byId<HTMLElement>('restaurant_extra_actions').hidden = offline;
   byId<HTMLElement>('google_attribution').hidden = true;
 }
 
