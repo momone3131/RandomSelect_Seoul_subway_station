@@ -1,7 +1,15 @@
 import { App } from '@capacitor/app';
+import { registerPlugin } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Share } from '@capacitor/share';
 import { getRuntimePlatform, isNativeRuntime } from './runtime';
+
+interface RandomSeoulPlatformPlugin {
+  openUrl(options: { url: string }): Promise<void>;
+  openMap(options: { provider: 'google' | 'naver'; query: string }): Promise<void>;
+}
+
+const NativePlatform = registerPlugin<RandomSeoulPlatformPlugin>('RandomSeoulPlatform');
 
 function byId<T extends HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null;
@@ -55,6 +63,13 @@ function currentResultText(): string {
   return lines.join('\n');
 }
 
+function currentStationQuery(): string {
+  const line = byId<HTMLElement>('line_title')?.textContent?.trim() ?? '';
+  const station = byId<HTMLElement>('station_name')?.textContent?.trim() ?? '';
+  if (!line || !station || line.includes('어떤 노선') || station.includes('기다리는 중')) return '';
+  return `${station}역 ${line}`;
+}
+
 async function shareCurrentResult(): Promise<void> {
   const text = currentResultText();
   if (!text) return;
@@ -69,7 +84,7 @@ async function shareCurrentResult(): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
     } catch {
-      // The regular Web copy path remains available if native sharing cannot run.
+      // Native sharing is optional; the app remains usable without it.
     }
   }
 }
@@ -81,6 +96,30 @@ function bindNativeShare(): void {
     event.preventDefault();
     event.stopImmediatePropagation();
     void shareCurrentResult();
+  }, true);
+}
+
+function bindNativeMaps(): void {
+  const bindStationButton = (id: string, provider: 'google' | 'naver') => {
+    byId<HTMLButtonElement>(id)?.addEventListener('click', (event) => {
+      const query = currentStationQuery();
+      if (!query) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      void NativePlatform.openMap({ provider, query }).catch((error) => console.warn('Map launch failed.', error));
+    }, true);
+  };
+
+  bindStationButton('google_map_btn', 'google');
+  bindStationButton('naver_map_btn', 'naver');
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const anchor = event.target.closest<HTMLAnchorElement>('a.restaurant-map-link');
+    if (!anchor?.href) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void NativePlatform.openUrl({ url: anchor.href }).catch((error) => console.warn('External map link failed.', error));
   }, true);
 }
 
@@ -127,6 +166,7 @@ async function initializeNativeAppEnhancements(): Promise<void> {
   window.addEventListener('online', updateRuntimeState);
   window.addEventListener('offline', updateRuntimeState);
   bindNativeShare();
+  bindNativeMaps();
   bindResultHaptics();
   await bindAndroidBackButton();
 }
