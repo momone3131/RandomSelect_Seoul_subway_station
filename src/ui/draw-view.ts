@@ -169,7 +169,8 @@ function renderStationList(line?: SubwayLine, selected?: SubwayStation): void {
   line.segments.forEach((segment, segmentIndex) => {
     const stations = line.stations.filter((station) => station.segmentIndex === segmentIndex);
     if (!stations.length) return;
-    const heading = make('h3', 'segment-heading', `${segment.label} · ${stations[0]!.ordinal}~${stations.at(-1)!.ordinal}번째`);
+    const lastStation = stations[stations.length - 1]!;
+    const heading = make('h3', 'segment-heading', `${segment.label} · ${stations[0]!.ordinal}~${lastStation.ordinal}번째`);
     const grid = make('div', 'station-grid');
     for (const station of stations) {
       const picked = selected?.ordinal === station.ordinal;
