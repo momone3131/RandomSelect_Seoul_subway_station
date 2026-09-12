@@ -21,6 +21,9 @@ dialog{background:var(--bg);color:var(--ink);padding:0;border:1px solid #e4e7de;
 @media(max-width:720px){.restaurant-section{padding:16px}.restaurant-grid,.restaurant-loading{grid-template-columns:1fr}.restaurant-card,.restaurant-skeleton{min-height:150px}.restaurant-head{align-items:flex-start}.restaurant-map-link{min-height:42px}}
 @media(max-width:430px){.restaurant-section{margin-top:17px;padding:14px;border-radius:15px}.restaurant-head{margin-bottom:11px}.restaurant-head h2{font-size:17px}.restaurant-context{font-size:10px}.restaurant-card{padding:12px}.restaurant-empty{padding:19px 12px}.restaurant-empty .restaurant-map-link{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(max-width:720px){.restaurant-grid,.restaurant-loading{grid-template-columns:1fr!important}.restaurant-card,.restaurant-skeleton{min-height:150px}.restaurant-head{align-items:flex-start}.restaurant-meta{flex-wrap:wrap}.restaurant-map-link{width:100%;min-height:44px}.restaurant-extra-actions{justify-content:stretch}.restaurant-extra-actions .restaurant-map-link{width:100%;min-width:0}}
+@media(max-width:430px){.restaurant-section{margin-top:17px;padding:14px;border-radius:15px}.restaurant-head{margin-bottom:11px}.restaurant-head h2{font-size:17px}.restaurant-context{font-size:10px}.restaurant-grid,.restaurant-loading{grid-template-columns:1fr!important}.restaurant-card{padding:12px}.restaurant-name{font-size:14px;line-height:1.5}.restaurant-empty{padding:19px 12px}.restaurant-empty .restaurant-map-link{width:100%}}
+/* v9.3 mobile restaurant stack fix: keep restaurant cards in a single vertical column on phones. */
 /* v2: retain the original paper / green visual language, add a third stop. */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button{-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(66,101,51,.12)}
