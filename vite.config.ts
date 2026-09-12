@@ -6,7 +6,7 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: ['index.html', 'modular.html']
+      input: ['index.html', 'modular.html', 'responsive-smoke.html']
     }
   }
 });
