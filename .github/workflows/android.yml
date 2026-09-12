@@ -24,6 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RANDOM_SEOUL_PLACES_API_KEY: ${{ secrets.RANDOM_SEOUL_PLACES_API_KEY || 'DEFAULT_API_KEY' }}
+      RANDOM_SEOUL_DEV_KEYSTORE_BASE64: ${{ secrets.RANDOM_SEOUL_DEV_KEYSTORE_BASE64 }}
+      RANDOM_SEOUL_DEV_STORE_PASSWORD: ${{ secrets.RANDOM_SEOUL_DEV_STORE_PASSWORD }}
+      RANDOM_SEOUL_DEV_KEY_ALIAS: ${{ secrets.RANDOM_SEOUL_DEV_KEY_ALIAS }}
+      RANDOM_SEOUL_DEV_KEY_PASSWORD: ${{ secrets.RANDOM_SEOUL_DEV_KEY_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,6 +60,21 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
+      - name: Configure stable development signing when available
+        shell: bash
+        run: |
+          if [ -n "$RANDOM_SEOUL_DEV_KEYSTORE_BASE64" ] && \
+             [ -n "$RANDOM_SEOUL_DEV_STORE_PASSWORD" ] && \
+             [ -n "$RANDOM_SEOUL_DEV_KEY_ALIAS" ] && \
+             [ -n "$RANDOM_SEOUL_DEV_KEY_PASSWORD" ]; then
+            KEYSTORE_PATH="$RUNNER_TEMP/random-seoul-dev.jks"
+            printf '%s' "$RANDOM_SEOUL_DEV_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+            echo "RANDOM_SEOUL_DEV_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+            echo "Stable development signing is configured."
+          else
+            echo "Stable development signing secrets are not configured; using the runner's default debug signing key."
+          fi
+
       - name: Report Places key mode
         shell: bash
         run: |
@@ -68,6 +87,29 @@ jobs:
       - name: Assemble debug APK
         working-directory: android
         run: ./gradlew assembleDebug --stacktrace
+
+      - name: Report Android debug certificate fingerprint
+        shell: bash
+        run: |
+          if [ -n "${RANDOM_SEOUL_DEV_KEYSTORE_PATH:-}" ]; then
+            SHA1=$(keytool -list -v \
+              -keystore "$RANDOM_SEOUL_DEV_KEYSTORE_PATH" \
+              -storepass "$RANDOM_SEOUL_DEV_STORE_PASSWORD" \
+              -alias "$RANDOM_SEOUL_DEV_KEY_ALIAS" | awk -F': ' '/SHA1:/{print $2; exit}')
+            echo "Stable debug SHA-1: $SHA1"
+            {
+              echo "### Android development signing"
+              echo "- Package: \`io.github.momone3131.randomseoul\`"
+              echo "- Stable debug SHA-1: \`$SHA1\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No stable development keystore is configured. The default CI debug certificate is not suitable for a long-lived Google API Android restriction."
+            {
+              echo "### Android development signing"
+              echo "- Stable development keystore: not configured"
+              echo "- Add the four RANDOM_SEOUL_DEV_* secrets before relying on a SHA-1 application restriction."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
