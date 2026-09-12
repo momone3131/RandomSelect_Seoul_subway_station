@@ -21,7 +21,7 @@ jobs:
   build-debug-apk:
     runs-on: ubuntu-latest
     env:
-      RANDOM_SEOUL_PLACES_API_KEY: DEFAULT_API_KEY
+      RANDOM_SEOUL_PLACES_API_KEY: ${{ secrets.RANDOM_SEOUL_PLACES_API_KEY || 'DEFAULT_API_KEY' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,6 +53,15 @@ jobs:
 
       - name: Sync Capacitor Android
         run: npx cap sync android
+
+      - name: Report Places key mode
+        shell: bash
+        run: |
+          if [ "$RANDOM_SEOUL_PLACES_API_KEY" = "DEFAULT_API_KEY" ]; then
+            echo "Android Places key is not configured; APK will build but restaurant search will remain disabled."
+          else
+            echo "Android Places key secret is configured."
+          fi
 
       - name: Assemble debug APK
         working-directory: android
