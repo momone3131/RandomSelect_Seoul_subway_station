@@ -1,0 +1,25 @@
+/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. */
+@media (max-width: 720px) {
+  .restaurant-grid,
+  .restaurant-loading {
+    grid-template-columns: 1fr !important;
+  }
+
+  .restaurant-meta {
+    flex-wrap: wrap;
+  }
+
+  .restaurant-map-link {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .restaurant-extra-actions {
+    justify-content: stretch;
+  }
+
+  .restaurant-extra-actions .restaurant-map-link {
+    width: 100%;
+    min-width: 0;
+  }
+}
