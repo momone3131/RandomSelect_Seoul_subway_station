@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 
 def placesApiKey = project.findProperty('RANDOM_SEOUL_PLACES_API_KEY') ?: System.getenv('RANDOM_SEOUL_PLACES_API_KEY') ?: 'DEFAULT_API_KEY'
+def devKeystorePath = System.getenv('RANDOM_SEOUL_DEV_KEYSTORE_PATH')
+def devStorePassword = System.getenv('RANDOM_SEOUL_DEV_STORE_PASSWORD')
+def devKeyAlias = System.getenv('RANDOM_SEOUL_DEV_KEY_ALIAS')
+def devKeyPassword = System.getenv('RANDOM_SEOUL_DEV_KEY_PASSWORD')
+def hasStableDevSigning = [devKeystorePath, devStorePassword, devKeyAlias, devKeyPassword].every { value -> value != null && !value.trim().isEmpty() }
 
 android {
     namespace = "io.github.momone3131.randomseoul"
@@ -22,7 +27,22 @@ android {
     buildFeatures {
         buildConfig true
     }
+    signingConfigs {
+        if (hasStableDevSigning) {
+            randomSeoulDev {
+                storeFile file(devKeystorePath)
+                storePassword devStorePassword
+                keyAlias devKeyAlias
+                keyPassword devKeyPassword
+            }
+        }
+    }
     buildTypes {
+        debug {
+            if (hasStableDevSigning) {
+                signingConfig signingConfigs.randomSeoulDev
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
