@@ -22,27 +22,27 @@ Last updated: 2026-09-12
 
 ### Phase 1 — Modular web refactor
 
-Status: **STARTING**
+Status: **IN PROGRESS**
 
 Working branch: `refactor/random-seoul-core`
 
 ### Immediate tasks
 
-- [ ] Add Vite + TypeScript project scaffold
-- [ ] Preserve current single-file baseline as reference fixture
+- [x] Add Vite + TypeScript project scaffold
+- [x] Preserve current single-file baseline by leaving `main/index.html` untouched during refactor
 - [ ] Extract CSS from `index.html`
 - [ ] Extract subway line data
 - [ ] Extract food category/search data
-- [ ] Define shared domain types
-- [ ] Extract draw engine
-- [ ] Extract restaurant ranking function
-- [ ] Define `PlaceSearchService`
+- [x] Define shared domain types
+- [x] Extract draw engine
+- [x] Extract restaurant ranking function
+- [x] Define `PlaceSearchService`
 - [ ] Move Google Web Places implementation behind service boundary
 - [ ] Extract state/storage layer
 - [ ] Extract UI render modules
-- [ ] Add unit tests for draw/ranking
+- [x] Add unit tests for draw/ranking
 - [ ] Verify mobile/desktop web parity
-- [ ] Add GitHub Actions web build/test
+- [x] Add GitHub Actions web build/test
 - [ ] Merge only after parity verification
 
 ## Protected requirements
@@ -54,6 +54,14 @@ During this phase:
 - No Android-specific business logic may move into shared domain code.
 - No iOS-specific assumptions may be introduced.
 - Product behavior changes must be separated from architecture-only changes where practical.
+
+## Next implementation slice
+
+1. Extract subway/food data from the single file.
+2. Extract Google Web Places adapter while keeping current behavior.
+3. Extract storage/state boundaries.
+4. Move CSS and UI renderers.
+5. Switch `index.html` from inline logic to module entrypoint only after the extracted modules are covered by tests.
 
 ## Next phase
 
@@ -72,3 +80,7 @@ See `docs/PROJECT_PLAN.md` for the full sequence.
 - Cross-platform shared-core architecture adopted.
 - Android-first / iOS-second rollout retained.
 - Architecture and roadmap documentation established in repository.
+- Vite/TypeScript/Vitest scaffold added on the refactor branch.
+- Shared domain types, deterministic draw engine, platform-neutral place-search boundary, and restaurant-ranking engine extracted.
+- Unit tests added for draw and restaurant ranking behavior.
+- CI workflow added for tests and web build.
