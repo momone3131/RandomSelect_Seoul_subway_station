@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "generate:legacy": "node scripts/extract-legacy-shell.mjs",
-    "dev": "npm run generate:legacy && vite",
-    "build": "npm run generate:legacy && tsc -b && vite build",
+    "generate:shell": "node scripts/extract-legacy-shell.mjs",
+    "dev": "npm run generate:shell && vite",
+    "build": "npm run generate:shell && tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
