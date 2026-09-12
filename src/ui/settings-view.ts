@@ -11,6 +11,34 @@ export class SettingsModalView {
   private previousFocus: Element | null = null;
   private lockedScrollY = 0;
   private onDraftChange?: (draftIds: readonly string[]) => void;
+  private readonly modalKeydownHandler = (event: KeyboardEvent): void => {
+    if (!this.mode) return;
+    if (event.key === 'Escape' || event.keyCode === 27) {
+      event.preventDefault();
+      this.close();
+      return;
+    }
+    if (event.key !== 'Tab' && event.keyCode !== 9) return;
+
+    const dialog = byId<HTMLElement>('settings_dialog');
+    const nodes = dialog.querySelectorAll<HTMLElement>('button,input,[tabindex="0"]');
+    const focusable = Array.from(nodes).filter((node) => !('disabled' in node && Boolean((node as HTMLButtonElement).disabled)) && node.getClientRects().length > 0);
+    if (!focusable.length) {
+      event.preventDefault();
+      dialog.focus();
+      return;
+    }
+
+    const first = focusable[0]!;
+    const last = focusable[focusable.length - 1]!;
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   get isOpen(): boolean {
     return this.mode !== undefined;
@@ -52,10 +80,12 @@ export class SettingsModalView {
     byId<HTMLElement>('choices_scroll').scrollTop = 0;
     byId<HTMLButtonElement>('close_settings').focus();
     document.querySelector<HTMLElement>('.page')?.setAttribute('aria-hidden', 'true');
+    document.addEventListener('keydown', this.modalKeydownHandler);
   }
 
   close(): void {
     if (!this.mode) return;
+    document.removeEventListener('keydown', this.modalKeydownHandler);
     byId<HTMLElement>('settings_overlay').hidden = true;
     document.querySelector<HTMLElement>('.page')?.removeAttribute('aria-hidden');
     document.body.style.position = '';
