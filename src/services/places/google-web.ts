@@ -1,4 +1,6 @@
+import { Capacitor } from '@capacitor/core';
 import type { PlaceCandidate, PlaceSearchRequest, ProviderAttribution } from '../../domain/types';
+import { NativePlaceSearchService } from './native-place-search';
 import { PlaceSearchUnavailableError, type PlaceSearchService } from './place-search';
 
 interface GoogleLatLngLike {
@@ -129,12 +131,26 @@ function loadGooglePlaces(apiKey: string): Promise<GooglePlacesLibrary> {
   return loaderPromise;
 }
 
+/**
+ * Web implementation of PlaceSearchService.
+ *
+ * During the Android-first migration the common composition root still constructs this
+ * class. On a Capacitor native runtime it delegates immediately to the thin native
+ * Places bridge, so no Web API key or Maps JavaScript SDK is used by the app. The
+ * composition root will be renamed to a generic factory in a later cleanup slice.
+ */
 export class GoogleWebPlaceSearchService implements PlaceSearchService {
+  private readonly nativeService = Capacitor.isNativePlatform()
+    ? new NativePlaceSearchService()
+    : undefined;
+
   constructor(private readonly apiKey: string) {
-    if (!apiKey) throw new Error('Google Maps API key is required.');
+    if (!this.nativeService && !apiKey) throw new Error('Google Maps API key is required.');
   }
 
   async searchText(request: PlaceSearchRequest): Promise<PlaceCandidate[]> {
+    if (this.nativeService) return this.nativeService.searchText(request);
+
     const library = await loadGooglePlaces(this.apiKey);
     const googleRequest: Record<string, unknown> = {
       textQuery: request.textQuery,
