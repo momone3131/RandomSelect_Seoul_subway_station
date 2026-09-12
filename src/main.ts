@@ -24,6 +24,7 @@ import {
 } from './ui/restaurant-view';
 import { SettingsModalView } from './ui/settings-view';
 import { byId } from './ui/dom';
+import { BrowserSmokePlaceSearchService } from './testing/browser-smoke-place-search';
 import {
   legacyBody,
   legacyGoogleMapsApiKey,
@@ -56,14 +57,27 @@ if (runtimeState) runtimeState.textContent = '브라우저 실행 중';
 
 type InteractiveTarget = HTMLElement & { isContentEditable?: boolean };
 
+const selfTestMode = new URLSearchParams(window.location.search).get('selftest') === '1';
 const storage = new WebStorageService();
 const store = new AppStore(loadPersistedInitialState(storage));
 const apiKey = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY || legacyGoogleMapsApiKey || '').trim();
-const places: PlaceSearchService = apiKey
-  ? new GoogleWebPlaceSearchService(apiKey)
-  : new UnavailablePlaceSearchService();
-const stationLocations = new StationLocationService(places, storage);
-const controller = new RandomSeoulController(store, places, stationLocations);
+const places: PlaceSearchService = selfTestMode
+  ? new BrowserSmokePlaceSearchService()
+  : apiKey
+    ? new GoogleWebPlaceSearchService(apiKey)
+    : new UnavailablePlaceSearchService();
+const stationLocations = new StationLocationService(
+  places,
+  storage,
+  selfTestMode ? () => 1_000_000 : Date.now,
+);
+const controller = new RandomSeoulController(
+  store,
+  places,
+  stationLocations,
+  selfTestMode ? () => 0 : Math.random,
+  selfTestMode ? () => 1_000_000 : Date.now,
+);
 const settingsView = new SettingsModalView();
 
 let busy = false;
@@ -307,5 +321,43 @@ document.addEventListener('keydown', (event) => {
   void runMainDraw();
 });
 
+async function runBrowserSelfTest(): Promise<void> {
+  try {
+    await runMainDraw();
+    await runMainDraw();
+    await runMainDraw();
+
+    const complete = store.getSnapshot();
+    const cardCount = document.querySelectorAll('.restaurant-card').length;
+    document.body.dataset.selftestRecommendations = String(complete.recommendations.length);
+    document.body.dataset.selftestCards = String(cardCount);
+    document.body.dataset.selftestFood = complete.currentFood?.id ?? '';
+
+    if (!complete.currentLine || !complete.currentStation || !complete.currentFood) {
+      throw new Error('Self-test did not complete line/station/food draw.');
+    }
+    if (complete.recommendations.length !== 3 || cardCount !== 3) {
+      throw new Error('Self-test did not render exactly three recommendations.');
+    }
+    if (complete.recommendations.some((restaurant) => restaurant.id === 'selftest-far')) {
+      throw new Error('Self-test 2 km filter failed.');
+    }
+
+    await runMainDraw();
+    const restarted = store.getSnapshot();
+    if (!restarted.currentLine || restarted.currentStation || restarted.currentFood) {
+      throw new Error('Self-test full restart did not return to the line-complete stage.');
+    }
+
+    document.body.dataset.selftestCycleReset = 'true';
+    document.body.dataset.selftest = 'passed';
+  } catch (error) {
+    document.body.dataset.selftest = 'failed';
+    document.body.dataset.selftestError = error instanceof Error ? error.message : String(error);
+    console.error(error);
+  }
+}
+
 renderState();
 document.body.setAttribute('data-app-ready', 'true');
+if (selfTestMode) void runBrowserSelfTest();
