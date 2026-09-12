@@ -66,5 +66,7 @@ jobs:
             --virtual-time-budget=1500 \
             --dump-dom \
             'http://127.0.0.1:4173/responsive-smoke.html' > /tmp/random-seoul-mobile-dom.html
+          echo 'Responsive smoke measurements:'
+          grep -o 'data-responsive[^>]*' /tmp/random-seoul-mobile-dom.html || true
           grep -q 'data-responsive="passed"' /tmp/random-seoul-mobile-dom.html
           grep -q 'data-responsive-columns="1"' /tmp/random-seoul-mobile-dom.html
