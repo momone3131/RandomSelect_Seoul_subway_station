@@ -41,7 +41,7 @@ export class RandomSeoulController {
     if (stage === 'done') {
       this.store.resetCourse();
       this.activeHistoryId = undefined;
-      return { stage: 'line', recommendations: undefined, ...this.drawLineResult() };
+      return this.drawLineResult();
     }
     if (stage === 'line') return this.drawLineResult();
     if (stage === 'station') return this.drawStationResult();
