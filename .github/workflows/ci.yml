@@ -30,7 +30,7 @@ jobs:
       - name: Build web
         run: npm run build
 
-      - name: Smoke test modular Web entry in headless Chrome
+      - name: Smoke test modular Web flow in headless Chrome
         shell: bash
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/random-seoul-vite.log 2>&1 &
@@ -48,9 +48,12 @@ jobs:
             --headless=new \
             --no-sandbox \
             --disable-gpu \
-            --virtual-time-budget=2500 \
+            --virtual-time-budget=4000 \
             --dump-dom \
-            http://127.0.0.1:4173/modular.html > /tmp/random-seoul-dom.html
+            'http://127.0.0.1:4173/modular.html?selftest=1' > /tmp/random-seoul-dom.html
           grep -q 'data-app-ready="true"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest="passed"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-cards="3"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-cycle-reset="true"' /tmp/random-seoul-dom.html
           grep -q 'RANDOM SEOUL' /tmp/random-seoul-dom.html
-          grep -q '노선 뽑기' /tmp/random-seoul-dom.html
