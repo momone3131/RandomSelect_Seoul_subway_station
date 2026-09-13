@@ -124,21 +124,9 @@ function bindNativeMaps(): void {
 }
 
 function bindResultHaptics(): void {
-  const panelIds = ['line_panel', 'station_panel', 'food_panel'];
-  for (const id of panelIds) {
-    const panel = byId<HTMLElement>(id);
-    if (!panel) continue;
-    const observer = new MutationObserver((records) => {
-      for (const record of records) {
-        const oldClass = record.oldValue ?? '';
-        if (panel.classList.contains('bounce') && !oldClass.split(/\s+/).includes('bounce')) {
-          void Haptics.impact({ style: ImpactStyle.Medium }).catch(() => undefined);
-          break;
-        }
-      }
-    });
-    observer.observe(panel, { attributes: true, attributeFilter: ['class'], attributeOldValue: true });
-  }
+  window.addEventListener('randomseoul:draw-revealed', () => {
+    void Haptics.impact({ style: ImpactStyle.Medium }).catch(() => undefined);
+  });
 }
 
 async function bindAndroidBackButton(): Promise<void> {
