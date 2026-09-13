@@ -158,6 +158,7 @@ export class RandomSeoulController {
       recommendations: [],
       history: [historyItem, ...current.history].slice(0, 12),
     }));
+    void this.loadAttractions().catch(() => undefined);
     return { stage: 'station' };
   }
 
@@ -193,7 +194,12 @@ export class RandomSeoulController {
       region: 'kr',
     });
     const attractions = rankAttractions(candidates, center);
-    this.store.update((current) => ({ ...current, attractions }));
+    this.store.update((current) => {
+      const sameStation = current.currentLine?.id === line.id
+        && current.currentStation?.ordinal === station.ordinal
+        && current.currentStation?.name === station.name;
+      return sameStation ? { ...current, attractions } : { ...current };
+    });
     return attractions;
   }
 
