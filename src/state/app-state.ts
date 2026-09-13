@@ -18,7 +18,7 @@ export interface AppState {
   currentLine?: SubwayLine;
   currentStation?: SubwayStation;
   currentFood?: FoodCategory;
-  attractions: AttractionRecommendation[];
+  attractions?: AttractionRecommendation[];
   recommendations: RestaurantRecommendation[];
   history: DrawHistoryItem[];
 }
