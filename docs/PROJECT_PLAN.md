@@ -1,6 +1,6 @@
 # Random Seoul — Project Plan
 
-Last updated: 2026-09-12
+Last updated: 2026-09-13
 
 이 문서는 Random Seoul 개발의 기준 계획입니다. 대화가 길어지더라도 구현 방향이 흐려지지 않도록 저장소 안에서 계속 갱신합니다.
 
@@ -10,11 +10,12 @@ Last updated: 2026-09-12
 
 1. 지하철 노선 무작위 추첨
 2. 해당 노선의 역 무작위 추첨
-3. 음식 종목 무작위 추첨
-4. 뽑힌 역 주변 추천 식당 최대 3곳 표시
-5. 지도 앱/웹으로 이동
+3. 역 주변에 충분히 추천할 만한 볼거리가 있으면 **비랜덤 1~2곳** 표시
+4. 음식 종목 무작위 추첨
+5. 뽑힌 역 주변 추천 식당 최대 3곳 표시
+6. 지도 앱/웹으로 이동
 
-메인 버튼은 `노선 → 역 → 음식 → 새 코스 전체 재추첨` 순서로 동작합니다. 역/음식 부분 재추첨은 보조 버튼으로 제공합니다.
+메인 버튼은 `노선 → 역 → 음식 → 새 코스 전체 재추첨` 순서로 동작합니다. 볼거리 추천은 별도 추첨 단계가 아니라 역 확정 뒤 백그라운드에서 한 번 조회하는 보조 정보입니다. 역/음식 부분 재추첨은 보조 버튼으로 제공합니다.
 
 ## 2. Non-negotiable requirements
 
@@ -26,10 +27,11 @@ Last updated: 2026-09-12
 - iOS 때문에 공통 로직을 Swift에 복제하지 않습니다.
 - 플랫폼별 네이티브 코드는 Places SDK, 지도 열기, 저장, 공유, 햅틱, 뒤로가기 등 플랫폼 의존 기능에만 둡니다.
 - GPS/현재 위치 권한은 기본 기능에 필요하지 않으므로 요청하지 않는 방향을 유지합니다.
+- 볼거리는 약한 후보를 억지로 추천하지 않습니다. 품질 기준을 통과하지 못하면 영역 자체를 숨깁니다.
 
-## 3. Current recommendation model
+## 3. Recommendation models
 
-웹 안정판 기준 식당 추천 규칙:
+### Restaurant recommendations
 
 - Google Places Text Search 후보 사용
 - 역 기준 **직선거리 2 km 초과 제외**
@@ -43,7 +45,26 @@ Last updated: 2026-09-12
 - Google 검색 관련성: **15%**
 - 역과의 거리: **5%**
 
-이 가중치는 제품 튜닝 대상이며 변경 시 `docs/STATUS.md`와 관련 테스트를 함께 갱신합니다.
+### Attraction recommendations
+
+역이 확정되면 같은 `PlaceSearchService`를 사용해 한 번만 검색합니다. 음식 재추첨 때는 다시 검색하지 않습니다.
+
+- 검색 범위: 역 기준 **직선거리 2 km**
+- 관광명소/박물관/미술관/공원/역사·문화 명소 계열만 허용
+- 최대 20개 후보에서 재랭킹
+- 최소 평가 수 및 최소 점수 quality gate 적용
+- 최종 **0~2곳**: 기준 통과 후보가 없으면 UI를 표시하지 않음
+
+현재 최종 점수:
+
+- Google 검색 관련성: **45%**
+- `log(1 + 평가 수)` 기반 인지도 신호: **30%**
+- 역과의 거리: **15%**
+- 별점: **10%**
+
+명소 랭킹도 공통 TypeScript가 소유하며, 실제 사용자 테스트에서 이촌역→국립중앙박물관, 한강 인접역→한강공원 같은 대표 결과가 우선되는지 확인해 튜닝합니다.
+
+추천 가중치/거리/quality gate가 바뀌면 `docs/STATUS.md`와 관련 테스트를 함께 갱신합니다.
 
 ## 4. Delivery strategy
 
@@ -78,16 +99,15 @@ Last updated: 2026-09-12
 
 - Capacitor 기반 Android 프로젝트 생성
 - 앱 표시명 `Random Seoul`
-- 권장 application id: `io.github.momone3131.randomseoul`
+- application id: `io.github.momone3131.randomseoul`
 - targetSdk 36 기준
 - 공통 웹 UI/코어를 앱 내부 자산으로 포함
 
 ### Phase 3 — Native Android Places adapter
 
-- 웹용 Google Maps JavaScript Places 사용 제거
 - Places SDK for Android로 검색
-- Kotlin은 후보 데이터를 공통 모델로 반환만 함
-- 최종 2 km 필터/Bayesian/log ranking은 공통 TypeScript에서 계속 수행
+- Java/Kotlin은 후보 데이터를 공통 모델로 반환만 함
+- 식당/볼거리 최종 필터와 랭킹은 공통 TypeScript에서 계속 수행
 
 ### Phase 4 — Android-native UX
 
@@ -138,8 +158,8 @@ Android에서 검증된 공통 코어를 유지하고 iOS 어댑터만 추가합
 
 - 제품 흐름
 - 플랫폼 전략
-- 식당 랭킹 공식
-- 거리 제한
+- 식당/볼거리 랭킹 공식
+- 거리 제한 또는 quality gate
 - 외부 API 공급자
 - 앱 식별자/브랜드
 - 웹 지원 정책
