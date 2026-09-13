@@ -99,6 +99,7 @@ export function saveHistory(storage: StorageService, history: readonly DrawHisto
 export function loadPersistedInitialState(storage: StorageService): AppState {
   return {
     preferences: loadPreferences(storage),
+    attractions: [],
     recommendations: [],
     history: loadHistory(storage),
   };
