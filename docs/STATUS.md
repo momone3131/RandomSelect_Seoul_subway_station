@@ -1,6 +1,6 @@
 # Random Seoul — Development Status
 
-Last updated: 2026-09-12
+Last updated: 2026-09-13
 
 이 문서는 현재 진행 위치와 다음 행동을 기록합니다. 구현이 진행될 때마다 갱신합니다.
 
@@ -68,7 +68,7 @@ Platform adapters:
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — DEBUG APP BUILDS SUCCESSFULLY**
+Status: **ACTIVE — SECRET-BACKED DEBUG APK READY FOR REAL-DEVICE TEST**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -98,28 +98,43 @@ Working PR: `#3 android: build Random Seoul native shell`
 - [x] Offline behavior keeps line/station/food draws usable and limits failure to restaurant recommendations
 - [x] Offline restaurant error copy clearly explains the available behavior
 - [x] Remove duplicate Android push+PR CI execution and cancel stale runs automatically
-- [x] Optional stable development-signing support via GitHub Actions secrets
-- [x] When stable development signing is configured, CI reports the SHA-1 needed for Android API-key restriction
+- [x] Stable development-signing support via GitHub Actions secrets
+- [x] Stable development SHA-1 verified in CI as `DD:19:BA:81:FE:11:DE:8F:70:25:0C:D6:48:9C:14:47:76:23:4F:EE`
+- [x] Dedicated Android Places API key is supplied through GitHub Actions secret
+- [x] Secret-backed debug APK builds successfully with the stable development signing identity
+- [x] Android manifest remains minimal: `INTERNET` only, no GPS/location permission
 
 ### Current validation
 
-Latest shared CI and Android CI both pass on the Phase 2 branch after native sharing/haptics/back/map/offline changes.
+The secret-backed Android CI run on 2026-09-13 passed all of the following:
 
-### Next checkpoint — stable Android identity + real device
+- shared TypeScript tests: 20/20
+- native Vite build
+- Capacitor Android sync
+- stable development keystore decoding and use
+- Android Places API key secret detection
+- Gradle `assembleDebug`
+- stable certificate SHA-1 report
+- debug APK artifact upload
 
-- [ ] Provision one stable development signing keystore outside the repository
-- [ ] Add development signing values as GitHub Actions secrets
-- [ ] Read the stable debug SHA-1 from the Android CI summary
-- [ ] Create a dedicated Android Google Places key
-- [ ] Restrict that key to:
-  - package `io.github.momone3131.randomseoul`
-  - stable development certificate SHA-1
-  - required Places API only
-- [ ] Add the Android Places key as `RANDOM_SEOUL_PLACES_API_KEY` GitHub secret
-- [ ] Build/download the key-enabled debug APK
+The produced debug APK is now ready for real-device validation.
+
+### Next checkpoint — real Android device
+
+- [x] Provision stable development signing keystore outside the repository
+- [x] Add development signing values as GitHub Actions secrets
+- [x] Verify stable debug SHA-1
+- [x] Create a dedicated Android Google Places key
+- [x] Restrict that key to package + stable development SHA-1 + Places API (New)
+- [x] Add the Android Places key as `RANDOM_SEOUL_PLACES_API_KEY` GitHub secret
+- [x] Build/download the key-enabled debug APK
 - [ ] Install on a real Android device
 - [ ] Verify line → station → food → live TOP 3 restaurant flow
-- [ ] Verify Google/Naver map launch, restaurant link, share, haptics, back button, and offline behavior
+- [ ] Verify Google/Naver map launch
+- [ ] Verify restaurant-specific Google Maps launch
+- [ ] Verify native share and haptics
+- [ ] Verify Android back-button behavior
+- [ ] Verify offline behavior: draws continue, restaurant recommendation reports network requirement
 
 ### After real-device debug validation
 
@@ -131,9 +146,18 @@ Latest shared CI and Android CI both pass on the Phase 2 branch after native sha
 
 ## CI policy during Phase 2
 
-Android CI now runs once per PR update rather than once for both push and PR events. `concurrency.cancel-in-progress` cancels stale Android builds when a newer commit arrives. This reduces duplicate failure emails while keeping the current head fully validated.
+Android CI runs once per PR update rather than once for both push and PR events. `concurrency.cancel-in-progress` cancels stale builds when a newer commit arrives. The shared Web CI also cancels stale PR runs and uses the lockfile-backed `npm ci` path.
 
 ## Change log
+
+### 2026-09-13
+
+- Five Android GitHub Actions secrets were configured by the repository owner.
+- Secret-backed Android CI passed with stable development signing enabled.
+- Stable development certificate SHA-1 matched the Google Cloud Android restriction value.
+- Android Places key secret was detected by CI and embedded through the native build path.
+- A new stable-signed, key-enabled debug APK artifact was generated successfully.
+- The next required validation is on a real Android device.
 
 ### 2026-09-12
 
