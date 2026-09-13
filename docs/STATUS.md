@@ -11,7 +11,7 @@ Status: **MODULAR WEB DEPLOYED**
 - Deployment: GitHub Pages, existing public URL retained
 - Web migration PR: `#5 web: deploy modular Random Seoul with nearby attractions` — merged
 - Source merge commit: `3c6384f548b1b4b9fd20bec7193b3cc6e9af2efd`
-- Deployment artifact commit: `e21765f4b48e249eb2250cd91d64f9c2877c599e`
+- Latest deployment artifact commit: `5e59cf3961859a01f2ca241eff18d80bf8d973da`
 - Maintained source entry: `modular.html`
 - Public entry: root `index.html`, generated from the verified Vite modular build
 - Public root `index.html` is now the compact Random Seoul build artifact rather than the legacy single-file source
@@ -21,8 +21,10 @@ Status: **MODULAR WEB DEPLOYED**
 - Restaurant recommendation: Google Places TOP 3, hard radius 2 km
 - Existing Web localStorage settings/history keys are preserved
 - Web browser key remains separate from Android and is HTTP-referrer restricted
+- Random Seoul subway-sign + dice icon is published as 192/512 px Web app icons
+- Web manifest and Apple touch icon metadata are connected for browser/PWA/iPhone Home Screen use
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → `dist/modular.html` → root `index.html` + hashed assets.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → `dist/modular.html` → root `index.html` + hashed assets + Web app icons/manifest.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -76,6 +78,7 @@ Working PR: `#3 android: build Random Seoul native shell`
 - Galaxy S20: install/launch, line → station → food, live restaurant TOP 3 verified
 - station/food haptic issue root cause found and event-based fix built
 - nearby-attraction feature included in current Android shared core
+- final Random Seoul subway-sign + dice launcher/adaptive icon applied across Android density resources
 
 ### Remaining Android field checks
 
@@ -84,6 +87,7 @@ Working PR: `#3 android: build Random Seoul native shell`
 - verify attraction-specific Google Maps link
 - verify station Google/Naver map launch and restaurant-specific Google Maps link in a healthy Maps/emulator environment
 - verify share/back/offline behavior
+- visually verify the new launcher icon on a physical Android device
 
 PR #3 remains draft and is not merged to `main` until native behavior validation is sufficiently complete.
 
@@ -108,7 +112,7 @@ Web PR/CI:
 - responsive mobile contract
 - Web release artifact upload
 
-Web Release additionally verifies the release build again before promoting root `index.html` and hashed assets.
+Web Release additionally verifies the release build again before promoting root `index.html`, hashed assets, manifest and app icons.
 
 Android CI additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, SHA-1 report, and APK artifact upload.
 
@@ -124,6 +128,8 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 - `modular.html` became the maintained Web source entry.
 - Verified Web Release generated and committed the new root `index.html` and hashed assets.
 - Browser-restricted Web Places key remains separate from Android and is injected at build time.
+- Random Seoul official icon selected: Seoul subway station-sign motif with a dice replacing the station name.
+- Web manifest / Apple touch icon and Android launcher/adaptive icon resources updated to the same identity.
 - GitHub Pages is rebuilt from the deployed modular root files while the public URL remains unchanged.
 
 ### 2026-09-12
