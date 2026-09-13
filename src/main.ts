@@ -18,6 +18,7 @@ import { getRuntimePlatform } from './platform/runtime';
 import { animateDrawStage, revealDrawStage, type AnimatedDrawStage } from './ui/draw-animation';
 import { renderDrawView } from './ui/draw-view';
 import { renderHistory } from './ui/history-view';
+import { renderAttractions, resetAttractionView } from './ui/attraction-view';
 import {
   renderRestaurantError,
   renderRestaurantLoading,
@@ -152,6 +153,8 @@ function renderState(): void {
   const state = store.getSnapshot();
   renderDrawView(state, { busy, modalOpen: settingsView.isOpen });
   renderHistory(state.history);
+  if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions);
+  else resetAttractionView();
   updateStatusCopy();
   savePreferences(storage, state.preferences);
   saveHistory(storage, state.history);
@@ -360,7 +363,7 @@ async function runBrowserSelfTest(): Promise<void> {
     await runMainDraw();
 
     const complete = store.getSnapshot();
-    const cardCount = document.querySelectorAll('.restaurant-card').length;
+    const cardCount = document.querySelectorAll('#restaurant_cards .restaurant-card').length;
     document.body.dataset.selftestRecommendations = String(complete.recommendations.length);
     document.body.dataset.selftestCards = String(cardCount);
     document.body.dataset.selftestFood = complete.currentFood?.id ?? '';
