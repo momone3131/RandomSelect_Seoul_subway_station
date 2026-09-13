@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
-      - refactor/random-seoul-core
   pull_request:
     branches:
       - main
+
+concurrency:
+  group: web-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test-and-build:
@@ -20,9 +23,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Test
         run: npm test
@@ -70,3 +74,10 @@ jobs:
           grep -o 'data-responsive[^>]*' /tmp/random-seoul-mobile-dom.html || true
           grep -q 'data-responsive="passed"' /tmp/random-seoul-mobile-dom.html
           grep -q 'data-responsive-columns="1"' /tmp/random-seoul-mobile-dom.html
+
+      - name: Upload Web release build
+        uses: actions/upload-artifact@v4
+        with:
+          name: random-seoul-web-dist
+          path: dist
+          if-no-files-found: error
