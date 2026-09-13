@@ -2,6 +2,7 @@ import type { AppState } from '../state/app-state';
 import type { FoodCategory, SubwayLine, SubwayStation } from '../domain/types';
 import { readableInk } from './color';
 import { append, byId, make, replaceContent } from './dom';
+import { renderAttractions, resetAttractionView } from './attraction-view';
 
 export interface DrawViewStatus {
   busy: boolean;
@@ -194,4 +195,6 @@ export function renderDrawView(state: Readonly<AppState>, status: DrawViewStatus
   renderFood(state.currentFood, state.currentStation, state.preferences.selectedFoodIds.length);
   renderControls(state, status);
   renderStationList(state.currentLine, state.currentStation);
+  if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions ?? []);
+  else resetAttractionView();
 }
