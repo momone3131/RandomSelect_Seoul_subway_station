@@ -127,4 +127,8 @@ export function revealDrawStage(stage: AnimatedDrawStage): void {
   panel.classList.remove('bounce');
   void panel.offsetWidth;
   panel.classList.add('bounce');
+
+  window.dispatchEvent(new CustomEvent<{ stage: AnimatedDrawStage }>('randomseoul:draw-revealed', {
+    detail: { stage },
+  }));
 }
