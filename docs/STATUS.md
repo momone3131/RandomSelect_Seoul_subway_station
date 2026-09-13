@@ -68,7 +68,7 @@ Platform adapters:
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — SECRET-BACKED DEBUG APK READY FOR REAL-DEVICE TEST**
+Status: **ACTIVE — REAL-DEVICE CORE FLOW VERIFIED**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -90,7 +90,6 @@ Working PR: `#3 android: build Random Seoul native shell`
 - [x] Android CI passes shared tests → native Web build → Capacitor sync → Gradle `assembleDebug`
 - [x] Capacitor App / Haptics / Share plugins synced
 - [x] Native result sharing on Android
-- [x] Haptic feedback on finalized line/station/food results
 - [x] Android back handling: close settings first, otherwise normal back/exit behavior
 - [x] Native Google Maps / Naver Map launch adapter with Web fallback
 - [x] Restaurant-specific external Google Maps link opens outside the app
@@ -103,12 +102,31 @@ Working PR: `#3 android: build Random Seoul native shell`
 - [x] Dedicated Android Places API key is supplied through GitHub Actions secret
 - [x] Secret-backed debug APK builds successfully with the stable development signing identity
 - [x] Android manifest remains minimal: `INTERNET` only, no GPS/location permission
+- [x] Galaxy S20 physical-device install and app launch verified
+- [x] Galaxy S20 line → station → food flow verified
+- [x] Galaxy S20 live Google Places TOP 3 recommendations verified
+- [x] Fix haptic trigger architecture: native haptics now listen to an explicit draw-revealed event instead of transient DOM `bounce` class mutations
+- [x] Haptic-fix Web CI and Android APK build pass
+
+### Real-device findings
+
+Galaxy S20 test on 2026-09-13:
+
+- app installs and launches normally
+- line / station / food draws work
+- native Google Places returns and renders TOP 3 restaurants correctly
+- line selection haptic worked in the first test APK
+- station and food haptics did not fire in the first test APK
+- root cause: station/food render functions replace the panel `className`, removing the transient `bounce` class before the MutationObserver-based haptic listener can reliably observe it
+- fix: `revealDrawStage()` now emits the explicit `randomseoul:draw-revealed` event and the native platform layer triggers haptics directly from that event
+- the fixed APK builds successfully and awaits a quick physical-device retest
+- restaurant-specific Google Maps launch is still pending confirmation because Google Maps on the old S20 device was not operating normally; emulator validation is planned
 
 ### Current validation
 
-The secret-backed Android CI run on 2026-09-13 passed all of the following:
+Secret-backed Android CI validates:
 
-- shared TypeScript tests: 20/20
+- shared TypeScript tests
 - native Vite build
 - Capacitor Android sync
 - stable development keystore decoding and use
@@ -117,22 +135,12 @@ The secret-backed Android CI run on 2026-09-13 passed all of the following:
 - stable certificate SHA-1 report
 - debug APK artifact upload
 
-The produced debug APK is now ready for real-device validation.
+### Remaining real-device / emulator checks
 
-### Next checkpoint — real Android device
-
-- [x] Provision stable development signing keystore outside the repository
-- [x] Add development signing values as GitHub Actions secrets
-- [x] Verify stable debug SHA-1
-- [x] Create a dedicated Android Google Places key
-- [x] Restrict that key to package + stable development SHA-1 + Places API (New)
-- [x] Add the Android Places key as `RANDOM_SEOUL_PLACES_API_KEY` GitHub secret
-- [x] Build/download the key-enabled debug APK
-- [ ] Install on a real Android device
-- [ ] Verify line → station → food → live TOP 3 restaurant flow
-- [ ] Verify Google/Naver map launch
-- [ ] Verify restaurant-specific Google Maps launch
-- [ ] Verify native share and haptics
+- [ ] Re-test haptic on line, station, and food using the haptic-fix APK
+- [ ] Verify Google/Naver station map launch
+- [ ] Verify restaurant-specific Google Maps launch, preferably also in an emulator with a healthy Google Maps installation
+- [ ] Verify native result sharing
 - [ ] Verify Android back-button behavior
 - [ ] Verify offline behavior: draws continue, restaurant recommendation reports network requirement
 
@@ -156,8 +164,12 @@ Android CI runs once per PR update rather than once for both push and PR events.
 - Secret-backed Android CI passed with stable development signing enabled.
 - Stable development certificate SHA-1 matched the Google Cloud Android restriction value.
 - Android Places key secret was detected by CI and embedded through the native build path.
-- A new stable-signed, key-enabled debug APK artifact was generated successfully.
-- The next required validation is on a real Android device.
+- Stable-signed, key-enabled debug APK artifact generated successfully.
+- Galaxy S20 physical-device core flow and live TOP 3 Places recommendations verified.
+- Physical-device testing exposed missing station/food haptics.
+- Haptic trigger was changed from DOM class observation to an explicit draw-revealed event so line/station/food share the same native feedback path.
+- Haptic-fix Web and Android CI builds passed.
+- Restaurant-specific map-link validation remains pending emulator/healthy Maps testing.
 
 ### 2026-09-12
 
