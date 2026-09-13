@@ -1,4 +1,5 @@
 import type {
+  AttractionRecommendation,
   DrawHistoryItem,
   FoodCategory,
   RestaurantRecommendation,
@@ -17,6 +18,7 @@ export interface AppState {
   currentLine?: SubwayLine;
   currentStation?: SubwayStation;
   currentFood?: FoodCategory;
+  attractions: AttractionRecommendation[];
   recommendations: RestaurantRecommendation[];
   history: DrawHistoryItem[];
 }
@@ -51,6 +53,7 @@ export class AppStore {
       currentLine: undefined,
       currentStation: undefined,
       currentFood: undefined,
+      attractions: [],
       recommendations: [],
     }));
   }
@@ -60,6 +63,7 @@ export class AppStore {
       ...current,
       currentStation: undefined,
       currentFood: undefined,
+      attractions: [],
       recommendations: [],
     }));
   }
@@ -83,6 +87,7 @@ export function createInitialState(
       selectedFoodIds: [...foodIds],
       instantDraw: false,
     },
+    attractions: [],
     recommendations: [],
     history: [],
   };

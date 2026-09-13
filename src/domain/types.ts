@@ -69,6 +69,11 @@ export interface RestaurantRecommendation extends PlaceCandidate {
   score: number;
 }
 
+export interface AttractionRecommendation extends PlaceCandidate {
+  distanceMeters: number;
+  score: number;
+}
+
 export interface DrawHistoryItem {
   id: string;
   lineId: string;
