@@ -1,8 +1,16 @@
 import { FOOD_BY_ID } from '../data/food-categories';
 import { SUBWAY_LINE_BY_ID } from '../data/subway-lines';
 import { drawOne, type RandomSource } from '../domain/draw-engine';
+import { rankAttractions } from '../domain/attraction-ranking';
 import { rankRestaurants } from '../domain/restaurant-ranking';
-import type { DrawHistoryItem, FoodCategory, PlaceCandidate, RestaurantRecommendation, SubwayLine } from '../domain/types';
+import type {
+  AttractionRecommendation,
+  DrawHistoryItem,
+  FoodCategory,
+  PlaceCandidate,
+  RestaurantRecommendation,
+  SubwayLine,
+} from '../domain/types';
 import type { AppStore } from '../state/app-state';
 import type { PlaceSearchService } from '../services/places/place-search';
 import type { StationLocationService } from '../services/places/station-location';
@@ -61,6 +69,7 @@ export class RandomSeoulController {
       ...current,
       currentStation: undefined,
       currentFood: undefined,
+      attractions: [],
       recommendations: [],
     }));
     this.activeHistoryId = undefined;
@@ -84,6 +93,7 @@ export class RandomSeoulController {
       currentLine: undefined,
       currentStation: undefined,
       currentFood: undefined,
+      attractions: [],
       recommendations: [],
     }));
     this.activeHistoryId = undefined;
@@ -123,6 +133,7 @@ export class RandomSeoulController {
       currentLine: line,
       currentStation: undefined,
       currentFood: undefined,
+      attractions: [],
       recommendations: [],
     }));
     return { stage: 'line' };
@@ -143,9 +154,11 @@ export class RandomSeoulController {
       ...current,
       currentStation: station,
       currentFood: undefined,
+      attractions: [],
       recommendations: [],
       history: [historyItem, ...current.history].slice(0, 12),
     }));
+    void this.loadAttractions().catch(() => undefined);
     return { stage: 'station' };
   }
 
@@ -163,6 +176,31 @@ export class RandomSeoulController {
 
     const recommendations = await this.loadRecommendations();
     return { stage: 'food', recommendations };
+  }
+
+  async loadAttractions(): Promise<AttractionRecommendation[]> {
+    const state = this.store.getSnapshot();
+    const line = state.currentLine;
+    const station = state.currentStation;
+    if (!line || !station) return [];
+
+    const center = await this.stationLocations.resolve(line, station.name);
+    const candidates = await this.places.searchText({
+      textQuery: `${station.name}역 관광명소`,
+      center: { latitude: center.latitude, longitude: center.longitude },
+      radiusMeters: 2000,
+      maxResults: 20,
+      language: 'ko',
+      region: 'kr',
+    });
+    const attractions = rankAttractions(candidates, center);
+    this.store.update((current) => {
+      const sameStation = current.currentLine?.id === line.id
+        && current.currentStation?.ordinal === station.ordinal
+        && current.currentStation?.name === station.name;
+      return sameStation ? { ...current, attractions } : { ...current };
+    });
+    return attractions;
   }
 
   async loadRecommendations(): Promise<RestaurantRecommendation[]> {
