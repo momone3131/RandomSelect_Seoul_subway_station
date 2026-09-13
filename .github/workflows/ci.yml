@@ -23,13 +23,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Test
         run: npm test
+
+      - name: Prepare Web Places key
+        shell: bash
+        env:
+          WEB_KEY_SECRET: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+        run: |
+          KEY="$WEB_KEY_SECRET"
+          if [ -z "$KEY" ]; then
+            KEY="$(grep -hEo 'AIza[A-Za-z0-9_-]{30,}' index.html 2>/dev/null | head -n 1 || true)"
+          fi
+          if [ -z "$KEY" ] && compgen -G 'assets/*.js' > /dev/null; then
+            KEY="$(grep -hEo 'AIza[A-Za-z0-9_-]{30,}' assets/*.js 2>/dev/null | head -n 1 || true)"
+          fi
+          if [ -z "$KEY" ]; then
+            echo 'No browser-restricted Google Maps key was available for the Web release build.' >&2
+            exit 1
+          fi
+          echo "::add-mask::$KEY"
+          echo "VITE_GOOGLE_MAPS_API_KEY=$KEY" >> "$GITHUB_ENV"
 
       - name: Build web
         run: npm run build
@@ -74,3 +92,10 @@ jobs:
           grep -o 'data-responsive[^>]*' /tmp/random-seoul-mobile-dom.html || true
           grep -q 'data-responsive="passed"' /tmp/random-seoul-mobile-dom.html
           grep -q 'data-responsive-columns="1"' /tmp/random-seoul-mobile-dom.html
+
+      - name: Upload Web release build
+        uses: actions/upload-artifact@v4
+        with:
+          name: random-seoul-web-dist
+          path: dist
+          if-no-files-found: error

@@ -1,0 +1,119 @@
+name: Web Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'public/**'
+      - 'modular.html'
+      - 'vite.config.ts'
+      - 'package.json'
+      - '.github/workflows/web-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: web-release-main
+  cancel-in-progress: true
+
+jobs:
+  build-and-promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test
+        run: npm test
+
+      - name: Prepare Web Places key
+        shell: bash
+        env:
+          WEB_KEY_SECRET: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+        run: |
+          KEY="$WEB_KEY_SECRET"
+          if [ -z "$KEY" ]; then
+            KEY="$(grep -hEo 'AIza[A-Za-z0-9_-]{30,}' index.html 2>/dev/null | head -n 1 || true)"
+          fi
+          if [ -z "$KEY" ] && compgen -G 'assets/*.js' > /dev/null; then
+            KEY="$(grep -hEo 'AIza[A-Za-z0-9_-]{30,}' assets/*.js 2>/dev/null | head -n 1 || true)"
+          fi
+          if [ -z "$KEY" ]; then
+            echo 'No browser-restricted Google Maps key was available for the Web release build.' >&2
+            exit 1
+          fi
+          echo "::add-mask::$KEY"
+          echo "VITE_GOOGLE_MAPS_API_KEY=$KEY" >> "$GITHUB_ENV"
+
+      - name: Build Web release
+        run: npm run build
+
+      - name: Smoke test release build
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/random-seoul-release.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill $PREVIEW_PID || true' EXIT
+          for i in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:4173/modular.html > /dev/null; then
+              break
+            fi
+            sleep 0.5
+          done
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_BIN"
+          "$CHROME_BIN" \
+            --headless=new \
+            --no-sandbox \
+            --disable-gpu \
+            --virtual-time-budget=4000 \
+            --dump-dom \
+            'http://127.0.0.1:4173/modular.html?selftest=1' > /tmp/random-seoul-release-dom.html
+          grep -q 'data-app-ready="true"' /tmp/random-seoul-release-dom.html
+          grep -q 'data-selftest="passed"' /tmp/random-seoul-release-dom.html
+          grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-release-dom.html
+          grep -q 'RANDOM SEOUL' /tmp/random-seoul-release-dom.html
+          test -f dist/icon-192.png
+          test -f dist/icon-512.png
+          test -f dist/site.webmanifest
+
+      - name: Promote verified build to GitHub Pages root
+        shell: bash
+        run: |
+          mkdir -p assets
+          rm -f assets/modular-*.js assets/modulepreload-polyfill-*.js
+          cp dist/modular.html index.html
+          cp dist/assets/modular-*.js assets/
+          cp dist/assets/modulepreload-polyfill-*.js assets/
+          cp dist/icon-192.png icon-192.png
+          cp dist/icon-512.png icon-512.png
+          cp dist/site.webmanifest site.webmanifest
+
+      - name: Commit deployed Web files
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets/ icon-192.png icon-512.png site.webmanifest
+          if git diff --cached --quiet; then
+            echo 'Web deployment files are already current.'
+            exit 0
+          fi
+          git commit -m 'deploy: publish modular Random Seoul web'
+          git push origin HEAD:main
