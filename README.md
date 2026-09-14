@@ -20,5 +20,6 @@ Random Seoul은 수도권 지하철 노선 → 역 → 음식 종목을 순서�
 2. `docs/STATUS.md` — 실제 현재 개발 진행 상태와 최근 변경
 3. `docs/PROJECT_PLAN.md` — 제품 요구사항과 로드맵
 4. `docs/ARCHITECTURE.md` — 코드/데이터/플랫폼 구조
+5. `docs/ATTRACTION_CURATION.md` — 역 주변 볼거리의 Tier A/B/C 선정 및 제외 기준
 
 의미 있는 기능/설계/상태 변경은 코드와 같은 변경에서 관련 문서를 함께 갱신합니다. 세부 문서 업데이트 규칙은 `docs/PROJECT_CONTEXT.md`를 기준으로 합니다.
