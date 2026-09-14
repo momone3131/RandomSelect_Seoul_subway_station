@@ -31,6 +31,18 @@ describe('curated attractions', () => {
     ]);
   });
 
+  it('uses an exact nearby anchor for broad or ambiguous attraction targets', () => {
+    expect(getCuratedAttractions('ic2', '검암')).toEqual([
+      expect.objectContaining({
+        name: '경인아라뱃길 시천가람터',
+        mapQuery: '시천가람터 인천광역시 서구 시천동 158-11',
+      }),
+    ]);
+    expect(getCuratedAttractions('l5', '오목교').map((item) => item.name)).toEqual([
+      '현대백화점 목동점',
+    ]);
+  });
+
   it('can supplement an existing one-place station without exceeding two', () => {
     expect(getCuratedAttractions('l5', '여의도').map((item) => item.name)).toEqual([
       '여의도공원',
@@ -47,6 +59,17 @@ describe('curated attractions', () => {
       SUBWAY_LINES.flatMap((line) => line.stations.map((station) => `${line.id}:${station.name}`)),
     );
     expect(EXTRA_CURATED_STATION_KEYS.filter((key) => !stationKeys.has(key))).toEqual([]);
+  });
+
+  it('never stores a station-only target for an attraction', () => {
+    for (const line of SUBWAY_LINES) {
+      for (const station of line.stations) {
+        for (const attraction of getCuratedAttractions(line.id, station.name)) {
+          const target = (attraction.mapQuery ?? attraction.name).trim();
+          expect(target).not.toBe(`${station.name}역`);
+        }
+      }
+    }
   });
 
   it('does not force a recommendation for an uncurated station', () => {
