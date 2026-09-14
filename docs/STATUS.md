@@ -26,7 +26,7 @@ Status: **MODULAR WEB DEPLOYED / CURATED ATTRACTIONS LIVE**
 - Web browser key remains separate from Android and is HTTP-referrer restricted
 - Random Seoul subway-sign + dice icon is published as Web app icon
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It is currently `workflow_dispatch`-only, so source changes passing normal CI do not by themselves promote a new root Web artifact.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -39,7 +39,7 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Curated nearby attractions
 
-Status: **LIVE / TIER A+B EXPANSION APPLIED**
+Status: **LIVE / TIER A+B EXPANSION APPLIED TO SOURCE**
 
 Google Places attraction search/ranking has been removed from runtime.
 
@@ -65,7 +65,11 @@ The dataset has been expanded beyond the initial major-landmark-heavy seed. Repr
 
 The same expanded shared dataset and regression tests are synchronized to `feature/random-seoul-android`.
 
-Post-expansion CI checks should be verified against the actual latest commit before release; older Web/Android CI runs were green before this expansion.
+Verification state:
+
+- `main` latest head after the expansion/docs changes passes the normal GitHub **CI** workflow (tests/build/browser gates).
+- the public Web root artifact still requires the separate manual **Web Release** workflow to promote this source revision because `web-release.yml` is dispatch-only.
+- Android branch source/tests are synchronized, but the current Android branch head has not received a new Actions run from these connector-authored commits; its previous Android/CI run was green before this expansion. Re-verify current Android head before merge/release.
 
 ## Static station centers
 
@@ -110,7 +114,7 @@ Implemented/verified:
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
 - curated-attraction/static-station-center shared changes synchronized to Android branch
 - expanded Tier A/B attraction dataset and its regression tests synchronized to Android branch
-- pre-expansion Web CI and Android APK CI were passing; verify current head checks before release/merge
+- previous Android APK/CI run was green before this expansion; current head requires a fresh Actions verification before release/merge
 
 ## Shared architecture requirements
 
@@ -158,6 +162,8 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 - Expanded `curated-attractions.ts` using the Tier A/B policy instead of keeping the initial major-landmark-heavy seed.
 - Added regional destinations such as 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장 and 안양예술공원 while preserving the 0–2/no-forced-fill rule.
 - Added Tier B regression coverage and synchronized the expanded dataset/tests to the Android working branch.
+- Verified the resulting `main` head with the normal GitHub CI workflow; current `main` CI is green.
+- Recorded that public Web promotion is separate/manual (`Web Release`) and Android current head still needs a fresh Actions verification before merge/release.
 - Formalized editorial attraction selection: context and visit value are primary; official sources validate existence/access/representativeness; generic Tier C neighborhood facilities remain excluded.
 - Relaxed attraction curation threshold from mostly major landmarks to `regional representativeness + actual visit value`; Tier A/B are eligible.
 - Added `docs/ATTRACTION_CURATION.md` as the explicit attraction inclusion/exclusion standard.
@@ -169,7 +175,7 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 - Removed live Google attraction Text Search/ranking from the shared controller.
 - Added static-first station coordinate lookup with live fallback for uncovered stations.
 - Added regression tests for curated attractions and static station centers.
-- Merged PR #6, completed verified Web release, and synchronized the same shared behavior into Android PR #3.
+- Merged PR #6, completed the earlier verified Web release, and synchronized the same shared behavior into Android PR #3.
 
 ### 2026-09-13
 
