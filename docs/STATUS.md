@@ -39,7 +39,7 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Curated nearby attractions
 
-Status: **COMPLETE / PR #6 MERGED**
+Status: **LIVE / POLICY RELAXED, DATASET EXPANSION PENDING**
 
 Google Places attraction search/ranking has been removed from runtime.
 
@@ -48,15 +48,21 @@ Current policy:
 - station draw remains random; attraction is supplemental information
 - own `curated-attractions.ts` station→attraction dataset
 - maximum 2 representative places
-- no recommendation if a station lacks a clearly representative destination
+- no recommendation if a station has no worthwhile candidate
+- curation threshold is **regional representativeness + actual visit value**, not “must be a major Seoul-wide landmark”
+- Tier A: major metro-area landmark/destination → include
+- Tier B: neighborhood-representative market, street, cultural space, walk, park or local destination worth deliberately visiting → include
+- Tier C: ordinary playground, small neighborhood park, generic rest area or weak local facility → exclude
 - no Google attraction Text Search
 - no Google rating/review threshold for attractions
 - no attraction Google-content cache/database
 - map button remains a normal outbound Google Maps search link
 
-Initial examples include 이촌→국립중앙박물관, 여의나루→여의도한강공원, 자양→뚝섬한강공원, 경복궁→경복궁/국립고궁박물관, 마곡나루→서울식물원 and other high-confidence landmarks.
+Detailed criteria: `docs/ATTRACTION_CURATION.md`.
 
-This replaces the previous `minimum reviews = 20 / score >= 0.45` strategy, which could still surface lesser-known Places results.
+The initial seed is still intentionally small and relatively conservative. A broader station-by-station expansion using the new Tier A/B policy has **not yet been applied**.
+
+This replaces both extremes encountered so far: automatic Places results that surfaced low-value neighborhood facilities, and an overly conservative first curation pass dominated by major landmarks.
 
 ## Static station centers
 
@@ -123,6 +129,7 @@ The repository itself is now the durable project memory for future chats and dev
 - `docs/STATUS.md`: current implementation state and recent verified changes
 - `docs/PROJECT_PLAN.md`: product intent, platform strategy and roadmap
 - `docs/ARCHITECTURE.md`: technical structure and design ownership
+- `docs/ATTRACTION_CURATION.md`: attraction inclusion/exclusion policy
 
 Meaningful feature, architecture, policy, branch-role or validation changes must update the relevant documentation in the same change/PR. New sessions should read `PROJECT_CONTEXT.md` first, then `STATUS.md`, and verify actual GitHub branches/PRs/CI before modifying code.
 
@@ -144,6 +151,8 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 
 ### 2026-09-14
 
+- Relaxed attraction curation threshold from mostly major landmarks to `regional representativeness + actual visit value`; Tier A/B are eligible, generic Tier C neighborhood facilities remain excluded.
+- Added `docs/ATTRACTION_CURATION.md` as the explicit attraction inclusion/exclusion standard; broad dataset expansion is still pending.
 - Clarified platform roles: Android is the current primary app target; Web remains supported and is also the rapid feature/UX validation path, especially because the project owner uses an iPhone.
 - Added `docs/PROJECT_CONTEXT.md` so a new chat/session can recover purpose, architecture assumptions, branch roles, data policy and restart procedure from Git alone.
 - Established mandatory documentation-maintenance rules for meaningful code/feature/architecture/status changes.
