@@ -1,6 +1,6 @@
 # Random Seoul — Architecture
 
-Last updated: 2026-09-13
+Last updated: 2026-09-14
 
 ## 1. Architecture goals
 
@@ -8,11 +8,12 @@ Random Seoul은 Web / Android / iOS가 같은 제품 로직을 공유하도록 �
 
 핵심 원칙:
 
-- 추첨/데이터/상태/랭킹은 플랫폼 독립적인 TypeScript
+- 추첨/데이터/상태/식당 랭킹은 플랫폼 독립적인 TypeScript
 - Web/Android/iOS 차이는 adapter/service 경계 뒤로 숨김
 - Android Java/Kotlin과 iOS Swift는 가능한 한 얇게 유지
 - Web은 앱 출시 후에도 정식 타깃으로 유지
-- Restaurant/attraction 후보 검색은 provider가 담당하고, 필터링/랭킹은 shared TypeScript가 담당
+- 식당 추천은 실시간 Google Places 후보를 shared TypeScript에서 필터링/랭킹
+- 대표 명소와 가능한 역 좌표는 자체 정적 데이터로 소유해 불필요한 Google 호출을 줄임
 
 ## 2. Repository structure
 
@@ -20,58 +21,37 @@ Random Seoul은 Web / Android / iOS가 같은 제품 로직을 공유하도록 �
 Random Seoul
 ├─ src/
 │  ├─ data/
+│  │  ├─ subway-lines.ts
+│  │  ├─ food-categories.ts
+│  │  ├─ curated-attractions.ts
+│  │  └─ station-coordinates.ts
 │  ├─ domain/
 │  │  ├─ types.ts
 │  │  ├─ draw-engine.ts
 │  │  ├─ station-resolver.ts
-│  │  ├─ restaurant-ranking.ts
-│  │  └─ attraction-ranking.ts
+│  │  └─ restaurant-ranking.ts
 │  ├─ services/
 │  │  ├─ places/
 │  │  ├─ maps/
 │  │  └─ storage/
 │  ├─ state/
 │  ├─ ui/
-│  │  ├─ draw-view.ts
-│  │  ├─ restaurant-view.ts
-│  │  ├─ attraction-view.ts
-│  │  ├─ settings-view.ts
-│  │  └─ history-view.ts
 │  ├─ platform/
 │  └─ main.ts
 ├─ native/
 ├─ tests/
 ├─ android/
 ├─ ios/
-├─ index.html              # committed GitHub Pages deployment artifact
-├─ modular.html            # maintained Web source entry
+├─ index.html
+├─ modular.html
 ├─ vite.config.ts
 ├─ capacitor.config.ts
 └─ .github/workflows/
-   ├─ ci.yml
-   ├─ web-release.yml
-   └─ android.yml
 ```
 
 ## 3. Shared place model and provider boundary
 
-```ts
-export interface PlaceCandidate {
-  id: string;
-  name: string;
-  category: string;
-  latitude: number;
-  longitude: number;
-  rating?: number;
-  userRatingCount?: number;
-  mapUrl?: string;
-  searchRank: number;
-}
-
-export interface PlaceSearchService {
-  searchText(request: PlaceSearchRequest): Promise<PlaceCandidate[]>;
-}
-```
+`PlaceCandidate`는 Google Places 등 외부 provider에서 받은 식당 후보를 shared core로 넘기는 공통 모델입니다.
 
 구현체:
 
@@ -79,7 +59,7 @@ export interface PlaceSearchService {
 - Android: Capacitor bridge → Places SDK for Android
 - iOS: later native Places bridge
 
-플랫폼 SDK는 후보 데이터를 반환하는 역할만 맡고 제품 순위는 결정하지 않습니다.
+플랫폼 SDK는 후보 데이터를 반환하는 역할만 맡고 식당 순위는 결정하지 않습니다.
 
 ## 4. Restaurant ranking ownership
 
@@ -101,50 +81,60 @@ export interface PlaceSearchService {
 - relevance 15%
 - distance 5%
 
-## 5. Nearby attraction ranking
+식당 결과는 Google에서 실시간 조회하며 TOP 3 결과/별점/리뷰수를 자체 추천 DB로 영구 저장하지 않습니다.
 
-역 추첨은 그대로 랜덤이며, 볼거리 추천은 **랜덤 단계가 아닌 보조 정보**입니다.
+## 5. Curated nearby attractions
 
-역이 확정되면 해당 역에 대해 Places Text Search를 한 번 수행하고 shared `attraction-ranking.ts`가 후보를 평가합니다.
+역 주변 볼거리는 더 이상 Google Places 검색/리뷰 수 threshold로 선정하지 않습니다.
 
-현재 규칙:
+`src/data/curated-attractions.ts`가 **역별 대표 명소 0~2곳**을 직접 소유합니다.
 
-- hard radius 2 km
-- 관광명소/박물관/미술관/공원/문화/역사 등 허용 type만 대상
-- 최대 2곳
-- 최소 평가 수 20
-- 최소 종합 score 0.45
-- 약한 후보만 있으면 attraction UI 자체를 숨김
-- 음식만 재추첨할 때 attraction search를 반복하지 않음
-- 역이 바뀌면 이전 비동기 결과를 적용하지 않음
+규칙:
 
-가중치:
+- 유명도와 대표성이 충분히 높은 장소만 수동/검증된 데이터로 등록
+- 애매한 역은 억지로 추천하지 않고 `[]`
+- 한 역당 최대 2곳
+- 역 추첨 직후 동기적으로 표시되어 네트워크 대기 없음
+- 음식 재추첨과 무관
+- 명소 Google Places Text Search 없음
+- 명소 카드의 지도 버튼은 일반 Google Maps 검색 링크일 뿐 Places 데이터 저장소가 아님
 
-- Google relevance 45%
-- log(review count) 30%
-- distance 15%
-- rating 10%
+따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB에 등록되어 있느냐** 자체가 담당합니다.
 
-## 6. State ownership
+## 6. Station center strategy
+
+식당 검색의 위치 bias/거리 계산에는 역 중심 좌표가 필요합니다.
+
+`src/data/station-coordinates.ts`를 먼저 조회합니다.
+
+1. 정적 좌표가 있으면 즉시 사용 → Google station-resolution 호출 없음
+2. 정적 좌표가 없는 신규/미수록 역만 기존 Google 역 검색 사용
+3. fallback으로 얻은 Google 좌표는 기존 정책대로 30일 캐시
+
+정적 좌표는 서울특별시/TOPIS의 `서울시 역사마스터 정보`와 같은 공공 역 마스터 데이터를 기준으로 관리합니다. 해당 서울 열린데이터는 공공누리 제1유형(출처표시, 상업적 이용 및 변경 가능)입니다.
+
+현재 정적 테이블은 대표 명소가 있는 역과 주요 환승/사용 역부터 적용하며, 미수록 역은 기능 단절 없이 live fallback으로 동작합니다.
+
+## 7. State ownership
 
 `AppState`는 현재 line/station/food와 함께 다음 결과를 보유합니다.
 
-- `attractions`: 현재 역의 0~2개 볼거리 추천
-- `recommendations`: 현재 음식의 식당 TOP 3
+- `attractions`: 현재 역의 0~2개 자체 큐레이션 볼거리
+- `recommendations`: 현재 음식의 Google 기반 식당 TOP 3
 - `history`: 최근 추첨 기록
 
-UI는 상태를 표시하고 사용자 event를 전달하며, 랭킹/추첨 규칙 자체를 소유하지 않습니다.
+UI는 상태를 표시하고 사용자 event를 전달하며, 추첨/식당 랭킹 규칙 자체를 소유하지 않습니다.
 
-## 7. Storage boundary
+## 8. Storage boundary
 
 - Web: localStorage
 - Android/iOS: 현재 호환성 우선으로 WebView localStorage를 사용하며 native-backed storage는 필요 시 후속 전환
 
 기존 Web localStorage key를 유지해 설정/기록 마이그레이션을 깨지 않습니다.
 
-Places 식당/명소 결과 자체는 장기 캐시하지 않습니다. 역 좌표 캐시는 기존 30일 정책을 유지합니다.
+Google 식당 결과는 장기 캐시하지 않습니다. Google fallback 역 좌표 캐시는 기존 30일 정책을 유지합니다.
 
-## 8. Platform services
+## 9. Platform services
 
 플랫폼 차이는 adapter/plugin 뒤로 둡니다.
 
@@ -155,7 +145,7 @@ Places 식당/명소 결과 자체는 장기 캐시하지 않습니다. 역 좌�
 - native place search
 - persistent storage
 
-## 9. API key strategy
+## 10. API key strategy
 
 키는 플랫폼별로 분리합니다.
 
@@ -165,27 +155,13 @@ Places 식당/명소 결과 자체는 장기 캐시하지 않습니다. 역 좌�
 
 공통 TypeScript에 production key를 하드코딩하지 않습니다.
 
-Web CI/release는 `VITE_GOOGLE_MAPS_API_KEY` secret이 있으면 우선 사용합니다. Secret이 없는 현재 migration 경로에서는 기존 공개 Web에 이미 배포되어 있던 **HTTP-referrer-restricted browser key**를 기존 `index.html` 또는 배포 JS bundle에서 읽어 build-time environment로 승계합니다. 키 값은 CI 로그에서 마스킹합니다. Android key와는 절대 공유하지 않습니다.
-
-## 10. Build and deployment targets
+## 11. Build and deployment targets
 
 ### Web
 
 Maintained source entry는 `modular.html`입니다.
 
-`npm run build` → Vite `dist/modular.html` + hashed JS assets를 생성합니다.
-
-GitHub Pages는 기존 branch-root 방식을 유지합니다. `.github/workflows/web-release.yml`이 `main`의 Web source 변경 시:
-
-1. tests 실행
-2. restricted Web Places key 주입
-3. Vite build
-4. deterministic browser smoke test
-5. 검증된 `dist/modular.html`을 root `index.html`로 승격
-6. 필요한 hashed JS assets를 root `assets/`에 갱신
-7. deployment artifact commit을 `main`에 push
-
-따라서 공개 URL은 바꾸지 않으면서 source와 배포 artifact를 분리합니다.
+`npm run build` → Vite `dist/modular.html` + hashed JS assets를 생성합니다. `web-release.yml`이 tests → build → browser smoke를 통과한 artifact를 GitHub Pages root로 승격합니다.
 
 ### Android
 
@@ -195,12 +171,6 @@ Vite native build → Capacitor sync → Gradle build → APK/AAB.
 
 Vite native build → Capacitor sync → Xcode/cloud build.
 
-## 11. Migration status
-
-초기 단일 `index.html`은 Phase 1/초기 Android 개발 동안 기능 기준선으로 보존했습니다.
-
-2026-09-13부터 modular Web이 public GitHub Pages source-of-truth로 승격됩니다. Android native work 전체를 main에 합치지 않고, shared Web product 기능만 별도 Web deployment PR로 반영합니다.
-
 ## 12. Architecture decision maintenance
 
 다음 변경은 구현과 같은 PR/change에서 문서화합니다.
@@ -208,6 +178,7 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 - product flow
 - ranking/filter thresholds
 - Places provider/API
+- curated attraction/station-coordinate data policy
 - app identifier
 - storage provider
 - framework/platform dependency
