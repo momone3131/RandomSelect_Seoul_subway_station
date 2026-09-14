@@ -77,9 +77,10 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 - Google popularity search가 아니라 `src/data/curated-attractions.ts`의 자체 큐레이션 데이터
 - 역당 0~2곳
 - 합격선은 광역급 랜드마크 여부가 아니라 **지역 대표성 + 실제 방문가치**
-- 서울/수도권 대표 목적지(Tier A)와 동네를 대표해 일부러 들를 만한 시장·거리·문화공간·산책지·공원(Tier B)은 포함 가능
+- 서울/수도권 대표 목적지(Tier A)와 동네를 대표해 일부러 들를 만한 시장·거리·문화공간·산책지·공원(Tier B)은 포함
 - 일반 놀이터·소공원·특색이 약한 근린시설(Tier C)은 제외
 - 적절한 후보가 없으면 0개를 유지하며 숫자를 채우기 위해 억지 추천하지 않음
+- 점수 공식으로 자동 선별하지 않고 editorial judgment를 사용하며, 공식 관광/지자체 자료 등으로 존재성·접근성·대표성을 교차확인
 - 상세 기준은 `docs/ATTRACTION_CURATION.md`
 
 ### Station centers
@@ -93,12 +94,15 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 2026-09-14 기준:
 
 - Modular Web refactor: 완료 및 `main` 배포
-- Curated attraction dataset: 적용 완료; 초기 시드는 보수적이며 완화된 Tier A/B 기준으로의 전체 확장은 아직 진행 전
+- Curated attraction dataset: Tier A뿐 아니라 지역 대표 Tier B 목적지까지 확장 적용 완료
+- 대표 추가 예: 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장, 안양예술공원
+- 0~2개/no-forced-fill 정책 유지; 평범한 Tier C 근린시설은 계속 제외
+- 확장된 attraction dataset과 regression test를 Android 작업 브랜치에도 동기화 완료
 - Static-first station center: 적용 완료
 - Android shell: 개발 진행 중
 - Android Places native bridge: 구현됨
 - Galaxy S20에서 line → station → food → live restaurant TOP 3 핵심 흐름 검증됨
-- Web CI 및 Android debug APK CI가 현재 기준 통과
+- 기존 Web/Android CI는 확장 전 기준에서 통과했으며, 최신 head의 실제 CI 상태는 작업 시작 시 GitHub에서 다시 확인
 - Android 작업 branch/PR은 계속 진행 중이므로 세부 최신 상태는 `STATUS.md`와 GitHub를 확인
 
 ## 7. Documentation source of truth
