@@ -66,7 +66,7 @@ describe('RandomSeoulController', () => {
     expect(store.getSnapshot().currentFood).toBeUndefined();
   });
 
-  it('uses a 2 km restaurant search centered on the resolved station', async () => {
+  it('uses a 2 km restaurant search centered on the static station coordinates', async () => {
     const places = new ScenarioPlaces();
     const storage = new MemoryStorage();
     const store = new AppStore(createInitialState(['l2'], ['c_dimsum']));
@@ -80,6 +80,7 @@ describe('RandomSeoulController', () => {
     const restaurantRequest = places.requests.find((request) => request.textQuery.includes('딤섬'));
     expect(restaurantRequest?.radiusMeters).toBe(2000);
     expect(restaurantRequest?.maxResults).toBe(20);
-    expect(restaurantRequest?.center).toEqual({ latitude: 37.5657, longitude: 126.9769 });
+    expect(restaurantRequest?.center).toEqual({ latitude: 37.563588, longitude: 126.975411 });
+    expect(places.requests.some((request) => request.textQuery.includes('2호선'))).toBe(false);
   });
 });
