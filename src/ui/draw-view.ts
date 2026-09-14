@@ -3,6 +3,7 @@ import type { FoodCategory, SubwayLine, SubwayStation } from '../domain/types';
 import { readableInk } from './color';
 import { append, byId, make, replaceContent } from './dom';
 import { renderAttractions, resetAttractionView } from './attraction-view';
+import { placePrimaryDrawButton, type PrimaryDrawStage } from './primary-draw-placement';
 
 export interface DrawViewStatus {
   busy: boolean;
@@ -116,6 +117,13 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   const foodRedraw = byId<HTMLButtonElement>('food_redraw_btn');
   const copy = byId<HTMLButtonElement>('copy_btn');
   const instant = byId<HTMLInputElement>('instant');
+  const stage: PrimaryDrawStage = !state.currentLine
+    ? 'line'
+    : !state.currentStation
+      ? 'station'
+      : !state.currentFood
+        ? 'food'
+        : 'done';
 
   drawButton.disabled = locked || state.preferences.selectedLineIds.length === 0 || state.preferences.selectedFoodIds.length === 0;
   byId<HTMLButtonElement>('settings_btn').disabled = locked;
@@ -128,18 +136,16 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   instant.checked = state.preferences.instantDraw;
 
   drawButton.className = `draw-btn${status.busy ? ' busy' : ''}`;
-  byId<HTMLElement>('draw_shell').setAttribute('aria-busy', String(status.busy));
-  byId<HTMLElement>('draw_shell').setAttribute(
-    'data-stage',
-    !state.currentLine ? 'line' : !state.currentStation ? 'station' : !state.currentFood ? 'food' : 'done',
-  );
+  const drawShell = byId<HTMLElement>('draw_shell');
+  drawShell.setAttribute('aria-busy', String(status.busy));
+  drawShell.setAttribute('data-stage', stage);
   byId<HTMLElement>('draw_label').textContent = status.busy
     ? '두근두근, 뽑는 중…'
-    : !state.currentLine
+    : stage === 'line'
       ? '노선 뽑기'
-      : !state.currentStation
+      : stage === 'station'
         ? '역 순서 뽑기'
-        : !state.currentFood
+        : stage === 'food'
           ? '음식 종목 뽑기'
           : '새 코스 다시 뽑기';
 
@@ -151,6 +157,7 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   copy.hidden = !state.currentStation;
   byId<HTMLElement>('map_actions').hidden = !state.currentStation;
   renderSteps(state);
+  placePrimaryDrawButton(stage);
 }
 
 function renderStationList(line?: SubwayLine, selected?: SubwayStation): void {
