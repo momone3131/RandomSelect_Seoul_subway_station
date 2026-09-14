@@ -29,6 +29,10 @@ Last updated: 2026-09-14
 - 작업 브랜치: `feature/random-seoul-android`
 - Capacitor Android shell + Places SDK for Android native bridge
 - Android 전용 기능은 native adapter/plugin으로 한정
+- 최신 개발 APK는 GitHub Release의 고정 tag `android-dev-latest`에서 제공
+- 고정 APK asset: `random-seoul-latest.apk`
+- 저장소 `README.md` 상단에 직접 다운로드 링크와 Release 페이지 링크를 유지
+- Android branch의 관련 push가 성공적으로 빌드되면 최신 APK/체크섬/Actions artifact가 자동 갱신됨
 
 ### Web
 
@@ -101,8 +105,11 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 - 새 확장 예: IKEA 광명·고양, 스타필드 수원·고양, 더현대 서울, 현대프리미엄아울렛 송도, 트리플스트리트, 광교호수공원, 왕송호수, 여러 전통시장/카페거리/로데오거리/문화공간
 - Web 확장 코드 commit `7e45dfb3210c1b16a758523bdc5e4d8f2aac967c`가 tests/build/headless smoke를 통과했고 deployment commit `94700886f6d9b7c1ff23dde0cdff71beef024979`로 공개 bundle 배포 완료
 - 0~2개/no-forced-fill 정책 유지; 평범한 Tier C 근린시설은 계속 제외
-- 동일한 browse-worthy attraction source/tests를 Android 작업 브랜치에도 commit `c699421006f97dd7356f3951d6708ded875636bd`로 동기화
-- Android의 이 최신 head는 connector/Git ref 방식으로 갱신되어 새 Actions run이 아직 생성되지 않았으므로 release/merge 전 fresh Android CI 재검증 필요
+- 동일한 browse-worthy attraction source/tests를 Android 작업 브랜치에도 동기화
+- Android CI는 관련 `feature/random-seoul-android` push에서도 자동 실행되도록 변경됨
+- 최신 Android dev build source commit `e43b02fc021e9045b9b165414960a8174ba072b4`
+- Android CI run `34858766264`가 shared tests → native build → Capacitor sync → Gradle `assembleDebug` → artifact upload → GitHub Release publish까지 전부 통과
+- 최신 APK는 `android-dev-latest` Release의 `random-seoul-latest.apk`에서 받음; SHA-256 checksum asset도 함께 제공
 - Static-first station center: 적용 완료
 - Android shell: 개발 진행 중
 - Android Places native bridge: 구현됨
@@ -113,7 +120,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 
 문서 역할을 섞지 않습니다.
 
-- `README.md`: 프로젝트 입구 / 핵심 링크
+- `README.md`: 프로젝트 입구 / 최신 Android APK 링크 / 핵심 링크
 - `docs/PROJECT_CONTEXT.md`: 새 세션용 빠른 인계 문서
 - `docs/PROJECT_PLAN.md`: 제품 목적, 요구사항, 로드맵, 변경 불가 원칙
 - `docs/ARCHITECTURE.md`: 코드/데이터/플랫폼 구조와 설계 결정
@@ -146,6 +153,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 3. 필요한 경우 `PROJECT_PLAN.md` / `ARCHITECTURE.md` / `ATTRACTION_CURATION.md` 확인
 4. GitHub의 실제 branch, PR, recent commits, CI 상태 확인
 5. 작업 대상이 Web인지 Android인지 먼저 구분
-6. 변경 후 관련 테스트와 문서를 함께 갱신
+6. Android APK가 필요하면 먼저 README의 `Latest Android APK` 링크 또는 Release tag `android-dev-latest`를 확인
+7. 변경 후 관련 테스트와 문서를 함께 갱신
 
 이 절차를 따르면 과거 대화 원문 전체가 없어도 저장소만으로 개발 맥락을 복구할 수 있어야 합니다.
