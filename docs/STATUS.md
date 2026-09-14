@@ -13,7 +13,7 @@ Last updated: 2026-09-14
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED / CURATED ATTRACTIONS LIVE**
+Status: **MODULAR WEB DEPLOYED / TIER A+B ATTRACTIONS LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
@@ -26,7 +26,7 @@ Status: **MODULAR WEB DEPLOYED / CURATED ATTRACTIONS LIVE**
 - Web browser key remains separate from Android and is HTTP-referrer restricted
 - Random Seoul subway-sign + dice icon is published as Web app icon
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It is currently `workflow_dispatch`-only, so source changes passing normal CI do not by themselves promote a new root Web artifact.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and also supports manual dispatch.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -39,7 +39,7 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Curated nearby attractions
 
-Status: **LIVE / TIER A+B EXPANSION APPLIED TO SOURCE**
+Status: **LIVE / TIER A+B EXPANSION DEPLOYED**
 
 Google Places attraction search/ranking has been removed from runtime.
 
@@ -67,8 +67,9 @@ The same expanded shared dataset and regression tests are synchronized to `featu
 
 Verification state:
 
-- `main` latest head after the expansion/docs changes passes the normal GitHub **CI** workflow (tests/build/browser gates).
-- the public Web root artifact still requires the separate manual **Web Release** workflow to promote this source revision because `web-release.yml` is dispatch-only.
+- the expanded source/tests pass the normal GitHub **CI** workflow, including unit/regression tests, Web build and headless Chrome smoke flow.
+- **Web Release** was re-run after the updated regression test landed; test → build → release smoke → root promotion all succeeded.
+- deployment commit `0b7b169984593858bed2fa6d8647c09a3a9dcd3e` publishes the new `modular-Hw1UncCY.js` bundle from the expanded dataset to the Web root.
 - Android branch source/tests are synchronized, but the current Android branch head has not received a new Actions run from these connector-authored commits; its previous Android/CI run was green before this expansion. Re-verify current Android head before merge/release.
 
 ## Static station centers
@@ -162,8 +163,8 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 - Expanded `curated-attractions.ts` using the Tier A/B policy instead of keeping the initial major-landmark-heavy seed.
 - Added regional destinations such as 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장 and 안양예술공원 while preserving the 0–2/no-forced-fill rule.
 - Added Tier B regression coverage and synchronized the expanded dataset/tests to the Android working branch.
-- Verified the resulting `main` head with the normal GitHub CI workflow; current `main` CI is green.
-- Recorded that public Web promotion is separate/manual (`Web Release`) and Android current head still needs a fresh Actions verification before merge/release.
+- Verified the expanded source/tests through normal GitHub CI.
+- Re-ran Web Release after the updated regression test landed; release tests/build/browser smoke/root promotion succeeded and the new Web bundle was committed to `main`.
 - Formalized editorial attraction selection: context and visit value are primary; official sources validate existence/access/representativeness; generic Tier C neighborhood facilities remain excluded.
 - Relaxed attraction curation threshold from mostly major landmarks to `regional representativeness + actual visit value`; Tier A/B are eligible.
 - Added `docs/ATTRACTION_CURATION.md` as the explicit attraction inclusion/exclusion standard.
