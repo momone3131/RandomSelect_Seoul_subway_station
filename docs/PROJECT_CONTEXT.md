@@ -76,7 +76,11 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 
 - Google popularity search가 아니라 `src/data/curated-attractions.ts`의 자체 큐레이션 데이터
 - 역당 0~2곳
-- 대표성이 부족하면 억지로 추천하지 않음
+- 합격선은 광역급 랜드마크 여부가 아니라 **지역 대표성 + 실제 방문가치**
+- 서울/수도권 대표 목적지(Tier A)와 동네를 대표해 일부러 들를 만한 시장·거리·문화공간·산책지·공원(Tier B)은 포함 가능
+- 일반 놀이터·소공원·특색이 약한 근린시설(Tier C)은 제외
+- 적절한 후보가 없으면 0개를 유지하며 숫자를 채우기 위해 억지 추천하지 않음
+- 상세 기준은 `docs/ATTRACTION_CURATION.md`
 
 ### Station centers
 
@@ -89,7 +93,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 2026-09-14 기준:
 
 - Modular Web refactor: 완료 및 `main` 배포
-- Curated attraction dataset: 적용 완료
+- Curated attraction dataset: 적용 완료; 초기 시드는 보수적이며 완화된 Tier A/B 기준으로의 전체 확장은 아직 진행 전
 - Static-first station center: 적용 완료
 - Android shell: 개발 진행 중
 - Android Places native bridge: 구현됨
@@ -106,6 +110,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 - `docs/PROJECT_PLAN.md`: 제품 목적, 요구사항, 로드맵, 변경 불가 원칙
 - `docs/ARCHITECTURE.md`: 코드/데이터/플랫폼 구조와 설계 결정
 - `docs/STATUS.md`: 실제 현재 진행 상태, 검증 결과, 최근 변경 이력
+- `docs/ATTRACTION_CURATION.md`: 볼거리 포함/제외 기준
 
 충돌 시 **실제 코드/Git 상태 > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJECT_CONTEXT/README** 순으로 최신성을 판단합니다.
 
@@ -118,6 +123,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 - 기능 구현/버그 수정/데이터 정책 변경/플랫폼 상태 변화 → `STATUS.md` 업데이트
 - 제품 목적, 핵심 UX, 플랫폼 전략, 거리/랭킹/API 정책 변화 → `PROJECT_PLAN.md` 업데이트
 - 모듈 경계, 데이터 흐름, provider, storage, native bridge, build/deploy 구조 변화 → `ARCHITECTURE.md` 업데이트
+- 볼거리 진입 기준이나 큐레이션 운영 방식 변화 → `ATTRACTION_CURATION.md` 업데이트
 - 프로젝트 역할이나 새 세션에서 반드시 알아야 할 전제 변화 → `PROJECT_CONTEXT.md` 업데이트
 - 진입점이나 주요 문서 링크가 바뀌면 `README.md` 업데이트
 
@@ -129,7 +135,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 
 1. 이 `PROJECT_CONTEXT.md` 읽기
 2. `STATUS.md`에서 현재 phase와 마지막 변경 확인
-3. 필요한 경우 `PROJECT_PLAN.md` / `ARCHITECTURE.md` 확인
+3. 필요한 경우 `PROJECT_PLAN.md` / `ARCHITECTURE.md` / `ATTRACTION_CURATION.md` 확인
 4. GitHub의 실제 branch, PR, recent commits, CI 상태 확인
 5. 작업 대상이 Web인지 Android인지 먼저 구분
 6. 변경 후 관련 테스트와 문서를 함께 갱신
