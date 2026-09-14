@@ -2,6 +2,15 @@
 
 Random Seoul은 수도권 지하철 노선 → 역 → 음식 종목을 순서대로 무작위 추첨하고, 뽑힌 역 주변 식당을 추천하는 프로젝트입니다.
 
+## Latest Android APK
+
+Android 개발 최신본은 고정된 GitHub Release에서 받을 수 있습니다.
+
+- **APK 바로 받기:** https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk
+- **Latest Android Dev Release:** https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/tag/android-dev-latest
+
+`feature/random-seoul-android`에서 Android 관련 변경이 push되어 빌드에 성공하면 `random-seoul-latest.apk`가 자동으로 최신 파일로 교체됩니다. GitHub Actions의 `random-seoul-debug-apk` artifact에도 동일 APK와 SHA-256 파일을 남깁니다.
+
 ## Product direction
 
 - **Brand name:** Random Seoul
@@ -20,6 +29,6 @@ Random Seoul은 수도권 지하철 노선 → 역 → 음식 종목을 순서�
 2. `docs/STATUS.md` — 실제 현재 개발 진행 상태와 최근 변경
 3. `docs/PROJECT_PLAN.md` — 제품 요구사항과 로드맵
 4. `docs/ARCHITECTURE.md` — 코드/데이터/플랫폼 구조
-5. `docs/ATTRACTION_CURATION.md` — 역 주변 볼거리의 Tier A/B/C 선정 및 제외 기준
+5. `docs/ATTRACTION_CURATION.md` — 역 주변 볼거리의 선정 및 제외 기준
 
 의미 있는 기능/설계/상태 변경은 코드와 같은 변경에서 관련 문서를 함께 갱신합니다. 세부 문서 업데이트 규칙은 `docs/PROJECT_CONTEXT.md`를 기준으로 합니다.
