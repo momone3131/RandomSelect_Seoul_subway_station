@@ -1,6 +1,6 @@
 # Random Seoul — Development Status
 
-Last updated: 2026-09-13
+Last updated: 2026-09-14
 
 이 문서는 현재 진행 위치와 다음 행동을 기록합니다.
 
@@ -9,22 +9,17 @@ Last updated: 2026-09-13
 Status: **MODULAR WEB DEPLOYED**
 
 - Deployment: GitHub Pages, existing public URL retained
-- Web migration PR: `#5 web: deploy modular Random Seoul with nearby attractions` — merged
-- Source merge commit: `3c6384f548b1b4b9fd20bec7193b3cc6e9af2efd`
-- Latest deployment artifact commit: `5e59cf3961859a01f2ca241eff18d80bf8d973da`
 - Maintained source entry: `modular.html`
 - Public entry: root `index.html`, generated from the verified Vite modular build
-- Public root `index.html` is now the compact Random Seoul build artifact rather than the legacy single-file source
 - Web remains a permanent supported target
 - Main draw flow: line → station → food → new course
-- Supplemental station result: up to 2 nearby attractions when strong candidates exist
-- Restaurant recommendation: Google Places TOP 3, hard radius 2 km
+- Restaurant recommendation: Google Places live TOP 3, hard radius 2 km
+- Supplemental station result: own curated 0–2 representative attractions
 - Existing Web localStorage settings/history keys are preserved
 - Web browser key remains separate from Android and is HTTP-referrer restricted
-- Random Seoul subway-sign + dice icon is published as 192/512 px Web app icons
-- Web manifest and Apple touch icon metadata are connected for browser/PWA/iPhone Home Screen use
+- Random Seoul subway-sign + dice icon is published as Web app icon
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → `dist/modular.html` → root `index.html` + hashed assets + Web app icons/manifest.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -33,30 +28,50 @@ Status: **COMPLETE / MERGED**
 Merged PR: `#2 refactor: modularize Random Seoul shared core`
 Main merge commit: `4d7808fd7a21c59991234d86792b141b0d02c150`
 
-Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine, state/storage boundaries, Web Places adapter, station resolver/cache, shared restaurant ranking, shared controller, typed UI modules, 900 ms reveal behavior, deterministic browser self-test, responsive mobile parity gates.
+Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine, state/storage boundaries, Web Places adapter, station resolver/cache, shared restaurant ranking, shared controller, typed UI modules, deterministic browser self-test, responsive mobile parity gates.
 
-## Nearby attraction recommendation
+## Curated nearby attractions
 
-Implemented as shared Web/Android product logic.
+Status: **STATIC-DATA MIGRATION IN PROGRESS / PR #6**
 
-- Station draw remains random; attraction recommendation is not another random stage.
-- One background Places Text Search runs after a station is finalized.
-- Station result is not blocked by network latency.
-- Hard radius: 2 km.
-- Eligible candidates: attraction / museum / gallery / park / cultural / historical types.
-- Maximum: 2 results.
-- Minimum review count: 20.
-- Minimum attraction score: 0.45.
-- Ranking: Google relevance 45% + log(review count) 30% + distance 15% + rating 10%.
-- No qualifying candidate → attraction section is hidden.
-- Food-only redraw does not repeat attraction search.
-- Station redraw clears old attractions and performs one search for the new station.
-- Stale async results are rejected if the station changes.
-- Places result data is not added to long-term cache.
+Google Places attraction search/ranking is being removed from runtime.
 
-Current query: `<station>역 관광명소`.
+New policy:
 
-Field targets include 이촌역 → 국립중앙박물관 and Hangang-adjacent stations → representative Hangang parks when returned strongly by Places.
+- station draw remains random; attraction is supplemental information
+- own `curated-attractions.ts` station→attraction dataset
+- maximum 2 representative places
+- no recommendation if a station lacks a clearly representative destination
+- no Google attraction Text Search
+- no Google rating/review threshold for attractions
+- no attraction Google-content cache/database
+- map button remains a normal outbound Google Maps search link
+
+Initial examples include 이촌→국립중앙박물관, 여의나루→여의도한강공원, 자양→뚝섬한강공원, 경복궁→경복궁/국립고궁박물관, 마곡나루→서울식물원 and other high-confidence landmarks.
+
+This replaces the previous `minimum reviews = 20 / score >= 0.45` strategy, which could still surface lesser-known Places results.
+
+## Static station centers
+
+Status: **STATIC-FIRST MIGRATION IN PROGRESS / PR #6**
+
+- `station-coordinates.ts` is checked before Google station resolution
+- covered stations skip Google station-resolution calls entirely
+- uncovered/new stations retain the existing Google fallback
+- fallback Google station coordinates keep the existing 30-day cache behavior
+- initial static coverage prioritizes curated-attraction stations and major interchanges
+
+Reference/source policy: public station-master data such as Seoul Metropolitan Government / TOPIS `서울시 역사마스터 정보`, published under 공공누리 제1유형 (attribution; commercial use and modification allowed).
+
+## Restaurant recommendation policy
+
+Restaurants remain **live Google Places data**.
+
+- candidate lookup occurs when the user completes a food draw
+- ranking continues to use rating, review volume, Google relevance and distance
+- TOP 3 recommendation result is not persisted as a reusable restaurant DB
+- Google rating/review values are not harvested into a long-term database
+- restaurant UI/data can therefore stay current while static product data removes avoidable calls elsewhere
 
 ## Phase 2 — Android app
 
@@ -65,72 +80,62 @@ Status: **ACTIVE — CORE FLOW VERIFIED ON GALAXY S20**
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
 
-### Verified / implemented
+Implemented/verified:
 
 - Capacitor 8 Android project
 - app ID `io.github.momone3131.randomseoul`
-- minSdk 24 / compileSdk 36 / targetSdk 36
 - Places SDK for Android native bridge
 - separate Android-restricted Places API key
-- stable development signing and SHA-1
+- stable development signing
 - native share, haptics, back handling, map intents
-- `INTERNET` only; no GPS/location permission
+- no GPS/location permission
 - Galaxy S20: install/launch, line → station → food, live restaurant TOP 3 verified
-- station/food haptic issue root cause found and event-based fix built
-- nearby-attraction feature included in current Android shared core
-- final Random Seoul subway-sign + dice launcher/adaptive icon applied across Android density resources
+- station/food haptic event-based fix built
+- Random Seoul subway-sign + dice launcher/adaptive icon applied
 
-### Remaining Android field checks
-
-- re-test line/station/food haptics with latest APK
-- test attraction quality on 이촌역 / Hangang-adjacent stations
-- verify attraction-specific Google Maps link
-- verify station Google/Naver map launch and restaurant-specific Google Maps link in a healthy Maps/emulator environment
-- verify share/back/offline behavior
-- visually verify the new launcher icon on a physical Android device
-
-PR #3 remains draft and is not merged to `main` until native behavior validation is sufficiently complete.
+After PR #6 Web/shared validation, its shared static-attraction/station-coordinate changes must be synced into this Android branch and Android CI re-run.
 
 ## Shared architecture requirements
 
 - Web is a permanent product target.
-- Android/iOS business logic must not enter shared draw/controller/ranking rules.
+- Android/iOS business logic stays out of shared product rules.
 - Platform-specific work stays behind adapters/plugins.
-- Native/Web Places providers return common `PlaceCandidate` data.
-- Restaurant and attraction ranking remain shared TypeScript.
+- Restaurants remain shared TypeScript ranking over live provider candidates.
+- Attractions are first-party curated product data, not provider-ranked results.
+- Static station centers are preferred; live provider lookup is fallback only.
 - Current-location/GPS permission remains absent unless a later explicit feature requires it.
 
 ## Current automated gates
 
 Web PR/CI:
 
-- TypeScript/unit tests including attraction quality gate
+- TypeScript/unit tests
+- curated-attraction regression tests
+- static-station-center regression test
 - Vite modular build
 - deterministic headless Chrome full-flow smoke
-- restaurant TOP 3 contract
-- 2 km restaurant exclusion
+- restaurant TOP 3 / 2 km contract
 - responsive mobile contract
-- Web release artifact upload
 
-Web Release additionally verifies the release build again before promoting root `index.html`, hashed assets, manifest and app icons.
-
-Android CI additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, SHA-1 report, and APK artifact upload.
+Android CI additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report and APK artifact upload.
 
 ## Change log
+
+### 2026-09-14
+
+- Decided not to persist Google-derived restaurant TOP 3 results as a reusable DB.
+- Replaced attraction popularity thresholds with a stricter first-party curation approach.
+- Added initial station→representative-attraction static dataset, maximum 2 per station.
+- Removed live Google attraction Text Search/ranking from the shared controller.
+- Added static-first station coordinate lookup with live fallback for uncovered stations.
+- Added regression tests for curated attractions and static station centers.
 
 ### 2026-09-13
 
 - Galaxy S20 core Android flow and live restaurant TOP 3 verified.
-- Station/food haptic issue identified and event-based trigger fix built.
-- Nearby attraction recommendation added as non-random station supplemental information.
-- Attraction ranking/quality gates unit-tested.
-- Public Web migration PR #5 merged without merging the unfinished Android project.
-- `modular.html` became the maintained Web source entry.
-- Verified Web Release generated and committed the new root `index.html` and hashed assets.
-- Browser-restricted Web Places key remains separate from Android and is injected at build time.
-- Random Seoul official icon selected: Seoul subway station-sign motif with a dice replacing the station name.
-- Web manifest / Apple touch icon and Android launcher/adaptive icon resources updated to the same identity.
-- GitHub Pages is rebuilt from the deployed modular root files while the public URL remains unchanged.
+- Nearby attraction recommendation first introduced.
+- Public modular Web deployed while unfinished Android native work remained isolated in PR #3.
+- Random Seoul official subway-sign + dice icon applied to Web and Android.
 
 ### 2026-09-12
 
