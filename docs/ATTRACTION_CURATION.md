@@ -1,6 +1,6 @@
 # Random Seoul — Attraction Curation Policy
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 이 문서는 `src/data/curated-attractions*.ts`에 역별 볼거리를 추가하거나 제거할 때 사용하는 기준입니다.
 
@@ -112,6 +112,21 @@ Last updated: 2026-09-14
 - 특정 행사일에만 의미가 있는 장소는 평상시에도 방문가치가 있는지 확인합니다.
 - 장소가 폐업·이전·장기폐쇄되거나 방문가치가 크게 변하면 제거/교체합니다.
 
+## Map target integrity
+
+명소 카드의 지도 링크는 **명소 자체를 정확히 가리키는 것**이 품질 기준의 일부입니다.
+
+- 현재 attraction 데이터에는 별도 위·경도 필드가 없으며, `mapQuery`가 Google Maps에 전달되는 정적 지도 타깃입니다.
+- `mapQuery`는 **역 이름을 덧붙이지 않아도 그 장소를 독립적으로 식별할 수 있는 완결된 검색어**여야 합니다.
+- UI는 `mapQuery` 뒤에 `${stationName}역` 같은 문구를 자동으로 추가하지 않습니다. 역 이름 추가가 동명이인 역/시설을 우선 매칭시키는 원인이 될 수 있기 때문입니다.
+- 고유 시설명(예: 스타필드 수원, IKEA 광명점)처럼 충분히 식별되는 곳은 공식 시설명을 사용합니다.
+- 동명이인 가능성이 있는 시장·거리·공원은 도시/구/동/도로명 등 지역 식별자를 `mapQuery`에 함께 넣습니다.
+- 강·둘레길·수변공간처럼 범위가 넓은 장소는 해당 역에서 실제 접근하기 좋은 **공식 진입점·광장·공원 지점**을 대표 타깃으로 사용합니다.
+- 공식 주소를 확인할 수 있고 검색 오인 위험이 크면 시설명 + 주소를 사용합니다.
+- 정확한 타깃을 정하기 어려운 애매한 상권/근린 범위는 잘못된 핀을 보여주느니 추천에서 제거하고 0~1곳을 유지합니다.
+
+예: 검암역의 넓은 `경인아라뱃길` 검색어 대신 검암역에서 접근 가능한 공식 지점인 `경인아라뱃길 시천가람터`를 노출하고 `시천가람터 인천광역시 서구 시천동 158-11`을 지도 타깃으로 사용합니다.
+
 ## Data layout
 
 큐레이션 데이터는 유지보수를 위해 두 층으로 나뉩니다.
@@ -120,7 +135,7 @@ Last updated: 2026-09-14
 - `curated-attractions-extra.ts`: 이후 확장한 browse-worthy 목적지
 - `curated-attractions.ts`: 두 데이터셋을 합치고 ID 중복을 제거한 뒤 역당 최대 2곳을 반환하는 public entry
 
-`tests/curated-attractions.test.ts`는 대표 결과, 2개 상한, 그리고 extra 데이터가 실제 추첨 가능한 `노선:역` 키만 사용하는지를 회귀 검증합니다.
+`tests/curated-attractions.test.ts`는 대표 결과, 2개 상한, extra 데이터가 실제 추첨 가능한 `노선:역` 키만 사용하는지, 그리고 station-only 지도 타깃이 없는지를 회귀 검증합니다. `tests/map-links.test.ts`는 명소 지도 링크가 큐레이션된 타깃을 그대로 사용하며 역 이름을 자동으로 덧붙이지 않는지를 검증합니다.
 
 ## What this replaces
 
@@ -144,6 +159,9 @@ Last updated: 2026-09-14
 - `src/data/curated-attractions.ts`
 - `src/data/curated-attractions-base.ts`
 - `src/data/curated-attractions-extra.ts`
+- `src/services/maps/web-map-links.ts`
+- `src/ui/attraction-view.ts`
 - `tests/curated-attractions.test.ts`
+- `tests/map-links.test.ts`
 - `docs/STATUS.md`
 - 필요 시 `docs/PROJECT_PLAN.md` / `docs/PROJECT_CONTEXT.md` / `docs/ARCHITECTURE.md`
