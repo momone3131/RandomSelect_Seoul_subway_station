@@ -1,3 +1,4 @@
+import { getStaticStationLocation } from '../../data/station-coordinates';
 import type { SubwayLine } from '../../domain/types';
 import { resolveStationPlace } from '../../domain/station-resolver';
 import type { StorageService } from '../storage/storage';
@@ -6,7 +7,7 @@ import type { PlaceSearchService } from './place-search';
 export interface StationLocation {
   latitude: number;
   longitude: number;
-  placeId: string;
+  placeId?: string;
 }
 
 interface StationCacheEntry extends StationLocation {
@@ -31,6 +32,9 @@ export class StationLocationService {
   ) {}
 
   async resolve(line: SubwayLine, stationName: string): Promise<StationLocation> {
+    const staticLocation = getStaticStationLocation(line.id, stationName);
+    if (staticLocation) return staticLocation;
+
     const cache = this.storage.read<StationCache>(STATION_CACHE_KEY, {});
     const key = stationCacheId(line, stationName);
     const cached = cache[key];
