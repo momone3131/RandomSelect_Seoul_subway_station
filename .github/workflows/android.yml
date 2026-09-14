@@ -1,6 +1,18 @@
 name: Android CI
 
 on:
+  push:
+    branches:
+      - feature/random-seoul-android
+    paths:
+      - 'android/**'
+      - 'native/**'
+      - 'src/**'
+      - 'capacitor.config.ts'
+      - 'vite.native.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/android.yml'
   pull_request:
     branches:
       - main
@@ -14,6 +26,9 @@ on:
       - 'package-lock.json'
       - '.github/workflows/android.yml'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: android-ci-${{ github.event.pull_request.number || github.ref }}
@@ -111,9 +126,59 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Upload debug APK
+      - name: Prepare easy-download APK
+        shell: bash
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk random-seoul-latest.apk
+          sha256sum random-seoul-latest.apk > random-seoul-latest.apk.sha256
+
+      - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: random-seoul-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            random-seoul-latest.apk
+            random-seoul-latest.apk.sha256
           if-no-files-found: error
+
+      - name: Publish fixed latest-development release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/feature/random-seoul-android'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git tag -f android-dev-latest "$GITHUB_SHA"
+          git push --force origin refs/tags/android-dev-latest
+
+          NOTES=$(cat <<EOF
+          Latest Random Seoul Android development APK.
+
+          Source branch: feature/random-seoul-android
+          Source commit: $GITHUB_SHA
+          Build: debug/development APK
+
+          The fixed download asset is random-seoul-latest.apk. Each successful branch build replaces the previous APK.
+          EOF
+          )
+
+          if gh release view android-dev-latest >/dev/null 2>&1; then
+            gh release edit android-dev-latest \
+              --title 'Random Seoul — Latest Android Dev APK' \
+              --notes "$NOTES"
+          else
+            gh release create android-dev-latest \
+              --verify-tag \
+              --title 'Random Seoul — Latest Android Dev APK' \
+              --notes "$NOTES"
+          fi
+
+          gh release upload android-dev-latest \
+            random-seoul-latest.apk \
+            random-seoul-latest.apk.sha256 \
+            --clobber
+
+          {
+            echo '### Latest Android APK'
+            echo '- Release: https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/tag/android-dev-latest'
+            echo '- Direct APK: https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk'
+          } >> "$GITHUB_STEP_SUMMARY"
