@@ -1,6 +1,6 @@
 # Random Seoul — Architecture
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 ## 1. Architecture goals
 
@@ -110,11 +110,26 @@ Random Seoul
 - 역 추첨 직후 동기적으로 표시되어 네트워크 대기 없음
 - 음식 재추첨과 무관
 - 명소 Google Places Text Search 없음
-- 명소 카드의 지도 버튼은 일반 Google Maps 검색 링크일 뿐 Places 데이터 저장소가 아님
 
-`tests/curated-attractions.test.ts`는 대표 A/B 결과, 상한 2개, base+extra 보강 동작, 그리고 extra의 `노선:역` 키가 실제 `SUBWAY_LINES`에 존재하는지를 검증합니다.
+### Attraction map-target strategy
 
-따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB 등록 여부** 자체가 담당합니다.
+`AttractionRecommendation`은 별도 명소 위·경도를 저장하지 않고 `mapQuery`를 정적 지도 타깃으로 사용합니다.
+
+과거 UI는 `mapQuery + stationName + "역"`을 Google Maps 검색어로 만들었는데, 이 방식은 같은 이름의 역이나 주변 동명이인 장소를 Google이 우선 선택할 수 있었습니다. 현재는 다음 규칙으로 변경했습니다.
+
+- `mapQuery`는 명소 자체를 **독립적으로 식별하는 완결된 타깃**이어야 함
+- `attraction-view.ts`는 역 이름을 자동으로 덧붙이지 않음
+- `googleMapsAttractionUrl()`이 저장된 `mapQuery`를 그대로 Google Maps search URL로 변환
+- 고유 시설은 공식 시설명을 사용
+- 동명이인 가능성이 있는 시장/거리/공원은 도시·구·동·도로명 또는 주소를 함께 사용
+- 강·둘레길·수변 등 넓은 대상은 해당 역에서 접근하기 좋은 공식 진입점/광장/공원 지점을 타깃으로 사용
+- 정확한 타깃이 불확실한 후보는 station 검색어로 억지 보정하지 않고 제거 가능
+
+예: 검암의 `경인아라뱃길`은 `경인아라뱃길 시천가람터`로 구체화하고 `시천가람터 인천광역시 서구 시천동 158-11`을 `mapQuery`로 사용합니다.
+
+`tests/curated-attractions.test.ts`는 대표 A/B 결과, 상한 2개, base+extra 보강 동작, extra의 `노선:역` 키 유효성, station-only 지도 타깃 부재를 검증합니다. `tests/map-links.test.ts`는 attraction URL 생성 시 역 이름이 자동 추가되지 않는 것을 검증합니다.
+
+따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB 등록 여부 + 지도 타깃 정확성**이 담당합니다.
 
 ## 6. Station center strategy
 
@@ -194,6 +209,8 @@ Vite native build → Capacitor sync → Gradle `assembleDebug` → APK 생성 �
 
 Release tag와 APK asset은 성공한 최신 Android branch build를 가리키도록 자동 갱신합니다. PR 이벤트에서는 APK 검증만 하고 Release 갱신은 하지 않으며, branch push/workflow dispatch에서만 latest dev release를 갱신합니다.
 
+Android CI의 SDK setup은 obsolete `tools` package를 요청하지 않고 `platform-tools`만 명시합니다. 최신 GitHub runner에서 제거된 legacy `tools` package 때문에 SDK setup이 실패하는 것을 방지하기 위한 설정입니다.
+
 이 APK는 개발/debug 빌드이며 향후 Play 배포용 release AAB와는 별도입니다.
 
 ### iOS
@@ -207,7 +224,7 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 - product flow
 - ranking/filter thresholds
 - Places provider/API
-- curated attraction/station-coordinate data policy
+- curated attraction/station-coordinate/map-target data policy
 - app identifier
 - storage provider
 - framework/platform dependency
