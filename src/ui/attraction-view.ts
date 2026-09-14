@@ -1,5 +1,5 @@
 import type { AttractionRecommendation } from '../domain/types';
-import { googleMapsSearchUrl } from '../services/maps/web-map-links';
+import { googleMapsAttractionUrl } from '../services/maps/web-map-links';
 import { append, byId, make, replaceContent } from './dom';
 
 function ensureSection(): HTMLElement {
@@ -51,7 +51,7 @@ export function renderAttractions(stationName: string, attractions: readonly Att
   }
 
   section.hidden = false;
-  byId<HTMLElement>('attraction_context').textContent = `${stationName}역 주변 · 대표적인 곳만 엄선`;
+  byId<HTMLElement>('attraction_context').textContent = `${stationName}역 주변 · 둘러보기 좋은 곳만 엄선`;
   const fragment = document.createDocumentFragment();
 
   attractions.forEach((attraction, index) => {
@@ -64,8 +64,7 @@ export function renderAttractions(stationName: string, attractions: readonly Att
     if (attraction.note) meta.appendChild(make('span', 'restaurant-distance', attraction.note));
 
     const link = make('a', 'restaurant-map-link attraction-map-link google-place-link');
-    const query = attraction.mapQuery ?? attraction.name;
-    link.href = googleMapsSearchUrl(`${query} ${stationName}역`);
+    link.href = googleMapsAttractionUrl(attraction.name, attraction.mapQuery);
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     append(link, make('span', 'map-mark', 'G'), document.createTextNode('구글지도에서 보기'));
