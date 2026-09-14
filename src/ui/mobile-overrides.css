@@ -23,3 +23,71 @@
     min-width: 0;
   }
 }
+
+/* The primary draw action lives inside the card that will receive the next random result. */
+.panel.next-draw {
+  border-style: solid;
+  border-color: #b8ca96;
+  box-shadow: 0 10px 26px rgba(59, 83, 48, 0.10);
+  padding-bottom: 82px;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+
+.panel.next-draw > .draw-btn.integrated {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  width: auto;
+  min-height: 46px;
+  padding: 10px 13px;
+  justify-content: flex-start;
+  gap: 8px;
+  border-color: var(--dark);
+  border-radius: 12px;
+  background: var(--dark);
+  color: #efffc8;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.panel.next-draw > .draw-btn.integrated:not(:disabled):hover {
+  background: #294a3a;
+  box-shadow: none;
+}
+
+.panel.next-draw > .draw-btn.integrated .arrow {
+  margin-left: auto;
+}
+
+.draw-shell:not([data-stage="done"]) .action-zone {
+  padding-top: 0;
+}
+
+@media (max-width: 720px) {
+  .food-panel.next-draw {
+    min-height: 176px;
+    padding-bottom: 68px;
+  }
+}
+
+@media (max-width: 430px) {
+  .panel.next-draw {
+    padding-bottom: 68px;
+  }
+
+  .panel.next-draw > .draw-btn.integrated {
+    left: 9px;
+    right: 9px;
+    bottom: 9px;
+    min-height: 44px;
+    padding: 9px 11px;
+    font-size: 13px;
+  }
+
+  .food-panel.next-draw {
+    min-height: 166px;
+    padding-bottom: 62px;
+  }
+}
