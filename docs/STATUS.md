@@ -8,12 +8,12 @@ Last updated: 2026-09-15
 
 - **Android:** 현재 주 개발/배포 대상이자 앱 본체
 - **Web:** 계속 배포되는 지원 대상이면서 Android 기능/UX를 빠르게 검증하는 reference implementation
-- 프로젝트 소유자는 iPhone 사용자이므로 Web은 Android 기기 없이 새 기능을 직접 확인하는 실사용 검증 경로로도 중요함
+- 프로젝트 소유자는 iPhone 사용자이므로 Web은 Android 기기 없이 새 기능/UX를 직접 확인하는 실사용 검증 경로로도 중요함
 - **iOS:** Android 안정화 이후 shared core를 재사용해 후속 지원 예정
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED / ATTRACTION MAP TARGET FIX LIVE**
+Status: **MODULAR WEB DEPLOYED / INTEGRATED DRAW CTA + ATTRACTION MAP TARGET FIX LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
@@ -26,7 +26,7 @@ Status: **MODULAR WEB DEPLOYED / ATTRACTION MAP TARGET FIX LIVE**
 - Web browser key remains separate from Android and is HTTP-referrer restricted
 - Random Seoul subway-sign + dice icon is published as Web app icon
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and also supports manual dispatch. Deployment commit creation now fetches/rebases onto the latest `main` before push so harmless concurrent docs/test commits do not reject the release push.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and also supports manual dispatch. Deployment commit creation fetches/rebases onto the latest `main` before push so harmless concurrent docs/test commits do not reject the release push.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -36,6 +36,39 @@ Merged PR: `#2 refactor: modularize Random Seoul shared core`
 Main merge commit: `4d7808fd7a21c59991234d86792b141b0d02c150`
 
 Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine, state/storage boundaries, Web Places adapter, station resolver/cache, shared restaurant ranking, shared controller, typed UI modules, deterministic browser self-test, responsive mobile parity gates.
+
+## Primary draw UI
+
+Status: **LIVE ON WEB / INCLUDED IN LATEST ANDROID DEV APK**
+
+The main draw action is no longer a separate persistent full-width button below the three result cards during the line/station/food stages.
+
+Current behavior:
+
+- the same `draw_btn` is moved into the card that will receive the **next** random result
+- current target card receives `.next-draw` emphasis and a compact in-card CTA
+- line stage → CTA inside the line card
+- station stage → CTA inside the station card
+- food stage → CTA inside the food card
+- completed course → CTA returns to the normal action area and keeps the existing “새 코스 다시 뽑기” behavior
+- the integrated CTA uses a compact dark-green treatment with lime text instead of a second large lime bar below the cards
+- touch target remains at least 44 px on narrow mobile layouts
+- partial redraw, map, copy and restaurant actions remain in their existing lower action area
+
+Implementation:
+
+- `src/ui/primary-draw-placement.ts` owns placement of the existing main draw button
+- `draw-view.ts` computes the current draw stage and delegates placement
+- `mobile-overrides.css` owns the active-card emphasis and integrated CTA layout
+- `responsive-contract.test.ts` guards the placement/style contract
+
+Verification:
+
+- main source commit `84e0f88cb1fe1abcf85befb825cd85f2b4f0db7c`
+- Web Release run `34908440921` passed tests → build → headless browser smoke → deployment promotion
+- public Web deployment commit `8356f8dfe67dcc5a51378f3e6e5781495e424af5` publishes bundle `assets/modular-ixAMeIFU.js`
+- Android branch source commit `2d7d4e09140dcaa46950ffa0613f21741f50eda2`
+- Android CI run `34908504671` passed shared tests → native build → Capacitor sync → Gradle `assembleDebug` → artifact upload → latest Release publish
 
 ## Curated nearby attractions
 
@@ -89,14 +122,13 @@ Representative corrections:
 - 안양1번가·부평 문화의거리·강촌유원지: regional context added
 - 오목교의 vague `오목교·목동 상권` recommendation removed; the station keeps the stronger 현대백화점 목동점 candidate only
 
-Regression coverage now verifies the station-key set, max-2 rule, exact ambiguous target example, absence of station-only map targets, and that attraction URL generation does not append a station name.
+Regression coverage verifies the station-key set, max-2 rule, exact ambiguous target example, absence of station-only map targets, and that attraction URL generation does not append a station name.
 
 Verification:
 
 - main CI run `34903621591` passed the map-target regression suite, Vite build and browser smoke gates.
-- later documentation/workflow heads also pass normal main CI.
 - Web Release run `34904203485` passed tests → build → release smoke → root promotion → deployment push.
-- public Web deployment commit `828b39a04bf2cc577347d6e7302ec55d96fe6509` publishes bundle `assets/modular-Chs_uZ61.js`, which includes the corrected attraction map behavior/data.
+- public Web deployment commit `828b39a04bf2cc577347d6e7302ec55d96fe6509` published bundle `assets/modular-Chs_uZ61.js` with the corrected attraction map behavior/data; later UI deployment superseded the bundle while retaining these fixes.
 
 The 0–2 rule remains unchanged; weak places are not added merely to fill slots.
 
@@ -124,7 +156,7 @@ Restaurants remain **live Google Places data**.
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — MAP TARGET FIX INCLUDED IN LATEST DEV APK**
+Status: **ACTIVE — INTEGRATED DRAW CTA INCLUDED IN LATEST DEV APK**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -143,17 +175,18 @@ Implemented/verified:
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
 - curated-attraction/static-station-center shared changes synchronized to Android branch
 - exact attraction map-target behavior/data/tests synchronized to Android branch
+- integrated primary draw-card CTA synchronized to Android branch
 - Android CI runs on relevant pushes to `feature/random-seoul-android`
 - Android SDK setup explicitly requests `platform-tools` and no longer requests the removed legacy `tools` package
 - successful branch builds create `random-seoul-debug-apk` Actions artifact and update fixed Release tag `android-dev-latest`
 
 Latest verified development APK:
 
-- source commit: `b4e2e41616c88881b5ef054f20d6d6f992d26159`
-- Android CI run: `34903899348` — success
+- source commit: `2d7d4e09140dcaa46950ffa0613f21741f50eda2`
+- Android CI run: `34908504671` — success
 - asset: `random-seoul-latest.apk`
-- size: 11,407,520 bytes
-- SHA-256: `597b5cd675f538b1b0e95793a2aec2f3a173fe5d0023475e4560b201a617846a`
+- size: 11,408,240 bytes
+- SHA-256: `2646191154ebd9a35be949632d026e2f95c18db9fbfba75dfa7ebc9b60344e83`
 - checksum asset: `random-seoul-latest.apk.sha256`
 
 Easy download locations remain linked at the top of `README.md`.
@@ -189,6 +222,7 @@ Meaningful feature, architecture, policy, branch-role or validation changes must
 Web PR/CI:
 
 - TypeScript/unit tests
+- integrated primary draw placement/style contract
 - curated-attraction regression + station-key/map-target integrity tests
 - map-link regression test preventing automatic station-name suffixes
 - static-station-center regression test
@@ -203,6 +237,12 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 
 ### 2026-09-15
 
+- Polished the main draw UI by integrating the primary draw button into the card that will receive the next random result instead of keeping a separate large button row below all cards.
+- Added `.next-draw` active-card emphasis and a compact dark-green in-card CTA; line/station/food stages now visually bind the action and result target together.
+- Preserved the existing completed-course behavior by returning the same main button to the lower action area for full-course restart.
+- Added `primary-draw-placement.ts` and responsive regression coverage for the integrated CTA/touch-target contract.
+- Web source `84e0f88c...` passed Web Release run `34908440921`; deployment `8356f8df...` published bundle `modular-ixAMeIFU.js`.
+- Synchronized the UI change to Android source `2d7d4e09...`; Android CI run `34908504671` passed and republished the latest development APK.
 - Investigated reports that attraction map links sometimes opened a same-named station or unrelated nearby place.
 - Confirmed there were no dedicated attraction coordinates; the root cause was Google Maps search query construction that appended the drawn station name to `mapQuery`.
 - Added `googleMapsAttractionUrl()` and changed attraction UI to use each curated `mapQuery` directly with no automatic station suffix.
@@ -211,9 +251,7 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 - Removed the vague 오목교·목동 상권 entry rather than keeping a misleading map result.
 - Added regression tests for map-target integrity and no-station-suffix URL generation.
 - Synchronized all map-target fixes/tests to the Android branch and rebuilt the latest development APK.
-- Android CI initially hit GitHub runner incompatibility because `setup-android` tried to install removed SDK package `tools`; workflow now requests `platform-tools` explicitly. Run `34903899348` then passed completely and republished `android-dev-latest`.
 - Hardened `web-release.yml` against concurrent docs/test commits by rebasing the generated deployment commit onto latest `main` before push.
-- Web Release run `34904203485` passed and deployment commit `828b39a0...` published bundle `modular-Chs_uZ61.js` with the corrected map targets.
 
 ### 2026-09-14
 
