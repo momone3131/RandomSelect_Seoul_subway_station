@@ -76,8 +76,9 @@ Verification state:
 - main source commit `7e45dfb3210c1b16a758523bdc5e4d8f2aac967c` introduced the broader data layer and regression tests.
 - Web Release run tested the new station-key integrity, unit/regression suite, Vite build and headless Chrome smoke successfully.
 - deployment commit `94700886f6d9b7c1ff23dde0cdff71beef024979` publishes bundle `assets/modular-BsK7DWq7.js` to the public Web root.
-- Android branch source/tests are synchronized at `c699421006f97dd7356f3951d6708ded875636bd`.
-- no fresh Actions run has been generated for that Android head yet; re-verify the current Android branch through shared CI + Android APK CI before merge/release.
+- Android branch contains the same broader attraction source/tests.
+- latest Android development build source commit: `e43b02fc021e9045b9b165414960a8174ba072b4`.
+- Android CI run `34858766264` completed successfully: shared tests → native Web build → Capacitor sync → Gradle `assembleDebug` → artifact upload → GitHub Release publish.
 
 ## Static station centers
 
@@ -103,7 +104,7 @@ Restaurants remain **live Google Places data**.
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — BROADER ATTRACTION DATA SYNCED / FRESH CI PENDING**
+Status: **ACTIVE — LATEST DEV APK BUILT AND PUBLISHED**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -121,8 +122,16 @@ Implemented/verified:
 - station/food haptic event-based fix built
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
 - curated-attraction/static-station-center shared changes synchronized to Android branch
-- latest browse-worthy attraction data + regression tests synchronized at commit `c699421006f97dd7356f3951d6708ded875636bd`
-- current Android head has no new Actions run yet; previous APK/CI run was green before this newest expansion
+- latest browse-worthy attraction data + regression tests synchronized
+- Android CI now also runs on relevant pushes to `feature/random-seoul-android`
+- successful branch builds create `random-seoul-debug-apk` Actions artifact
+- successful branch builds publish/update fixed GitHub Release tag `android-dev-latest`
+- fixed APK asset name: `random-seoul-latest.apk`
+- checksum asset: `random-seoul-latest.apk.sha256`
+- current APK release asset size: 11,407,312 bytes
+- current APK SHA-256: `d8768eac956ff2b1f2e2bc43a11705fc3d4776053d54fd27744c192c3ebf48a6`
+
+Easy download locations are linked at the top of `README.md`.
 
 ## Shared architecture requirements
 
@@ -161,19 +170,21 @@ Web PR/CI:
 - restaurant TOP 3 / 2 km contract
 - responsive mobile contract
 
-Android CI additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report and APK artifact upload.
+Android CI additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report, APK artifact upload and latest-development Release publication on Android branch pushes.
 
 ## Change log
 
 ### 2026-09-14
 
+- Added a persistent Android development distribution path: successful Android branch builds now publish `random-seoul-latest.apk` to fixed Release tag `android-dev-latest` and keep the Actions artifact as a secondary path.
+- Added direct latest-APK and Release links to the repository `README.md` so the APK can be downloaded without navigating Actions internals.
+- Triggered a fresh Android build at commit `e43b02fc...`; Android CI run `34858766264` passed all build/test/release steps and published the APK plus SHA-256 checksum.
 - Broadened attraction acceptance from mainly landmark/region-representative destinations to **places that are genuinely worth browsing or spending time at after a random station draw**.
 - Added commercial/lifestyle destinations such as IKEA 광명/고양, 스타필드 수원/고양, 더현대 서울, 대형 몰·아울렛·백화점 alongside markets, parks, waterfronts, campuses and cultural spaces.
 - Kept ordinary playgrounds, apartment pocket parks and weak generic neighborhood facilities excluded.
 - Split curated attraction data into base + extra layers while keeping `curated-attractions.ts` as the stable public lookup entry.
 - Added regression coverage for browse-worthy commercial destinations, base+extra supplement behavior and invalid station-key detection.
 - Verified and deployed the broader Web data: source `7e45dfb...` → deployed root commit `94700886...` / bundle `modular-BsK7DWq7.js`.
-- Synchronized the same data/test changes to Android branch commit `c699421...`; fresh Android CI remains pending.
 - Earlier in the day, expanded the initial landmark-heavy seed with Tier B regional destinations such as 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장 and 안양예술공원.
 - Added `docs/ATTRACTION_CURATION.md` and established repository documentation as durable cross-chat project memory.
 - Clarified platform roles: Android primary, Web supported/reference validation surface, iOS later.
