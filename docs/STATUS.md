@@ -6,7 +6,7 @@ Last updated: 2026-09-14
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED**
+Status: **MODULAR WEB DEPLOYED / CURATED ATTRACTIONS LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
@@ -32,11 +32,11 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Curated nearby attractions
 
-Status: **STATIC-DATA MIGRATION IN PROGRESS / PR #6**
+Status: **COMPLETE / PR #6 MERGED**
 
-Google Places attraction search/ranking is being removed from runtime.
+Google Places attraction search/ranking has been removed from runtime.
 
-New policy:
+Current policy:
 
 - station draw remains random; attraction is supplemental information
 - own `curated-attractions.ts` station→attraction dataset
@@ -53,7 +53,7 @@ This replaces the previous `minimum reviews = 20 / score >= 0.45` strategy, whic
 
 ## Static station centers
 
-Status: **STATIC-FIRST MIGRATION IN PROGRESS / PR #6**
+Status: **STATIC-FIRST ACTIVE**
 
 - `station-coordinates.ts` is checked before Google station resolution
 - covered stations skip Google station-resolution calls entirely
@@ -75,7 +75,7 @@ Restaurants remain **live Google Places data**.
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — CORE FLOW VERIFIED ON GALAXY S20**
+Status: **ACTIVE — CURATED/STATIC SHARED CHANGES SYNCED, CI PASSING**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -92,8 +92,8 @@ Implemented/verified:
 - Galaxy S20: install/launch, line → station → food, live restaurant TOP 3 verified
 - station/food haptic event-based fix built
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
-
-After PR #6 Web/shared validation, its shared static-attraction/station-coordinate changes must be synced into this Android branch and Android CI re-run.
+- PR #6 curated-attraction/static-station-center shared changes synchronized to Android branch
+- Web CI and Android APK CI pass after synchronization
 
 ## Shared architecture requirements
 
@@ -129,6 +129,8 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 - Removed live Google attraction Text Search/ranking from the shared controller.
 - Added static-first station coordinate lookup with live fallback for uncovered stations.
 - Added regression tests for curated attractions and static station centers.
+- Merged PR #6, completed verified Web release, and synchronized the same shared behavior into Android PR #3.
+- Web CI and Android debug APK CI both pass after synchronization.
 
 ### 2026-09-13
 
