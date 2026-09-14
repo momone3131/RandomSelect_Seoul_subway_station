@@ -1,6 +1,6 @@
 # Random Seoul — Development Status
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 이 문서는 현재 진행 위치와 다음 행동을 기록합니다.
 
@@ -13,7 +13,7 @@ Last updated: 2026-09-14
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED / BROADER BROWSE-WORTHY ATTRACTIONS LIVE**
+Status: **MODULAR WEB DEPLOYED / ATTRACTION MAP TARGET FIX LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
@@ -26,7 +26,7 @@ Status: **MODULAR WEB DEPLOYED / BROADER BROWSE-WORTHY ATTRACTIONS LIVE**
 - Web browser key remains separate from Android and is HTTP-referrer restricted
 - Random Seoul subway-sign + dice icon is published as Web app icon
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and also supports manual dispatch.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and also supports manual dispatch. Deployment commit creation now fetches/rebases onto the latest `main` before push so harmless concurrent docs/test commits do not reject the release push.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -39,7 +39,7 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Curated nearby attractions
 
-Status: **LIVE / BROWSE-WORTHY EXPANSION DEPLOYED**
+Status: **LIVE / BROWSE-WORTHY EXPANSION + MAP TARGET HARDENING DEPLOYED**
 
 Google Places attraction search/ranking has been removed from runtime.
 
@@ -49,7 +49,7 @@ Current policy:
 - first-party curated static data
 - maximum 2 places per station
 - no recommendation if a station has no worthwhile candidate
-- threshold is now **actual browse/stay value + reasonable station accessibility**
+- threshold is **actual browse/stay value + reasonable station accessibility**
 - practical question: “이 역에 내려서 30분~몇 시간 정도 둘러보거나 구경할 목적으로 추천해도 괜찮은가?”
 - Tier A: major metro-area landmark/destination → include
 - Tier B: markets, distinctive streets, cultural spaces, walks, parks/waterfronts, campuses and large browse-worthy shopping/lifestyle destinations → include
@@ -57,7 +57,6 @@ Current policy:
 - Tier C: ordinary playground, apartment pocket park, generic neighborhood facility, ordinary mart/small shopping facility → exclude
 - selection is editorial rather than a mechanical rating/review score
 - no Google attraction Text Search or attraction rating/review threshold
-- map button remains a normal outbound Google Maps search link
 
 Detailed criteria: `docs/ATTRACTION_CURATION.md`.
 
@@ -67,18 +66,39 @@ Data layout:
 - `curated-attractions-extra.ts`: broader browse-worthy expansion
 - `curated-attractions.ts`: merge + ID dedupe + max-2 public lookup
 
-Representative additions in the latest expansion include IKEA 광명/고양, 스타필드 수원/고양, 롯데몰 김포공항, 현대백화점 디큐브시티, 더현대 서울, 스타필드시티 위례, 현대백화점 판교, 광교호수공원, 현대프리미엄아울렛 송도, 트리플스트리트, 원마운트, 라페스타, 왕송호수, 철도박물관, 신포국제시장, 여러 전통시장/카페거리/로데오거리/문화공간 등입니다.
+### Attraction map-target fix
+
+The attraction dataset does **not** store dedicated attraction latitude/longitude. `AttractionRecommendation.mapQuery` is the static Google Maps target.
+
+The previous UI appended the drawn station name to every attraction query (`mapQuery + stationName + 역`). That could make Google Maps prefer the station itself or a same-named nearby place. This has been removed globally.
+
+Current behavior:
+
+- `googleMapsAttractionUrl()` uses only the curated attraction `mapQuery` (or attraction name fallback)
+- UI never appends the station name automatically
+- ambiguous streets/markets/parks receive city/district/road/address disambiguators where needed
+- broad linear/waterfront destinations use a concrete nearby anchor when possible
+- vague targets are removed rather than forcing a misleading pin
+
+Representative corrections:
+
+- 검암: broad `경인아라뱃길` → `경인아라뱃길 시천가람터`, map target `시천가람터 인천광역시 서구 시천동 158-11`
+- 천호 로데오거리: road context added
+- 정자동 카페거리: 성남/분당 context added
+- 수원역·범계·산본·서현 로데오거리: city/road context added
+- 안양1번가·부평 문화의거리·강촌유원지: regional context added
+- 오목교의 vague `오목교·목동 상권` recommendation removed; the station keeps the stronger 현대백화점 목동점 candidate only
+
+Regression coverage now verifies the station-key set, max-2 rule, exact ambiguous target example, absence of station-only map targets, and that attraction URL generation does not append a station name.
+
+Verification:
+
+- main CI run `34903621591` passed the map-target regression suite, Vite build and browser smoke gates.
+- later documentation/workflow heads also pass normal main CI.
+- Web Release run `34904203485` passed tests → build → release smoke → root promotion → deployment push.
+- public Web deployment commit `828b39a04bf2cc577347d6e7302ec55d96fe6509` publishes bundle `assets/modular-Chs_uZ61.js`, which includes the corrected attraction map behavior/data.
 
 The 0–2 rule remains unchanged; weak places are not added merely to fill slots.
-
-Verification state:
-
-- main source commit `7e45dfb3210c1b16a758523bdc5e4d8f2aac967c` introduced the broader data layer and regression tests.
-- Web Release run tested the new station-key integrity, unit/regression suite, Vite build and headless Chrome smoke successfully.
-- deployment commit `94700886f6d9b7c1ff23dde0cdff71beef024979` publishes bundle `assets/modular-BsK7DWq7.js` to the public Web root.
-- Android branch contains the same broader attraction source/tests.
-- latest Android development build source commit: `e43b02fc021e9045b9b165414960a8174ba072b4`.
-- Android CI run `34858766264` completed successfully: shared tests → native Web build → Capacitor sync → Gradle `assembleDebug` → artifact upload → GitHub Release publish.
 
 ## Static station centers
 
@@ -104,7 +124,7 @@ Restaurants remain **live Google Places data**.
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — LATEST DEV APK BUILT AND PUBLISHED**
+Status: **ACTIVE — MAP TARGET FIX INCLUDED IN LATEST DEV APK**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -122,16 +142,21 @@ Implemented/verified:
 - station/food haptic event-based fix built
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
 - curated-attraction/static-station-center shared changes synchronized to Android branch
-- latest browse-worthy attraction data + regression tests synchronized
-- Android CI now also runs on relevant pushes to `feature/random-seoul-android`
-- successful branch builds create `random-seoul-debug-apk` Actions artifact
-- successful branch builds publish/update fixed GitHub Release tag `android-dev-latest`
-- fixed APK asset name: `random-seoul-latest.apk`
-- checksum asset: `random-seoul-latest.apk.sha256`
-- current APK release asset size: 11,407,312 bytes
-- current APK SHA-256: `d8768eac956ff2b1f2e2bc43a11705fc3d4776053d54fd27744c192c3ebf48a6`
+- exact attraction map-target behavior/data/tests synchronized to Android branch
+- Android CI runs on relevant pushes to `feature/random-seoul-android`
+- Android SDK setup explicitly requests `platform-tools` and no longer requests the removed legacy `tools` package
+- successful branch builds create `random-seoul-debug-apk` Actions artifact and update fixed Release tag `android-dev-latest`
 
-Easy download locations are linked at the top of `README.md`.
+Latest verified development APK:
+
+- source commit: `b4e2e41616c88881b5ef054f20d6d6f992d26159`
+- Android CI run: `34903899348` — success
+- asset: `random-seoul-latest.apk`
+- size: 11,407,520 bytes
+- SHA-256: `597b5cd675f538b1b0e95793a2aec2f3a173fe5d0023475e4560b201a617846a`
+- checksum asset: `random-seoul-latest.apk.sha256`
+
+Easy download locations remain linked at the top of `README.md`.
 
 ## Shared architecture requirements
 
@@ -141,6 +166,7 @@ Easy download locations are linked at the top of `README.md`.
 - Platform-specific work stays behind adapters/plugins.
 - Restaurants remain shared TypeScript ranking over live provider candidates.
 - Attractions are first-party curated product data, not provider-ranked results.
+- Attraction map targets must be self-contained and must not depend on automatically appending a station name.
 - Static station centers are preferred; live provider lookup is fallback only.
 - Current-location/GPS permission remains absent unless a later explicit feature requires it.
 
@@ -154,7 +180,7 @@ The repository itself is the durable project memory for future chats and develop
 - `docs/STATUS.md`: current implementation state and recent verified changes
 - `docs/PROJECT_PLAN.md`: product intent, platform strategy and roadmap
 - `docs/ARCHITECTURE.md`: technical structure and design ownership
-- `docs/ATTRACTION_CURATION.md`: attraction inclusion/exclusion policy
+- `docs/ATTRACTION_CURATION.md`: attraction inclusion/exclusion and map-target integrity policy
 
 Meaningful feature, architecture, policy, branch-role or validation changes must update the relevant documentation in the same change/PR. New sessions should read `PROJECT_CONTEXT.md` first, then `STATUS.md`, and verify actual GitHub branches/PRs/CI before modifying code.
 
@@ -163,7 +189,8 @@ Meaningful feature, architecture, policy, branch-role or validation changes must
 Web PR/CI:
 
 - TypeScript/unit tests
-- curated-attraction regression + station-key integrity tests
+- curated-attraction regression + station-key/map-target integrity tests
+- map-link regression test preventing automatic station-name suffixes
 - static-station-center regression test
 - Vite modular build
 - deterministic headless Chrome full-flow smoke
@@ -174,18 +201,29 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 
 ## Change log
 
+### 2026-09-15
+
+- Investigated reports that attraction map links sometimes opened a same-named station or unrelated nearby place.
+- Confirmed there were no dedicated attraction coordinates; the root cause was Google Maps search query construction that appended the drawn station name to `mapQuery`.
+- Added `googleMapsAttractionUrl()` and changed attraction UI to use each curated `mapQuery` directly with no automatic station suffix.
+- Disambiguated high-risk market/street/park targets with city/district/road/address context.
+- Replaced 검암's broad `경인아라뱃길` target with the concrete nearby `경인아라뱃길 시천가람터` anchor and address target.
+- Removed the vague 오목교·목동 상권 entry rather than keeping a misleading map result.
+- Added regression tests for map-target integrity and no-station-suffix URL generation.
+- Synchronized all map-target fixes/tests to the Android branch and rebuilt the latest development APK.
+- Android CI initially hit GitHub runner incompatibility because `setup-android` tried to install removed SDK package `tools`; workflow now requests `platform-tools` explicitly. Run `34903899348` then passed completely and republished `android-dev-latest`.
+- Hardened `web-release.yml` against concurrent docs/test commits by rebasing the generated deployment commit onto latest `main` before push.
+- Web Release run `34904203485` passed and deployment commit `828b39a0...` published bundle `modular-Chs_uZ61.js` with the corrected map targets.
+
 ### 2026-09-14
 
-- Added a persistent Android development distribution path: successful Android branch builds now publish `random-seoul-latest.apk` to fixed Release tag `android-dev-latest` and keep the Actions artifact as a secondary path.
+- Added a persistent Android development distribution path: successful Android branch builds publish `random-seoul-latest.apk` to fixed Release tag `android-dev-latest` and keep the Actions artifact as a secondary path.
 - Added direct latest-APK and Release links to the repository `README.md` so the APK can be downloaded without navigating Actions internals.
-- Triggered a fresh Android build at commit `e43b02fc...`; Android CI run `34858766264` passed all build/test/release steps and published the APK plus SHA-256 checksum.
 - Broadened attraction acceptance from mainly landmark/region-representative destinations to **places that are genuinely worth browsing or spending time at after a random station draw**.
 - Added commercial/lifestyle destinations such as IKEA 광명/고양, 스타필드 수원/고양, 더현대 서울, 대형 몰·아울렛·백화점 alongside markets, parks, waterfronts, campuses and cultural spaces.
 - Kept ordinary playgrounds, apartment pocket parks and weak generic neighborhood facilities excluded.
 - Split curated attraction data into base + extra layers while keeping `curated-attractions.ts` as the stable public lookup entry.
 - Added regression coverage for browse-worthy commercial destinations, base+extra supplement behavior and invalid station-key detection.
-- Verified and deployed the broader Web data: source `7e45dfb...` → deployed root commit `94700886...` / bundle `modular-BsK7DWq7.js`.
-- Earlier in the day, expanded the initial landmark-heavy seed with Tier B regional destinations such as 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장 and 안양예술공원.
 - Added `docs/ATTRACTION_CURATION.md` and established repository documentation as durable cross-chat project memory.
 - Clarified platform roles: Android primary, Web supported/reference validation surface, iOS later.
 - Decided not to persist Google-derived restaurant TOP 3 results as a reusable DB.
