@@ -13,7 +13,7 @@ Random Seoul은 Web / Android / iOS가 같은 제품 로직을 공유하도록 �
 - Android Java/Kotlin과 iOS Swift는 가능한 한 얇게 유지
 - Web은 앱 출시 후에도 정식 타깃으로 유지
 - 식당 추천은 실시간 Google Places 후보를 shared TypeScript에서 필터링/랭킹
-- 대표 명소와 가능한 역 좌표는 자체 정적 데이터로 소유해 불필요한 Google 호출을 줄임
+- 대표/둘러보기 좋은 장소와 가능한 역 좌표는 자체 정적 데이터로 소유해 불필요한 Google 호출을 줄임
 
 ## 2. Repository structure
 
@@ -23,7 +23,9 @@ Random Seoul
 │  ├─ data/
 │  │  ├─ subway-lines.ts
 │  │  ├─ food-categories.ts
-│  │  ├─ curated-attractions.ts
+│  │  ├─ curated-attractions.ts        # public merge/lookup entry
+│  │  ├─ curated-attractions-base.ts   # 기존 검증 시드
+│  │  ├─ curated-attractions-extra.ts  # browse-worthy 확장 데이터
 │  │  └─ station-coordinates.ts
 │  ├─ domain/
 │  │  ├─ types.ts
@@ -85,21 +87,34 @@ Random Seoul
 
 ## 5. Curated nearby attractions
 
-역 주변 볼거리는 더 이상 Google Places 검색/리뷰 수 threshold로 선정하지 않습니다.
+역 주변 볼거리는 Google Places 검색/리뷰 수 threshold로 선정하지 않습니다.
 
-`src/data/curated-attractions.ts`가 **역별 대표 명소 0~2곳**을 직접 소유합니다.
+공통 TypeScript 정적 데이터가 **역별 0~2곳**을 직접 소유합니다.
+
+데이터 계층:
+
+- `curated-attractions-base.ts`: 기존 Tier A/지역 목적지 시드
+- `curated-attractions-extra.ts`: 이후 확장된 쇼핑·라이프스타일·시장·상권·문화·공원/수변 등 browse-worthy 목적지
+- `curated-attractions.ts`: base → extra 순으로 합치고 attraction ID를 중복 제거한 뒤 최대 2개를 반환하는 유일한 public lookup entry
+
+이 구조는 초기 데이터와 후속 확장 데이터를 분리해 큰 정적 파일의 유지보수 충돌을 줄이기 위한 것이며, UI/application 계층은 세부 데이터 파일을 직접 참조하지 않습니다.
 
 규칙:
 
-- 유명도와 대표성이 충분히 높은 장소만 수동/검증된 데이터로 등록
-- 애매한 역은 억지로 추천하지 않고 `[]`
+- 품질 gate는 자동 점수가 아니라 first-party editorial curation
+- “전국구 명소인가?”가 아니라 “이 역에 갔을 때 30분~몇 시간 둘러볼 가치가 있는가?”를 기준으로 함
+- 전통시장·특색 있는 거리·문화시설·공원뿐 아니라 스타필드/IKEA/대형 복합몰·아울렛·주요 백화점 같은 체류형 상업시설도 허용
+- 일반 놀이터·아파트 앞 소공원·평범한 근린시설/마트/소형 상가는 제외
+- 적절한 후보가 없으면 `[]`; 2개를 억지로 채우지 않음
 - 한 역당 최대 2곳
 - 역 추첨 직후 동기적으로 표시되어 네트워크 대기 없음
 - 음식 재추첨과 무관
 - 명소 Google Places Text Search 없음
 - 명소 카드의 지도 버튼은 일반 Google Maps 검색 링크일 뿐 Places 데이터 저장소가 아님
 
-따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB에 등록되어 있느냐** 자체가 담당합니다.
+`tests/curated-attractions.test.ts`는 대표 A/B 결과, 상한 2개, base+extra 보강 동작, 그리고 extra의 `노선:역` 키가 실제 `SUBWAY_LINES`에 존재하는지를 검증합니다.
+
+따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB 등록 여부** 자체가 담당합니다.
 
 ## 6. Station center strategy
 

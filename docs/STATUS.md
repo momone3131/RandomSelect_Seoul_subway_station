@@ -13,7 +13,7 @@ Last updated: 2026-09-14
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED / TIER A+B ATTRACTIONS LIVE**
+Status: **MODULAR WEB DEPLOYED / BROADER BROWSE-WORTHY ATTRACTIONS LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
@@ -21,7 +21,7 @@ Status: **MODULAR WEB DEPLOYED / TIER A+B ATTRACTIONS LIVE**
 - Web remains a supported target and rapid validation surface
 - Main draw flow: line → station → food → new course
 - Restaurant recommendation: Google Places live TOP 3, hard radius 2 km
-- Supplemental station result: own curated 0–2 representative attractions
+- Supplemental station result: own curated 0–2 attractions / browse-worthy destinations
 - Existing Web localStorage settings/history keys are preserved
 - Web browser key remains separate from Android and is HTTP-referrer restricted
 - Random Seoul subway-sign + dice icon is published as Web app icon
@@ -39,38 +39,45 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Curated nearby attractions
 
-Status: **LIVE / TIER A+B EXPANSION DEPLOYED**
+Status: **LIVE / BROWSE-WORTHY EXPANSION DEPLOYED**
 
 Google Places attraction search/ranking has been removed from runtime.
 
 Current policy:
 
 - station draw remains random; attraction is supplemental information
-- own `curated-attractions.ts` station→attraction dataset
-- maximum 2 representative places
+- first-party curated static data
+- maximum 2 places per station
 - no recommendation if a station has no worthwhile candidate
-- curation threshold is **regional representativeness + actual visit value**, not “must be a major Seoul-wide landmark”
+- threshold is now **actual browse/stay value + reasonable station accessibility**
+- practical question: “이 역에 내려서 30분~몇 시간 정도 둘러보거나 구경할 목적으로 추천해도 괜찮은가?”
 - Tier A: major metro-area landmark/destination → include
-- Tier B: neighborhood-representative market, street, cultural space, walk, park or local destination worth deliberately visiting → include
-- Tier C: ordinary playground, small neighborhood park, generic rest area or weak local facility → exclude
-- selection is editorial rather than a mechanical rating/review score; official tourism/local-government sources are used to validate existence, access and representativeness where useful
-- no Google attraction Text Search
-- no Google rating/review threshold for attractions
-- no attraction Google-content cache/database
+- Tier B: markets, distinctive streets, cultural spaces, walks, parks/waterfronts, campuses and large browse-worthy shopping/lifestyle destinations → include
+- commercial facilities such as Starfield, IKEA, large malls/outlets/major department stores are eligible when browsing the facility itself is a worthwhile outing experience
+- Tier C: ordinary playground, apartment pocket park, generic neighborhood facility, ordinary mart/small shopping facility → exclude
+- selection is editorial rather than a mechanical rating/review score
+- no Google attraction Text Search or attraction rating/review threshold
 - map button remains a normal outbound Google Maps search link
 
 Detailed criteria: `docs/ATTRACTION_CURATION.md`.
 
-The dataset has been expanded beyond the initial major-landmark-heavy seed. Representative Tier B additions include 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 답십리 고미술상가, 서울새활용플라자, 광명전통시장 and 안양예술공원. The 0–2 rule remains unchanged and weak places are not added merely to fill slots.
+Data layout:
 
-The same expanded shared dataset and regression tests are synchronized to `feature/random-seoul-android`.
+- `curated-attractions-base.ts`: prior verified seed
+- `curated-attractions-extra.ts`: broader browse-worthy expansion
+- `curated-attractions.ts`: merge + ID dedupe + max-2 public lookup
+
+Representative additions in the latest expansion include IKEA 광명/고양, 스타필드 수원/고양, 롯데몰 김포공항, 현대백화점 디큐브시티, 더현대 서울, 스타필드시티 위례, 현대백화점 판교, 광교호수공원, 현대프리미엄아울렛 송도, 트리플스트리트, 원마운트, 라페스타, 왕송호수, 철도박물관, 신포국제시장, 여러 전통시장/카페거리/로데오거리/문화공간 등입니다.
+
+The 0–2 rule remains unchanged; weak places are not added merely to fill slots.
 
 Verification state:
 
-- the expanded source/tests pass the normal GitHub **CI** workflow, including unit/regression tests, Web build and headless Chrome smoke flow.
-- **Web Release** was re-run after the updated regression test landed; test → build → release smoke → root promotion all succeeded.
-- deployment commit `0b7b169984593858bed2fa6d8647c09a3a9dcd3e` publishes the new `modular-Hw1UncCY.js` bundle from the expanded dataset to the Web root.
-- Android branch source/tests are synchronized, but the current Android branch head has not received a new Actions run from these connector-authored commits; its previous Android/CI run was green before this expansion. Re-verify current Android head before merge/release.
+- main source commit `7e45dfb3210c1b16a758523bdc5e4d8f2aac967c` introduced the broader data layer and regression tests.
+- Web Release run tested the new station-key integrity, unit/regression suite, Vite build and headless Chrome smoke successfully.
+- deployment commit `94700886f6d9b7c1ff23dde0cdff71beef024979` publishes bundle `assets/modular-BsK7DWq7.js` to the public Web root.
+- Android branch source/tests are synchronized at `c699421006f97dd7356f3951d6708ded875636bd`.
+- no fresh Actions run has been generated for that Android head yet; re-verify the current Android branch through shared CI + Android APK CI before merge/release.
 
 ## Static station centers
 
@@ -96,7 +103,7 @@ Restaurants remain **live Google Places data**.
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — EXPANDED ATTRACTION DATA SYNCED**
+Status: **ACTIVE — BROADER ATTRACTION DATA SYNCED / FRESH CI PENDING**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -114,8 +121,8 @@ Implemented/verified:
 - station/food haptic event-based fix built
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
 - curated-attraction/static-station-center shared changes synchronized to Android branch
-- expanded Tier A/B attraction dataset and its regression tests synchronized to Android branch
-- previous Android APK/CI run was green before this expansion; current head requires a fresh Actions verification before release/merge
+- latest browse-worthy attraction data + regression tests synchronized at commit `c699421006f97dd7356f3951d6708ded875636bd`
+- current Android head has no new Actions run yet; previous APK/CI run was green before this newest expansion
 
 ## Shared architecture requirements
 
@@ -132,7 +139,7 @@ Implemented/verified:
 
 Status: **ACTIVE / REQUIRED**
 
-The repository itself is now the durable project memory for future chats and development sessions.
+The repository itself is the durable project memory for future chats and development sessions.
 
 - `docs/PROJECT_CONTEXT.md`: fast handoff / project recovery document
 - `docs/STATUS.md`: current implementation state and recent verified changes
@@ -147,7 +154,7 @@ Meaningful feature, architecture, policy, branch-role or validation changes must
 Web PR/CI:
 
 - TypeScript/unit tests
-- curated-attraction regression tests
+- curated-attraction regression + station-key integrity tests
 - static-station-center regression test
 - Vite modular build
 - deterministic headless Chrome full-flow smoke
@@ -160,23 +167,18 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 
 ### 2026-09-14
 
-- Expanded `curated-attractions.ts` using the Tier A/B policy instead of keeping the initial major-landmark-heavy seed.
-- Added regional destinations such as 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장 and 안양예술공원 while preserving the 0–2/no-forced-fill rule.
-- Added Tier B regression coverage and synchronized the expanded dataset/tests to the Android working branch.
-- Verified the expanded source/tests through normal GitHub CI.
-- Re-ran Web Release after the updated regression test landed; release tests/build/browser smoke/root promotion succeeded and the new Web bundle was committed to `main`.
-- Formalized editorial attraction selection: context and visit value are primary; official sources validate existence/access/representativeness; generic Tier C neighborhood facilities remain excluded.
-- Relaxed attraction curation threshold from mostly major landmarks to `regional representativeness + actual visit value`; Tier A/B are eligible.
-- Added `docs/ATTRACTION_CURATION.md` as the explicit attraction inclusion/exclusion standard.
-- Clarified platform roles: Android is the current primary app target; Web remains supported and is also the rapid feature/UX validation path, especially because the project owner uses an iPhone.
-- Added `docs/PROJECT_CONTEXT.md` so a new chat/session can recover purpose, architecture assumptions, branch roles, data policy and restart procedure from Git alone.
-- Established mandatory documentation-maintenance rules for meaningful code/feature/architecture/status changes.
+- Broadened attraction acceptance from mainly landmark/region-representative destinations to **places that are genuinely worth browsing or spending time at after a random station draw**.
+- Added commercial/lifestyle destinations such as IKEA 광명/고양, 스타필드 수원/고양, 더현대 서울, 대형 몰·아울렛·백화점 alongside markets, parks, waterfronts, campuses and cultural spaces.
+- Kept ordinary playgrounds, apartment pocket parks and weak generic neighborhood facilities excluded.
+- Split curated attraction data into base + extra layers while keeping `curated-attractions.ts` as the stable public lookup entry.
+- Added regression coverage for browse-worthy commercial destinations, base+extra supplement behavior and invalid station-key detection.
+- Verified and deployed the broader Web data: source `7e45dfb...` → deployed root commit `94700886...` / bundle `modular-BsK7DWq7.js`.
+- Synchronized the same data/test changes to Android branch commit `c699421...`; fresh Android CI remains pending.
+- Earlier in the day, expanded the initial landmark-heavy seed with Tier B regional destinations such as 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장 and 안양예술공원.
+- Added `docs/ATTRACTION_CURATION.md` and established repository documentation as durable cross-chat project memory.
+- Clarified platform roles: Android primary, Web supported/reference validation surface, iOS later.
 - Decided not to persist Google-derived restaurant TOP 3 results as a reusable DB.
-- Replaced attraction popularity thresholds with a first-party curation approach.
-- Removed live Google attraction Text Search/ranking from the shared controller.
-- Added static-first station coordinate lookup with live fallback for uncovered stations.
-- Added regression tests for curated attractions and static station centers.
-- Merged PR #6, completed the earlier verified Web release, and synchronized the same shared behavior into Android PR #3.
+- Removed live Google attraction Text Search/ranking and added static-first station coordinate lookup with live fallback.
 
 ### 2026-09-13
 

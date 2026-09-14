@@ -14,7 +14,7 @@ Last updated: 2026-09-14
 
 1. 수도권 지하철 노선 랜덤 추첨
 2. 해당 노선의 역 랜덤 추첨
-3. 해당 역의 대표 볼거리 0~2곳 표시
+3. 해당 역의 대표/둘러보기 좋은 장소 0~2곳 표시
 4. 음식 종류 랜덤 추첨
 5. 역 주변 실시간 식당 추천 TOP 3 표시
 6. 지도 앱/웹으로 이동
@@ -74,14 +74,17 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 
 ### Attractions
 
-- Google popularity search가 아니라 `src/data/curated-attractions.ts`의 자체 큐레이션 데이터
+- Google popularity search가 아니라 first-party curated static data 사용
 - 역당 0~2곳
-- 합격선은 광역급 랜드마크 여부가 아니라 **지역 대표성 + 실제 방문가치**
-- 서울/수도권 대표 목적지(Tier A)와 동네를 대표해 일부러 들를 만한 시장·거리·문화공간·산책지·공원(Tier B)은 포함
-- 일반 놀이터·소공원·특색이 약한 근린시설(Tier C)은 제외
+- 합격선은 **“그 역에 갔을 때 30분~몇 시간 둘러보거나 구경할 가치가 있는가”**
+- Tier A 광역 대표 목적지는 포함
+- Tier B는 시장·특색 있는 거리/상권·문화공간·산책지·호수공원·수목원뿐 아니라 스타필드/IKEA/대형 복합몰·아울렛·주요 백화점 등 체류형 상업시설까지 포함 가능
+- 상업시설은 구매 여부와 관계없이 공간 자체를 둘러볼 경험이 있으면 후보가 될 수 있음
+- 일반 놀이터·아파트 앞 소공원·평범한 근린시설·일반 마트/소형 상가처럼 방문 이유가 약한 Tier C는 제외
 - 적절한 후보가 없으면 0개를 유지하며 숫자를 채우기 위해 억지 추천하지 않음
-- 점수 공식으로 자동 선별하지 않고 editorial judgment를 사용하며, 공식 관광/지자체 자료 등으로 존재성·접근성·대표성을 교차확인
+- 점수 공식으로 자동 선별하지 않고 editorial judgment 사용
 - 상세 기준은 `docs/ATTRACTION_CURATION.md`
+- 데이터 구조는 `curated-attractions-base.ts` + `curated-attractions-extra.ts`를 `curated-attractions.ts`에서 merge/dedupe/max-2 처리
 
 ### Station centers
 
@@ -94,15 +97,16 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 2026-09-14 기준:
 
 - Modular Web refactor: 완료 및 `main` 배포
-- Curated attraction dataset: Tier A뿐 아니라 지역 대표 Tier B 목적지까지 확장 적용 완료
-- 대표 추가 예: 문래창작촌, 용리단길, 성수 연무장길, 경의선숲길, 홍제폭포, 샤로수길, 신당동 떡볶이타운, 서울새활용플라자, 광명전통시장, 안양예술공원
+- Curated attraction dataset: 기존 Tier A/지역 Tier B에서 **browse-worthy 목적지까지 추가 확장**
+- 새 확장 예: IKEA 광명·고양, 스타필드 수원·고양, 더현대 서울, 현대프리미엄아울렛 송도, 트리플스트리트, 광교호수공원, 왕송호수, 여러 전통시장/카페거리/로데오거리/문화공간
+- Web 확장 코드 commit `7e45dfb3210c1b16a758523bdc5e4d8f2aac967c`가 tests/build/headless smoke를 통과했고 deployment commit `94700886f6d9b7c1ff23dde0cdff71beef024979`로 공개 bundle 배포 완료
 - 0~2개/no-forced-fill 정책 유지; 평범한 Tier C 근린시설은 계속 제외
-- 확장된 attraction dataset과 regression test를 Android 작업 브랜치에도 동기화 완료
+- 동일한 browse-worthy attraction source/tests를 Android 작업 브랜치에도 commit `c699421006f97dd7356f3951d6708ded875636bd`로 동기화
+- Android의 이 최신 head는 connector/Git ref 방식으로 갱신되어 새 Actions run이 아직 생성되지 않았으므로 release/merge 전 fresh Android CI 재검증 필요
 - Static-first station center: 적용 완료
 - Android shell: 개발 진행 중
 - Android Places native bridge: 구현됨
 - Galaxy S20에서 line → station → food → live restaurant TOP 3 핵심 흐름 검증됨
-- 기존 Web/Android CI는 확장 전 기준에서 통과했으며, 최신 head의 실제 CI 상태는 작업 시작 시 GitHub에서 다시 확인
 - Android 작업 branch/PR은 계속 진행 중이므로 세부 최신 상태는 `STATUS.md`와 GitHub를 확인
 
 ## 7. Documentation source of truth
