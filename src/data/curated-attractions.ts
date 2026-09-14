@@ -2,6 +2,7 @@ import type { AttractionRecommendation } from '../domain/types';
 import { getCuratedAttractions as getBaseCuratedAttractions } from './curated-attractions-base';
 import { getExtraCuratedAttractions } from './curated-attractions-extra';
 
+// Keep this as the single public lookup: base is stable seed, extra is the browse-worthy expansion.
 export function getCuratedAttractions(lineId: string, stationName: string): AttractionRecommendation[] {
   const merged = [
     ...getBaseCuratedAttractions(lineId, stationName),
