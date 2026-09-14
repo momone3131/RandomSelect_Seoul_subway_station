@@ -1,10 +1,9 @@
+import { getCuratedAttractions } from '../data/curated-attractions';
 import { FOOD_BY_ID } from '../data/food-categories';
 import { SUBWAY_LINE_BY_ID } from '../data/subway-lines';
 import { drawOne, type RandomSource } from '../domain/draw-engine';
-import { rankAttractions } from '../domain/attraction-ranking';
 import { rankRestaurants } from '../domain/restaurant-ranking';
 import type {
-  AttractionRecommendation,
   DrawHistoryItem,
   FoodCategory,
   PlaceCandidate,
@@ -143,6 +142,7 @@ export class RandomSeoulController {
     const state = this.store.getSnapshot();
     if (!state.currentLine) return this.drawLineResult();
     const station = drawOne(state.currentLine.stations, this.random);
+    const attractions = getCuratedAttractions(state.currentLine.id, station.name);
     this.activeHistoryId = this.nextHistoryId();
     const historyItem: DrawHistoryItem = {
       id: this.activeHistoryId,
@@ -154,11 +154,10 @@ export class RandomSeoulController {
       ...current,
       currentStation: station,
       currentFood: undefined,
-      attractions: [],
+      attractions,
       recommendations: [],
       history: [historyItem, ...current.history].slice(0, 12),
     }));
-    void this.loadAttractions().catch(() => undefined);
     return { stage: 'station' };
   }
 
@@ -176,31 +175,6 @@ export class RandomSeoulController {
 
     const recommendations = await this.loadRecommendations();
     return { stage: 'food', recommendations };
-  }
-
-  async loadAttractions(): Promise<AttractionRecommendation[]> {
-    const state = this.store.getSnapshot();
-    const line = state.currentLine;
-    const station = state.currentStation;
-    if (!line || !station) return [];
-
-    const center = await this.stationLocations.resolve(line, station.name);
-    const candidates = await this.places.searchText({
-      textQuery: `${station.name}역 관광명소`,
-      center: { latitude: center.latitude, longitude: center.longitude },
-      radiusMeters: 2000,
-      maxResults: 20,
-      language: 'ko',
-      region: 'kr',
-    });
-    const attractions = rankAttractions(candidates, center);
-    this.store.update((current) => {
-      const sameStation = current.currentLine?.id === line.id
-        && current.currentStation?.ordinal === station.ordinal
-        && current.currentStation?.name === station.name;
-      return sameStation ? { ...current, attractions } : { ...current };
-    });
-    return attractions;
   }
 
   async loadRecommendations(): Promise<RestaurantRecommendation[]> {

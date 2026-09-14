@@ -2,10 +2,6 @@ import type { AttractionRecommendation } from '../domain/types';
 import { googleMapsSearchUrl } from '../services/maps/web-map-links';
 import { append, byId, make, replaceContent } from './dom';
 
-function distanceText(meters: number): string {
-  return meters < 1000 ? `${Math.round(meters)}m` : `${(Math.round(meters / 100) / 10).toFixed(1)}km`;
-}
-
 function ensureSection(): HTMLElement {
   const found = document.getElementById('attraction_section');
   if (found) return found;
@@ -31,12 +27,8 @@ function ensureSection(): HTMLElement {
   const cards = make('div', 'restaurant-grid');
   cards.id = 'attraction_cards';
   cards.hidden = true;
-  const attribution = make('div', 'google-attribution');
-  attribution.id = 'attraction_attribution';
-  attribution.hidden = true;
-  attribution.appendChild(make('span', '', 'Google Maps'));
 
-  append(section, head, cards, attribution);
+  append(section, head, cards);
   byId<HTMLElement>('map_actions').insertAdjacentElement('afterend', section);
   return section;
 }
@@ -46,7 +38,6 @@ export function resetAttractionView(): void {
   section.hidden = true;
   byId<HTMLElement>('attraction_cards').hidden = true;
   byId<HTMLElement>('attraction_count').hidden = true;
-  byId<HTMLElement>('attraction_attribution').hidden = true;
   replaceContent(byId<HTMLElement>('attraction_cards'));
 }
 
@@ -60,7 +51,7 @@ export function renderAttractions(stationName: string, attractions: readonly Att
   }
 
   section.hidden = false;
-  byId<HTMLElement>('attraction_context').textContent = `${stationName}역 근처 · 추천할 만한 곳만 표시`;
+  byId<HTMLElement>('attraction_context').textContent = `${stationName}역 주변 · 대표적인 곳만 엄선`;
   const fragment = document.createDocumentFragment();
 
   attractions.forEach((attraction, index) => {
@@ -68,13 +59,13 @@ export function renderAttractions(stationName: string, attractions: readonly Att
     const rank = make('span', 'restaurant-rank', String(index + 1));
     const name = make('h3', 'restaurant-name', attraction.name);
     const category = make('p', 'restaurant-desc', attraction.category || '볼거리');
+
     const meta = make('div', 'restaurant-meta');
-    if (attraction.rating !== undefined) meta.appendChild(make('span', 'restaurant-rating', `★ ${attraction.rating.toFixed(1)}`));
-    if ((attraction.userRatingCount ?? 0) > 0) meta.appendChild(make('span', 'restaurant-reviews', `평가 ${(attraction.userRatingCount ?? 0).toLocaleString('ko-KR')}개`));
-    meta.appendChild(make('span', 'restaurant-distance', `역에서 ${distanceText(attraction.distanceMeters)}`));
+    if (attraction.note) meta.appendChild(make('span', 'restaurant-distance', attraction.note));
 
     const link = make('a', 'restaurant-map-link attraction-map-link google-place-link');
-    link.href = attraction.mapUrl || googleMapsSearchUrl(`${attraction.name} ${stationName}역`);
+    const query = attraction.mapQuery ?? attraction.name;
+    link.href = googleMapsSearchUrl(`${query} ${stationName}역`);
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     append(link, make('span', 'map-mark', 'G'), document.createTextNode('구글지도에서 보기'));
@@ -86,5 +77,4 @@ export function renderAttractions(stationName: string, attractions: readonly Att
   byId<HTMLElement>('attraction_cards').hidden = false;
   byId<HTMLElement>('attraction_count').textContent = `${attractions.length}곳`;
   byId<HTMLElement>('attraction_count').hidden = false;
-  byId<HTMLElement>('attraction_attribution').hidden = false;
 }
