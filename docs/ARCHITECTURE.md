@@ -180,7 +180,21 @@ Maintained source entry는 `modular.html`입니다.
 
 ### Android
 
-Vite native build → Capacitor sync → Gradle build → APK/AAB.
+Vite native build → Capacitor sync → Gradle `assembleDebug` → APK 생성 순서입니다.
+
+`feature/random-seoul-android`의 Android 관련 변경이 push되면 `.github/workflows/android.yml`이 자동 실행됩니다.
+
+성공한 빌드는 두 경로로 배포합니다.
+
+1. GitHub Actions artifact `random-seoul-debug-apk`
+2. 고정 GitHub Release tag `android-dev-latest`
+   - APK asset: `random-seoul-latest.apk`
+   - checksum: `random-seoul-latest.apk.sha256`
+   - 고정 직접 다운로드 URL은 README에 노출
+
+Release tag와 APK asset은 성공한 최신 Android branch build를 가리키도록 자동 갱신합니다. PR 이벤트에서는 APK 검증만 하고 Release 갱신은 하지 않으며, branch push/workflow dispatch에서만 latest dev release를 갱신합니다.
+
+이 APK는 개발/debug 빌드이며 향후 Play 배포용 release AAB와는 별도입니다.
 
 ### iOS
 
@@ -198,3 +212,4 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 - storage provider
 - framework/platform dependency
 - Web support/deployment strategy
+- Android build/artifact/release distribution strategy
