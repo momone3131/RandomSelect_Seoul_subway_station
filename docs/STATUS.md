@@ -4,6 +4,13 @@ Last updated: 2026-09-14
 
 이 문서는 현재 진행 위치와 다음 행동을 기록합니다.
 
+## Product / platform role
+
+- **Android:** 현재 주 개발/배포 대상이자 앱 본체
+- **Web:** 계속 배포되는 지원 대상이면서 Android 기능/UX를 빠르게 검증하는 reference implementation
+- 프로젝트 소유자는 iPhone 사용자이므로 Web은 Android 기기 없이 새 기능을 직접 확인하는 실사용 검증 경로로도 중요함
+- **iOS:** Android 안정화 이후 shared core를 재사용해 후속 지원 예정
+
 ## Public Web
 
 Status: **MODULAR WEB DEPLOYED / CURATED ATTRACTIONS LIVE**
@@ -11,7 +18,7 @@ Status: **MODULAR WEB DEPLOYED / CURATED ATTRACTIONS LIVE**
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
 - Public entry: root `index.html`, generated from the verified Vite modular build
-- Web remains a permanent supported target
+- Web remains a supported target and rapid validation surface
 - Main draw flow: line → station → food → new course
 - Restaurant recommendation: Google Places live TOP 3, hard radius 2 km
 - Supplemental station result: own curated 0–2 representative attractions
@@ -97,13 +104,27 @@ Implemented/verified:
 
 ## Shared architecture requirements
 
-- Web is a permanent product target.
+- Android is the current primary app-development target.
+- Web remains supported and doubles as the fastest cross-device validation surface.
 - Android/iOS business logic stays out of shared product rules.
 - Platform-specific work stays behind adapters/plugins.
 - Restaurants remain shared TypeScript ranking over live provider candidates.
 - Attractions are first-party curated product data, not provider-ranked results.
 - Static station centers are preferred; live provider lookup is fallback only.
 - Current-location/GPS permission remains absent unless a later explicit feature requires it.
+
+## Documentation continuity
+
+Status: **ACTIVE / REQUIRED**
+
+The repository itself is now the durable project memory for future chats and development sessions.
+
+- `docs/PROJECT_CONTEXT.md`: fast handoff / project recovery document
+- `docs/STATUS.md`: current implementation state and recent verified changes
+- `docs/PROJECT_PLAN.md`: product intent, platform strategy and roadmap
+- `docs/ARCHITECTURE.md`: technical structure and design ownership
+
+Meaningful feature, architecture, policy, branch-role or validation changes must update the relevant documentation in the same change/PR. New sessions should read `PROJECT_CONTEXT.md` first, then `STATUS.md`, and verify actual GitHub branches/PRs/CI before modifying code.
 
 ## Current automated gates
 
@@ -123,6 +144,9 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 
 ### 2026-09-14
 
+- Clarified platform roles: Android is the current primary app target; Web remains supported and is also the rapid feature/UX validation path, especially because the project owner uses an iPhone.
+- Added `docs/PROJECT_CONTEXT.md` so a new chat/session can recover purpose, architecture assumptions, branch roles, data policy and restart procedure from Git alone.
+- Established mandatory documentation-maintenance rules for meaningful code/feature/architecture/status changes.
 - Decided not to persist Google-derived restaurant TOP 3 results as a reusable DB.
 - Replaced attraction popularity thresholds with a stricter first-party curation approach.
 - Added initial station→representative-attraction static dataset, maximum 2 per station.
