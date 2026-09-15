@@ -85,32 +85,52 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('.restaurant-request{padding:0 14px 12px}');
   });
 
-  it('moves redraw actions into completed result cards as subtle icon-only controls', () => {
+  it('moves redraw actions into completed result cards with larger icon glyphs', () => {
     expect(drawView).toContain("placeCardRedrawButton(restart, 'line_panel'");
     expect(drawView).toContain("placeCardRedrawButton(stationRedraw, 'station_panel'");
     expect(drawView).toContain("placeCardRedrawButton(foodRedraw, 'food_panel'");
     expect(drawView).toContain("'background:transparent'");
     expect(drawView).toContain("'width:36px'");
-    expect(drawView).toContain("'font-size:0'");
-    expect(styles).toContain('.card-redraw-btn svg{width:24px;height:24px}');
-    expect(styles).toContain('.card-redraw-btn svg path{stroke-width:2.4}');
-    expect(drawView).toContain("button.setAttribute('aria-label', label)");
+    expect(styles).toContain('.card-redraw-btn svg{width:27px;height:27px}');
+    expect(styles).toContain('.card-redraw-btn svg path{stroke-width:2.7}');
   });
 
-  it('renders a completed station as a line-colored subway sign', () => {
+  it('renders a completed station as a vertically centered line-colored subway sign', () => {
     expect(drawView).toContain("panel.style.setProperty('--station-line', line.color)");
     expect(drawView).toContain("panel.style.setProperty('--station-line-ink', readableInk(line.color))");
     expect(styles).toContain('.station-panel.complete:not(.next-draw)');
     expect(styles).toContain('border:5px solid var(--station-line,#7898a6)!important');
-    expect(styles).toContain('background:var(--station-line,#7898a6)');
-    expect(styles).toContain('border-radius:50%');
+    expect(styles).toContain('align-content:center');
+    expect(styles).toContain('font-size:28px');
+    expect(styles).toContain('font-size:23px;line-height:1.15');
   });
 
-  it('shows a food question mark once a station is ready without enlarging the card', () => {
-    expect(drawView).toContain("name.textContent = station ? '?' : ''");
-    expect(drawView).toContain("name.className = station ? 'food-name food-question' : 'food-name placeholder'");
-    expect(styles).toContain('.food-panel.ready .food-question');
-    expect(styles).toContain('min-height:0');
+  it('keeps a centered food prompt visible before and during the food stage without enlarging the card', () => {
+    expect(drawView).toContain("name.textContent = '뭐 먹을까?'");
+    expect(drawView).toContain("name.className = 'food-name food-question'");
+    expect(styles).toContain('.food-panel.waiting .food-question{color:#a99683;opacity:.48}');
+    expect(styles).toContain('.food-panel.ready .food-question{color:#405548;opacity:1}');
+    expect(styles).toContain('.food-panel.waiting .food-emoji');
+  });
+
+  it('keeps copy and both station map actions in one compact row', () => {
+    expect(drawView).toContain('if (copy.parentElement !== mapActions) mapActions.prepend(copy)');
+    expect(drawView).toContain("byId<HTMLElement>('secondary_actions').hidden = true");
+    expect(styles).toContain('grid-template-columns:repeat(3,minmax(0,1fr))');
+  });
+
+  it('changes the hero prompt with the draw stage', () => {
+    expect(drawView).toContain("'어디로 가볼까?'");
+    expect(drawView).toContain("'어느 역에서 내릴까?'");
+    expect(drawView).toContain("'식사도 해야지?'");
+    expect(drawView).toContain("'이 코스로 가자!'");
+  });
+
+  it('copies a conversational station and food invitation without line or restaurant detail', () => {
+    expect(main).toContain('`${state.currentStation.name}에서 ${state.currentFood.name} 먹자!`');
+    expect(main).toContain('`${state.currentStation.name} 가자!`');
+    expect(main).not.toContain('목록의 ${state.currentStation.ordinal}번째 역');
+    expect(main).not.toContain('예시: ${state.currentFood.examples}');
   });
 
   it('uses concise stage labels', () => {
