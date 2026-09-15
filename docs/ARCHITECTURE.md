@@ -4,229 +4,233 @@ Last updated: 2026-09-15
 
 ## 1. Architecture goals
 
-Random Seoul은 Web / Android / iOS가 같은 제품 로직을 공유하도록 설계합니다.
+Random Seoul은 Web / Android / iOS가 동일한 제품 로직을 공유하도록 설계합니다.
 
 핵심 원칙:
 
-- 추첨/데이터/상태/식당 랭킹은 플랫폼 독립적인 TypeScript
+- 추첨/정적 데이터/상태/식당 필터·랭킹은 플랫폼 독립 TypeScript
 - Web/Android/iOS 차이는 adapter/service 경계 뒤로 숨김
-- Android Java/Kotlin과 iOS Swift는 가능한 한 얇게 유지
-- Web은 앱 출시 후에도 정식 타깃으로 유지
-- 식당 추천은 실시간 Google Places 후보를 shared TypeScript에서 필터링/랭킹
-- 대표/둘러보기 좋은 장소와 가능한 역 좌표는 자체 정적 데이터로 소유해 불필요한 Google 호출을 줄임
+- Android Kotlin/Java와 iOS Swift는 얇게 유지
+- Web은 정식 지원 타깃이자 빠른 reference implementation
+- 식당 후보는 live provider에서 받고 shared TypeScript가 랭킹
+- 명소와 가능한 역 중심 좌표는 자체 정적 데이터로 소유
+- 음식 추첨과 식당 네트워크 조회를 분리: **식당 조회는 사용자 요청 시에만**
 
 ## 2. Repository structure
 
 ```text
-Random Seoul
-├─ src/
-│  ├─ data/
-│  │  ├─ subway-lines.ts
-│  │  ├─ food-categories.ts
-│  │  ├─ curated-attractions.ts        # public merge/lookup entry
-│  │  ├─ curated-attractions-base.ts   # 기존 검증 시드
-│  │  ├─ curated-attractions-extra.ts  # browse-worthy 확장 데이터
-│  │  └─ station-coordinates.ts
-│  ├─ domain/
-│  │  ├─ types.ts
-│  │  ├─ draw-engine.ts
-│  │  ├─ station-resolver.ts
-│  │  └─ restaurant-ranking.ts
-│  ├─ services/
-│  │  ├─ places/
-│  │  ├─ maps/
-│  │  └─ storage/
-│  ├─ state/
-│  ├─ ui/
-│  ├─ platform/
-│  └─ main.ts
-├─ native/
-├─ tests/
-├─ android/
-├─ ios/
-├─ index.html
-├─ modular.html
-├─ vite.config.ts
-├─ capacitor.config.ts
-└─ .github/workflows/
+src/
+├─ application/
+│  └─ random-seoul-controller.ts
+├─ data/
+│  ├─ subway-lines.ts
+│  ├─ food-categories.ts
+│  ├─ curated-attractions.ts
+│  ├─ curated-attractions-base.ts
+│  ├─ curated-attractions-extra.ts
+│  └─ station-coordinates.ts
+├─ domain/
+│  ├─ types.ts
+│  ├─ draw-engine.ts
+│  ├─ station-resolver.ts
+│  └─ restaurant-ranking.ts
+├─ services/
+│  ├─ places/
+│  ├─ maps/
+│  └─ storage/
+├─ state/
+├─ ui/
+└─ main.ts
 ```
 
-## 3. Shared place model and provider boundary
+## 3. Shared place/provider boundary
 
-`PlaceCandidate`는 Google Places 등 외부 provider에서 받은 식당 후보를 shared core로 넘기는 공통 모델입니다.
-
-구현체:
+`PlaceCandidate`는 외부 Places provider 후보를 shared core로 넘기는 공통 모델입니다.
 
 - Web: Google Maps JavaScript Places
 - Android: Capacitor bridge → Places SDK for Android
-- iOS: later native Places bridge
+- iOS: later native bridge
 
-플랫폼 SDK는 후보 데이터를 반환하는 역할만 맡고 식당 순위는 결정하지 않습니다.
+Provider는 후보 데이터를 반환하고 최종 추천 순위를 결정하지 않습니다.
 
-## 4. Restaurant ranking ownership
+## 4. Draw → attraction → restaurant data flow
 
-`restaurant-ranking.ts`가 공통 식당 랭킹을 단독 소유합니다.
+현재 완료 흐름은 두 단계로 분리됩니다.
 
-현재 규칙:
+### A. 즉시 결과 단계
 
-1. 역과의 직선거리 2 km 초과 후보 제거
-2. 별점 Bayesian 보정
-3. 평가 수 `log(1 + n)` 변환
-4. Google 검색 순위 relevance signal
-5. 거리 signal
-6. TOP 3 반환
+`line → station → food`
+
+- `drawLineResult()` / `drawStationResult()` / `drawFoodResult()`는 네트워크 식당 조회를 기다리지 않음.
+- station 선택 시 `getCuratedAttractions()`가 정적 0~2곳을 즉시 상태에 넣음.
+- food 선택 시 food와 history만 확정하고 `recommendations`는 빈 상태로 유지.
+- UI는 노선/역/음식 바로 아래에 compact attractions를 먼저 표시.
+
+### B. 사용자 요청 식당 단계
+
+사용자가 **`추천 식당 보기`**를 누른 뒤 `controller.loadRecommendations()`를 호출합니다.
+
+1. 현재 line/station/food 조합을 request key로 캡처
+2. CTA를 `추천 식당 찾는 중…`으로 변경
+3. station center resolve
+4. Google Places 후보 조회
+5. 2 km 필터/공통 랭킹/TOP 3
+6. restaurant cards 렌더
+7. 결과가 준비된 후에만 `restaurant_section.scrollIntoView({ behavior: 'smooth' })`
+
+검색 중 빈 식당 영역으로 먼저 스크롤하지 않습니다. 코스가 바뀌면 request key도 바뀌므로 이전 restaurant lookup UI 상태는 초기화됩니다.
+
+이 분리는 음식 선택 피드백을 네트워크 지연과 분리하고, 사용자가 식당 추천을 원하지 않을 때 Places 후보 조회를 생략하게 합니다.
+
+## 5. Restaurant ranking ownership
+
+`restaurant-ranking.ts`가 공통 랭킹을 소유합니다.
+
+1. 역 기준 직선거리 2 km 초과 제거
+2. Bayesian rating
+3. `log(1 + review count)`
+4. Google relevance
+5. distance signal
+6. TOP 3
 
 가중치:
 
-- Bayesian rating 55%
+- rating 55%
 - review volume 25%
 - relevance 15%
 - distance 5%
 
-식당 결과는 Google에서 실시간 조회하며 TOP 3 결과/별점/리뷰수를 자체 추천 DB로 영구 저장하지 않습니다.
+Google 식당 결과/별점/리뷰 수는 장기 추천 DB로 저장하지 않습니다.
 
-## 5. Curated nearby attractions
+## 6. Curated attractions
 
-역 주변 볼거리는 Google Places 검색/리뷰 수 threshold로 선정하지 않습니다.
+명소는 first-party static data이며 역당 최대 0~2곳입니다.
 
-공통 TypeScript 정적 데이터가 **역별 0~2곳**을 직접 소유합니다.
+- `curated-attractions-base.ts`: 기존 시드
+- `curated-attractions-extra.ts`: browse-worthy 확장
+- `curated-attractions.ts`: merge/dedupe/max-2 public entry
 
-데이터 계층:
+품질 gate:
 
-- `curated-attractions-base.ts`: 기존 Tier A/지역 목적지 시드
-- `curated-attractions-extra.ts`: 이후 확장된 쇼핑·라이프스타일·시장·상권·문화·공원/수변 등 browse-worthy 목적지
-- `curated-attractions.ts`: base → extra 순으로 합치고 attraction ID를 중복 제거한 뒤 최대 2개를 반환하는 유일한 public lookup entry
+- 자동 평점이 아닌 editorial curation
+- 실제 체류/구경 가치 + 합리적인 역 접근성
+- 시장/거리/문화/공원/수변과 browse-worthy 대형 상업시설 허용
+- 약한 근린시설은 제외
+- 적절한 후보 없으면 `[]`
 
-이 구조는 초기 데이터와 후속 확장 데이터를 분리해 큰 정적 파일의 유지보수 충돌을 줄이기 위한 것이며, UI/application 계층은 세부 데이터 파일을 직접 참조하지 않습니다.
+### Attraction presentation
 
-규칙:
+`attraction-view.ts`는 attraction section을 `.panels` 바로 뒤에 배치합니다.
 
-- 품질 gate는 자동 점수가 아니라 first-party editorial curation
-- “전국구 명소인가?”가 아니라 “이 역에 갔을 때 30분~몇 시간 둘러볼 가치가 있는가?”를 기준으로 함
-- 전통시장·특색 있는 거리·문화시설·공원뿐 아니라 스타필드/IKEA/대형 복합몰·아울렛·주요 백화점 같은 체류형 상업시설도 허용
-- 일반 놀이터·아파트 앞 소공원·평범한 근린시설/마트/소형 상가는 제외
-- 적절한 후보가 없으면 `[]`; 2개를 억지로 채우지 않음
-- 한 역당 최대 2곳
-- 역 추첨 직후 동기적으로 표시되어 네트워크 대기 없음
-- 음식 재추첨과 무관
-- 명소 Google Places Text Search 없음
+- 완료 결과의 1차 정보로 식당보다 먼저 노출
+- 모바일 최대 2개를 compact 2-column layout으로 표시
+- 1개면 single column
+- 0개면 section 전체 생략
+- compact 카드에서는 과도한 meta를 숨기고 이름/종류/지도 액션 중심
 
 ### Attraction map-target strategy
 
-`AttractionRecommendation`은 별도 명소 위·경도를 저장하지 않고 `mapQuery`를 정적 지도 타깃으로 사용합니다.
+`AttractionRecommendation`은 명소 lat/lng를 저장하지 않고 self-contained `mapQuery`를 사용합니다.
 
-과거 UI는 `mapQuery + stationName + "역"`을 Google Maps 검색어로 만들었는데, 이 방식은 같은 이름의 역이나 주변 동명이인 장소를 Google이 우선 선택할 수 있었습니다. 현재는 다음 규칙으로 변경했습니다.
+- UI가 역 이름을 자동 suffix하지 않음
+- 동명이인 가능 장소는 도시/구/도로/주소로 보강
+- 넓은 수변/선형 목적지는 구체적인 접근 anchor 사용
+- 애매하면 잘못된 pin 대신 후보 제거 가능
 
-- `mapQuery`는 명소 자체를 **독립적으로 식별하는 완결된 타깃**이어야 함
-- `attraction-view.ts`는 역 이름을 자동으로 덧붙이지 않음
-- `googleMapsAttractionUrl()`이 저장된 `mapQuery`를 그대로 Google Maps search URL로 변환
-- 고유 시설은 공식 시설명을 사용
-- 동명이인 가능성이 있는 시장/거리/공원은 도시·구·동·도로명 또는 주소를 함께 사용
-- 강·둘레길·수변 등 넓은 대상은 해당 역에서 접근하기 좋은 공식 진입점/광장/공원 지점을 타깃으로 사용
-- 정확한 타깃이 불확실한 후보는 station 검색어로 억지 보정하지 않고 제거 가능
+`tests/curated-attractions.test.ts`와 `tests/map-links.test.ts`가 무결성을 검증합니다.
 
-예: 검암의 `경인아라뱃길`은 `경인아라뱃길 시천가람터`로 구체화하고 `시천가람터 인천광역시 서구 시천동 158-11`을 `mapQuery`로 사용합니다.
+## 7. Station center strategy
 
-`tests/curated-attractions.test.ts`는 대표 A/B 결과, 상한 2개, base+extra 보강 동작, extra의 `노선:역` 키 유효성, station-only 지도 타깃 부재를 검증합니다. `tests/map-links.test.ts`는 attraction URL 생성 시 역 이름이 자동 추가되지 않는 것을 검증합니다.
+식당 검색의 center/distance에는 `station-coordinates.ts` 정적 좌표를 우선 사용합니다.
 
-따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB 등록 여부 + 지도 타깃 정확성**이 담당합니다.
+1. 정적 좌표 존재 → live station resolution 없음
+2. 미수록 역만 Google fallback
+3. fallback 좌표는 기존 30일 cache
 
-## 6. Station center strategy
+station center와 attraction mapQuery는 완전히 다른 데이터 경로입니다.
 
-식당 검색의 위치 bias/거리 계산에는 역 중심 좌표가 필요합니다.
+## 8. State ownership
 
-`src/data/station-coordinates.ts`를 먼저 조회합니다.
+`AppState` 주요 결과:
 
-1. 정적 좌표가 있으면 즉시 사용 → Google station-resolution 호출 없음
-2. 정적 좌표가 없는 신규/미수록 역만 기존 Google 역 검색 사용
-3. fallback으로 얻은 Google 좌표는 기존 정책대로 30일 캐시
+- `currentLine`
+- `currentStation`
+- `currentFood`
+- `attractions`: 정적 0~2곳
+- `recommendations`: 사용자 요청 후 채워지는 live restaurant TOP 3
+- `history`
 
-정적 좌표는 서울특별시/TOPIS의 `서울시 역사마스터 정보`와 같은 공공 역 마스터 데이터를 기준으로 관리합니다. 해당 서울 열린데이터는 공공누리 제1유형(출처표시, 상업적 이용 및 변경 가능)입니다.
+Restaurant request의 UI lifecycle(`busy/complete/failed/current key`)은 현재 composition/UI layer에서 transient state로 관리하며 장기 저장하지 않습니다.
 
-현재 정적 테이블은 대표 명소가 있는 역과 주요 환승/사용 역부터 적용하며, 미수록 역은 기능 단절 없이 live fallback으로 동작합니다.
-
-## 7. State ownership
-
-`AppState`는 현재 line/station/food와 함께 다음 결과를 보유합니다.
-
-- `attractions`: 현재 역의 0~2개 자체 큐레이션 볼거리
-- `recommendations`: 현재 음식의 Google 기반 식당 TOP 3
-- `history`: 최근 추첨 기록
-
-UI는 상태를 표시하고 사용자 event를 전달하며, 추첨/식당 랭킹 규칙 자체를 소유하지 않습니다.
-
-## 8. Storage boundary
+## 9. Storage boundary
 
 - Web: localStorage
-- Android/iOS: 현재 호환성 우선으로 WebView localStorage를 사용하며 native-backed storage는 필요 시 후속 전환
+- Android/iOS: 현재 WebView localStorage 호환 우선
+- preferences/history 유지
+- Google restaurant recommendations 장기 cache 없음
+- Google fallback station coordinates만 기존 30일 cache
 
-기존 Web localStorage key를 유지해 설정/기록 마이그레이션을 깨지 않습니다.
+## 10. Platform services
 
-Google 식당 결과는 장기 캐시하지 않습니다. Google fallback 역 좌표 캐시는 기존 30일 정책을 유지합니다.
+플랫폼 차이는 adapter/plugin 뒤에 둡니다.
 
-## 9. Platform services
-
-플랫폼 차이는 adapter/plugin 뒤로 둡니다.
-
+- native place search
 - haptics
 - share
-- back handling
 - map launch/deep link
-- native place search
+- back handling
 - persistent storage
 
-## 10. API key strategy
+현재 GPS/current-location permission은 사용하지 않습니다.
 
-키는 플랫폼별로 분리합니다.
+## 11. API key strategy
 
-- Web key: GitHub Pages HTTP referrer 제한
-- Android key: package name + signing certificate SHA 제한
-- iOS key: bundle identifier 제한
+- Web: HTTP referrer restriction
+- Android: package + signing certificate restriction
+- iOS: bundle identifier restriction
 
 공통 TypeScript에 production key를 하드코딩하지 않습니다.
 
-## 11. Build and deployment targets
+## 12. Build / deployment
 
 ### Web
 
-Maintained source entry는 `modular.html`입니다.
+`modular.html` → `npm run build` → Vite hashed assets.
 
-`npm run build` → Vite `dist/modular.html` + hashed JS assets를 생성합니다. `web-release.yml`이 tests → build → browser smoke를 통과한 artifact를 GitHub Pages root로 승격합니다.
+`web-release.yml`은 `src/**`, `tests/**` 등 관련 변경에서 test → build → headless browser smoke → root artifact promotion을 수행합니다. 최종 deployment commit은 최신 main에 rebase 후 push합니다.
+
+Browser self-test는 현재 다음도 검증합니다.
+
+- line/station/food 완료 직후 recommendations = 0
+- explicit restaurant request 이후 TOP 3 렌더
+- 2 km contract
+- full reset flow
 
 ### Android
 
-Vite native build → Capacitor sync → Gradle `assembleDebug` → APK 생성 순서입니다.
+Vite native build → Capacitor sync → Gradle `assembleDebug`.
 
-`feature/random-seoul-android`의 Android 관련 변경이 push되면 `.github/workflows/android.yml`이 자동 실행됩니다.
+성공한 `feature/random-seoul-android` build는:
 
-성공한 빌드는 두 경로로 배포합니다.
+1. Actions artifact `random-seoul-debug-apk`
+2. fixed Release `android-dev-latest`의 `random-seoul-latest.apk`
 
-1. GitHub Actions artifact `random-seoul-debug-apk`
-2. 고정 GitHub Release tag `android-dev-latest`
-   - APK asset: `random-seoul-latest.apk`
-   - checksum: `random-seoul-latest.apk.sha256`
-   - 고정 직접 다운로드 URL은 README에 노출
+를 갱신합니다.
 
-Release tag와 APK asset은 성공한 최신 Android branch build를 가리키도록 자동 갱신합니다. PR 이벤트에서는 APK 검증만 하고 Release 갱신은 하지 않으며, branch push/workflow dispatch에서만 latest dev release를 갱신합니다.
-
-Android CI의 SDK setup은 obsolete `tools` package를 요청하지 않고 `platform-tools`만 명시합니다. 최신 GitHub runner에서 제거된 legacy `tools` package 때문에 SDK setup이 실패하는 것을 방지하기 위한 설정입니다.
-
-이 APK는 개발/debug 빌드이며 향후 Play 배포용 release AAB와는 별도입니다.
+Android shared UX는 Web과 같은 on-demand restaurant flow를 사용하고 실제 후보 조회만 native Places adapter를 통과합니다.
 
 ### iOS
 
-Vite native build → Capacitor sync → Xcode/cloud build.
+향후 동일 shared core + native adapters.
 
-## 12. Architecture decision maintenance
+## 13. Architecture decision maintenance
 
-다음 변경은 구현과 같은 PR/change에서 문서화합니다.
+다음 변경은 코드와 문서를 함께 갱신합니다.
 
-- product flow
+- product flow / network request timing
 - ranking/filter thresholds
-- Places provider/API
-- curated attraction/station-coordinate/map-target data policy
-- app identifier
-- storage provider
-- framework/platform dependency
-- Web support/deployment strategy
-- Android build/artifact/release distribution strategy
+- Places provider
+- attraction/station-coordinate/map-target policy
+- transient/persistent state ownership
+- platform bridge
+- Web/Android build/deploy structure
