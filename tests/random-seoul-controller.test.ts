@@ -41,7 +41,7 @@ class ScenarioPlaces implements PlaceSearchService {
 }
 
 describe('RandomSeoulController', () => {
-  it('runs line → station → food → new line from the main action', async () => {
+  it('runs line → station → food selection, then loads recommendations separately', async () => {
     const places = new ScenarioPlaces();
     const storage = new MemoryStorage();
     const store = new AppStore(createInitialState(['l2'], ['c_dimsum']));
@@ -57,8 +57,11 @@ describe('RandomSeoulController', () => {
     const foodResult = await controller.drawNext();
     expect(foodResult.stage).toBe('food');
     expect(store.getSnapshot().currentFood?.id).toBe('c_dimsum');
-    expect(store.getSnapshot().recommendations.length).toBeGreaterThan(0);
+    expect(store.getSnapshot().recommendations).toHaveLength(0);
     expect(store.getSnapshot().history[0]?.foodId).toBe('c_dimsum');
+
+    await controller.loadRecommendations();
+    expect(store.getSnapshot().recommendations.length).toBeGreaterThan(0);
 
     expect((await controller.drawNext()).stage).toBe('line');
     expect(store.getSnapshot().currentLine?.id).toBe('l2');
@@ -76,6 +79,7 @@ describe('RandomSeoulController', () => {
     await controller.drawNext();
     await controller.drawNext();
     await controller.drawNext();
+    await controller.loadRecommendations();
 
     const restaurantRequest = places.requests.find((request) => request.textQuery.includes('딤섬'));
     expect(restaurantRequest?.radiusMeters).toBe(2000);
