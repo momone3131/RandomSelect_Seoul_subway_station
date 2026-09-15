@@ -12,243 +12,169 @@ Last updated: 2026-09-15
 
 ## Public Web
 
-Status: **DEPLOYED — RESULT-FIRST / ON-DEMAND RESTAURANT FLOW + IN-CARD REDRAW + SUBWAY-SIGN STATION RESULT LIVE**
+Status: **DEPLOYED — DYNAMIC STAGE PROMPTS / SUBWAY-SIGN RESULT / COMPACT UTILITY ROW LIVE**
 
 Current completion flow:
 
 1. 노선 랜덤
 2. 역 랜덤
 3. 음식 랜덤
-4. **추천 명소 0~2개 즉시 표시**
-5. **`추천 식당 보기`** CTA 표시
-6. CTA 탭 시에만 Google Places 식당 검색
-7. TOP 3 렌더 완료 후 추천 식당 section으로 smooth scroll
+4. 추천 명소 0~2개 즉시 표시
+5. `추천 식당 보기`
+6. 사용자 요청 시에만 Google Places 식당 검색
+7. TOP 3 렌더 후 추천 식당 section으로 smooth scroll
 
 Important behavior:
 
-- 음식 선택 완료만으로 Google restaurant candidate lookup을 호출하지 않음
-- 음식 reveal은 네트워크 지연과 분리됨
-- 사용자가 식당 추천을 원하지 않으면 Places 후보 검색을 생략 가능
-- restaurant lookup 중에는 course-changing controls를 잠시 막아 stale result/state race를 방지
-- 실패 시 CTA가 `추천 식당 다시 찾기`로 복구
-- search가 끝나기 전에 빈 restaurant section으로 강제 scroll하지 않음
+- 음식 선택만으로 restaurant lookup을 자동 호출하지 않음
+- 음식 reveal과 네트워크 lookup 분리
+- restaurant lookup 중 course-changing controls 잠금
+- 실패 시 `추천 식당 다시 찾기`
+- search 완료 전 빈 restaurant section으로 자동 scroll하지 않음
 
 Latest verified Web:
 
-- source/regression head: `a55e20cfb3f67e18205dd9b3a030476fe0459caa`
-- main CI run `34973302421` — **success**
-- Web Release run `34973302381` — **success**
-- deployment commit: `217125018a347dd708a2893cb7600e305b5cd022`
-- public bundle: `assets/modular-ChK-hdZi.js`
-- GitHub Pages run `34973314283` — **success**
+- source/regression head: `8ea433d6f2920eabd1e9de936086a3590a732493`
+- main CI run `34978299548` — **success**
+- Web Release run `34978299383` — **success**
+- deployment commit: `bba8f6a7c49ada8726dc22a81116036e96af9e3d`
+- public bundle: `assets/modular-D8hThyDO.js`
+- GitHub Pages run `34978360339` — **success**
 
-The deployed bundle was directly checked for the current UI contract, including the larger redraw glyph CSS, line-color station-sign rules, and food pending `?` rendering.
-
-Browser self-test verifies:
-
-- line → station → food completes
-- food completion leaves `recommendations.length === 0`
-- explicit restaurant request then renders exactly 3 recommendations
-- 2 km restaurant filter still holds
-- full restart still works
+The deployed bundle was directly checked for the current dynamic headline, centered food prompt, compact utility-row behavior, and updated station-sign CSS.
 
 ## Primary draw / visual UI
 
-Status: **COMPACT PASTEL / LOW-CHROME UI + IN-CARD REDRAW + SUBWAY-SIGN STATION RESULT LIVE**
+### Dynamic hero prompt
 
-Current main interaction:
+The main headline now follows the draw state instead of remaining static:
 
-- next result card itself is the primary draw target
-- `노선 / 역 / 음식` labels only
-- explanatory copy largely hidden
-- completed course returns main CTA to `새 코스`
-- previously selected stages can be redrawn directly from their own cards
-- once a station has been selected, the waiting food card shows a clear `?` cue without increasing the food-card height
+- initial: `어디로 가볼까?`
+- line selected: `어느 역에서 내릴까?`
+- station selected: `식사도 해야지?`
+- food selected: `이 코스로 가자!`
+
+The headline deliberately avoids `오늘` or other time-specific wording.
 
 ### In-card redraw controls
 
-The old text redraw actions under the main CTA were replaced by subtle circular-arrow glyph controls inside completed cards.
-
-- completed **노선** card → top-right refresh glyph → redraw line and invalidate downstream station/food
-- completed **역** card → top-right refresh glyph → redraw station and invalidate downstream food
-- completed **음식** card → top-right refresh glyph → redraw food only
-- each control appears as soon as that stage has a committed result, including intermediate states such as “food is next but user wants to redraw line/station first”
-- redraw keeps the existing controller reset semantics, so stale attractions/recommendations are cleared with upstream changes
-- redraw controls reuse the existing buttons/handlers rather than duplicating action logic
-- visible treatment remains icon-only: **no separate background, no border, no chip/pill**
-- actual button hit area remains `36 × 36 px`
-- refresh SVG is now visually stronger at **24 × 24 px** with **2.4 stroke width**
-- line/station/food glyph colors remain darker same-family tones so they are discoverable without becoming a visual focal point
-- each icon-only button keeps an accessible Korean `aria-label`
-- lower secondary area now only carries non-redraw actions such as copy when applicable
+- completed line/station/food cards keep top-right refresh controls
+- redraw semantics remain line → downstream reset, station → food reset, food → food only
+- no icon background/border/chip
+- actual hit area remains `36 × 36 px`
+- refresh glyph is now **27 × 27 px** with **2.7 stroke width**
+- same-family darker tones remain so the icon is visible without dominating the card
 
 ### Subway-sign station result
 
-A completed station is styled as a compact Seoul-subway-sign-inspired result rather than a generic pastel card.
+A completed station uses a Seoul-subway-sign-inspired surface:
 
-- the selected line color is passed into the station card as `--station-line`
-- completed station surface uses a white interior with a thick rounded line-color frame
-- left circular badge uses the same line color
-- the number inside the circle is the app's **ordinal within the selected line list** (“몇 번째 역”), not a fabricated official station code
-- station name is large, bold, dark, and placed beside the circle
-- responsive sizes preserve the existing card footprint rather than making the result area taller
-- station-card redraw glyph follows the line color in a darker blend
-- this treatment intentionally borrows the visual grammar of real subway station signage without reproducing one operator's exact sign asset
+- selected line color drives the thick rounded frame and circular ordinal badge
+- white sign interior
+- circular badge contains the app's ordinal within the selected line list, not a fabricated official station code
+- badge + station name are vertically centered in the card
+- station-name type scale now matches the line result more closely:
+  - desktop `28px`
+  - mobile `23px`
+  - small phone `21px`
+- long station names continue using responsive reduced sizes (`23 / 18 / 16px`) to stay inside the card
 
-### Food pending cue
+### Food pending state
 
-When a station is already selected but food has not yet been drawn:
+The food card now remains informative even before it becomes the active draw target:
 
-- the food result area displays `?`
-- the question mark uses the existing food-card space (`min-height: 0` on the cue itself)
-- the food panel's existing mobile min-height remains unchanged
-- once food is selected, the normal emoji/category result replaces the cue
+- pending copy: `뭐 먹을까?`
+- before the food stage: faint (`opacity .48`)
+- when food becomes the current stage: full-strength prompt
+- prompt is centered in the existing food-card footprint
+- pending emoji is hidden
+- no food-card min-height increase
 
-Visual system:
+### Utility row
 
-- body: warm cream
-- line: pastel green
-- station waiting state: pastel blue
-- completed station: white subway-sign surface framed in the selected line color
-- food: pastel peach
-- attraction: compact pastel mauve surface
-- ordinary card outlines largely removed
-- active next-draw card alone keeps strong dark outline + hard short shadow
-- small type raised where practical rather than shrinking everything
-- mobile touch targets remain usable
+After a station is selected, the station actions now use one compact row:
 
-Draw feedback:
+**복사 / 네이버지도 / 구글지도**
 
-- press/hold: card physically depresses, shadow collapses
-- settled result: about **900 ms**, max `translateY(-12px) scale(1.09)` with visible pastel-gold ring and short held peak
+- three equal columns
+- copy is reparented into `map_actions`
+- old lower secondary-action row is hidden
+- mobile button height remains usable without consuming two separate rows
+
+### Copy behavior
+
+Copy is now a conversational invitation instead of internal draw metadata:
+
+- station + food: `신설동에서 떡볶이 먹자!` style
+- station only: `신설동 가자!` style
+- line name/number omitted
+- ordinal omitted
+- food examples omitted
+- recommended restaurant name is **never** inserted, even after recommendations have been loaded
+
+## Draw feedback
+
+- next-result card itself is the primary draw target
+- press/hold physically depresses card
+- settled result: ~900 ms, max `translateY(-12px) scale(1.09)` + pastel-gold ring
 - Android native haptic event remains
-- `prefers-reduced-motion` skips visual reveal motion
+- reduced-motion skips visual reveal motion
 
-## Attraction-first result layout
+## Attraction-first / restaurant-on-demand layout
 
-Status: **LIVE**
-
-`src/ui/attraction-view.ts` places attraction section directly after `.panels`.
-
-Mobile behavior:
-
-- title: `추천 명소`
-- max 2 compact cards
-- 2 attractions → 2-column grid
-- 1 attraction → single column
-- 0 attractions → section hidden entirely
-- compact cards prioritize name/category/`지도 보기`
-- long meta/note treatment is omitted from the compact first-result surface
-
-Immediately after this section is the full-width **`추천 식당 보기`** CTA.
-
-This layout intentionally makes the first completed mobile view feel like:
-
-**랜덤 결과 → 명소 → 식당 보기 선택**
-
-rather than making live restaurant cards part of the mandatory completion path.
+- attraction section directly follows `.panels`
+- max 2 compact attraction cards; 0 means section hidden
+- `추천 식당 보기` follows attractions
+- restaurant lookup is opt-in
+- completed restaurant results then auto-scroll into view
 
 ## Restaurant recommendation policy
 
-Status: **LIVE / USER-TRIGGERED**
-
 - provider: Google Places live candidate data
-- trigger: only after `추천 식당 보기`
 - hard radius: 2 km
 - max search candidates: 20
-- shared ranking TOP 3
-
-Weights:
-
+- TOP 3 shared ranking
 - Bayesian rating 55%
 - review volume log 25%
 - Google relevance 15%
 - distance 5%
-
-Persistence:
-
-- recommendation TOP 3 not stored as reusable restaurant DB
-- Google rating/review values not harvested into long-term DB
-
-`RandomSeoulController.drawFoodResult()` owns food selection only. `loadRecommendations()` owns restaurant lookup/ranking as a separate operation.
-
-Any line/station/food redraw changes the current restaurant key, resetting transient restaurant loading/complete/error state so a previous recommendation set cannot leak into a newly redrawn course.
+- Google-derived restaurant results are not persisted as a reusable own DB
 
 ## Curated nearby attractions
 
-Status: **LIVE / STATIC FIRST-PARTY / MAX 0–2**
-
+- static first-party curated data
+- max 0–2, no forced fill
 - no Google attraction Text Search
-- editorial curation, not review-score threshold
-- browse/stay-value threshold
-- major malls/IKEA/Starfield/outlets/department stores can qualify when the facility itself is an outing destination
-- weak ordinary neighborhood facilities excluded
-- no forced fill
+- browse/stay-value editorial threshold
+- `mapQuery` is a self-contained map target; station name is not automatically appended
 
-Data:
-
-- `curated-attractions-base.ts`
-- `curated-attractions-extra.ts`
-- `curated-attractions.ts` merge/dedupe/max2
-
-### Attraction map-target integrity
-
-- no dedicated attraction lat/lng
-- static `mapQuery` is the map target
-- UI never automatically appends station name
-- ambiguous targets are disambiguated by city/district/road/address
-- vague candidates can be removed rather than showing misleading pins
-
-Representative fixes remain:
+Representative map-target fixes remain:
 
 - 검암 → `경인아라뱃길 시천가람터` / `시천가람터 인천광역시 서구 시천동 158-11`
 - vague 오목교·목동 상권 candidate removed
 
 ## Static station centers
 
-Status: **STATIC-FIRST ACTIVE**
-
-- `station-coordinates.ts` first
+- `station-coordinates.ts` static first
 - missing stations only → Google fallback
 - fallback coordinate cache: 30 days
-- station center is for restaurant search/distance; attraction mapQuery is separate
 
 ## Android app
 
-Status: **ACTIVE — SUBWAY-SIGN RESULT / FOOD CUE / ON-DEMAND RESTAURANT FLOW IN LATEST DEV APK**
+Status: **ACTIVE — SAME UX IN LATEST DEV APK**
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-Implemented/synchronized:
-
-- Capacitor 8 Android project
-- native Places SDK bridge
-- separate Android-restricted Places key
-- stable development signing
-- share/haptics/back/map intents
-- no GPS/location permission
-- static attractions/station centers/map-target hardening
-- integrated card-as-button draw flow
-- low-chrome higher-contrast pastel UI
-- 900 ms settled-result reveal + native haptic
-- compact attraction-first completion surface
-- **restaurant lookup only after `추천 식당 보기`**
-- auto-scroll after restaurant results render
-- line/station/food redraw controls inside corresponding completed cards
-- enlarged/heavier refresh glyph visual while preserving 36 px hit area
-- line-color subway-sign completed station treatment
-- pending food `?` cue without increasing card height
-
 Latest verified Android:
 
-- branch/source head: `04cb963b1cf9c2aed10e19a3b316f13fad40f119`
-- Android CI run `34973468315` — **success**
-- shared tests → Vite native build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
+- branch/source head: `ced9c95f9f99c931e8b469d4cd4508d1ad078b83`
+- Android CI run `34978567418` — **success**
+- shared tests → native Web build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - asset: `random-seoul-latest.apk`
-- size: `11,412,492` bytes
-- SHA-256: `418b78f667508ca902f3f6eb25bcf045328edb9d2b4399d4f4089d4f3ab811d4`
+- size: `11,412,808` bytes
+- SHA-256: `71604b2bf31336777644e431bb6d66b1767a0b77a13f7c0128781417476b2e2a`
 
 Fixed direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -258,61 +184,39 @@ Fixed direct download:
 Key files:
 
 - `src/application/random-seoul-controller.ts`
-  - synchronous line/station/food selection
-  - upstream redraw reset semantics
+  - shared draw/reset semantics
   - separate `loadRecommendations()`
 - `src/main.ts`
   - restaurant request lifecycle
-  - `추천 식당 보기` CTA
-  - loading/error/complete transient state
-  - post-render smooth scroll
-  - existing redraw event handlers
+  - conversational copy text
+  - utility action handlers
 - `src/ui/draw-view.ts`
-  - concise stage/result rendering
-  - moves existing redraw buttons into completed line/station/food cards
-  - passes selected line color to station result
-  - renders pending food `?`
+  - stage-aware hero headline
+  - line/station/food rendering
+  - in-card redraw controls
+  - food pending prompt
+  - copy reparent into map action row
 - `src/ui/subway-sign-overrides.css`
-  - larger/heavier redraw icon visuals
-  - completed station subway-sign treatment
-  - responsive station-sign sizing
-  - food pending cue styling
+  - station-sign alignment/type sizing
+  - refresh icon visual sizing
+  - food waiting/ready prompt treatment
+  - compact 3-column utility row
 - `src/ui/attraction-view.ts`
-  - compact attraction section immediately after `.panels`
+  - compact attraction-first section
 - `src/ui/draw-animation.ts`
   - rolling preview + settled reveal
-- `src/ui/primary-draw-placement.ts`
-  - integrated active-card button + press feedback
-- `src/ui/mobile-overrides.css`
-  - pastel/low-chrome/compact attraction/CTA layout
-- `tests/random-seoul-controller.test.ts`
-  - deferred lookup + 2 km contract
 - `tests/responsive-contract.test.ts`
-  - UX ordering/CTA/scroll/visual/in-card redraw/subway-sign/food-cue contracts
+  - current visual/UX contract
 
 ## Build / CI gates
 
 ### Web
 
-`web-release.yml` triggers on relevant `src/**`, `tests/**`, build/workflow changes.
-
-Gate:
-- unit/contract tests
-- Vite build
-- headless browser full-flow smoke
-- verified artifact promotion
-- generated deploy commit rebase onto latest main
-- GitHub Pages deployment
+`web-release.yml` runs tests → Vite build → headless browser smoke → verified root promotion → Pages deployment.
 
 ### Android
 
-- shared tests
-- native Vite build
-- Capacitor sync
-- Android signing/key checks
-- Gradle `assembleDebug`
-- Actions artifact
-- fixed `android-dev-latest` Release replacement
+shared tests → native Web build → Capacitor sync → Gradle `assembleDebug` → Actions artifact → fixed `android-dev-latest` Release.
 
 ## Documentation continuity
 
@@ -328,21 +232,11 @@ Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJ
 
 ## Change log — 2026-09-15
 
-- Integrated main draw CTA into next-result card.
-- Removed explanatory copy and reclaimed vertical space.
-- Rebalanced card sizes/small typography/touch areas.
-- Removed redundant borders and shifted hierarchy toward pastel color surfaces.
-- Strengthened draw press/reveal feedback.
-- Hardened attraction map targets and removed station-name search bias.
-- Expanded browse-worthy attraction curation.
-- Changed restaurant flow from automatic post-food lookup to **explicit user-triggered lookup**.
-- Moved/compacted 추천 명소 directly under random-result panels.
-- Added full-width `추천 식당 보기` CTA.
-- Added loading state and smooth auto-scroll only after restaurant results are ready.
-- Moved line/station/food redraw actions from lower text buttons into the corresponding completed cards as low-contrast top-right refresh glyphs.
-- Enlarged the refresh glyph to 24 px and increased its stroke to 2.4 while keeping the transparent 36 px hit target.
-- Reworked completed station results into a line-color, white-interior subway-sign-inspired card with the selected ordinal in a circular badge.
-- Restored `?` in the ready-to-draw food card without increasing its card height.
-- Preserved upstream reset semantics and restaurant-state invalidation on partial redraw.
-- Updated Web and Android regression contracts for the current visual behavior.
-- Web CI/Web Release/Pages and Android latest dev APK verified for the subway-sign / food-cue release.
+- Kept card-as-button draw flow and in-card partial redraw controls.
+- Increased refresh glyph to 27 px / 2.7 stroke while preserving a transparent 36 px touch area.
+- Vertically centered completed station-sign content and enlarged station-name typography to match line-result scale.
+- Replaced food pending `?` with centered `뭐 먹을까?`; faint before its turn and strong when active, without increasing card height.
+- Consolidated `복사 / 네이버지도 / 구글지도` into one compact row.
+- Replaced technical copy payload with conversational `역에서 음식 먹자!` style text; no line/ordinal/examples/restaurant name.
+- Added stage-aware main headline: `어디로 가볼까? → 어느 역에서 내릴까? → 식사도 해야지? → 이 코스로 가자!`.
+- Web CI/Web Release/Pages and Android latest dev APK verified for this UX release.
