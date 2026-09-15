@@ -1,4 +1,302 @@
-import { RandomSeoulController } from './application/random-seoul-controller';import { AppStore } from './state/app-state';import { GoogleWebPlaceSearchService } from './services/places/google-web';import { PlaceSearchUnavailableError,type PlaceSearchService } from './services/places/place-search';import { StationLocationService } from './services/places/station-location';import { loadPersistedInitialState,saveHistory,savePreferences } from './services/storage/app-persistence';import { WebStorageService } from './services/storage/web-storage';import { googleMapsSearchUrl,naverMapSearchUrl } from './services/maps/web-map-links';import { animateDrawStage,revealDrawStage,type AnimatedDrawStage } from './ui/draw-animation';import { renderDrawView } from './ui/draw-view';import { renderHistory } from './ui/history-view';import { renderAttractions,resetAttractionView } from './ui/attraction-view';import { renderRestaurantError,renderRestaurantLoading,renderRestaurants,resetRestaurantView,type RestaurantViewContext } from './ui/restaurant-view';import { SettingsModalView } from './ui/settings-view';import { byId } from './ui/dom';import { BrowserSmokePlaceSearchService } from './testing/browser-smoke-place-search';import { legacyBody,legacyGoogleMapsApiKey,legacyStyles } from './generated/legacy-shell';class UnavailablePlaceSearchService implements PlaceSearchService{async searchText():Promise<never[]>{throw new PlaceSearchUnavailableError('Google Maps API key is not configured.');}}const appRoot=document.getElementById('app');if(!appRoot)throw new Error('Missing #app root.');const style=document.createElement('style');style.textContent=legacyStyles;document.head.appendChild(style);appRoot.innerHTML=legacyBody;document.title='Random Seoul';const brandTitle=document.querySelector<HTMLElement>('.brand-title');if(brandTitle)brandTitle.textContent='RANDOM SEOUL';const brandSub=document.querySelector<HTMLElement>('.brand-sub');if(brandSub)brandSub.textContent='서울 랜덤 외출 코스';const startupNotice=document.getElementById('startup_notice');if(startupNotice)startupNotice.hidden=true;const runtimeState=document.getElementById('runtime_state');if(runtimeState)runtimeState.textContent='브라우저 실행 중';type InteractiveTarget=HTMLElement&{isContentEditable?:boolean};const selfTestMode=new URLSearchParams(window.location.search).get('selftest')==='1';const storage=new WebStorageService();const store=new AppStore(loadPersistedInitialState(storage));const apiKey=(import.meta.env.VITE_GOOGLE_MAPS_API_KEY||legacyGoogleMapsApiKey||'').trim();const places:PlaceSearchService=selfTestMode?new BrowserSmokePlaceSearchService():apiKey?new GoogleWebPlaceSearchService(apiKey):new UnavailablePlaceSearchService();const stationLocations=new StationLocationService(places,storage,selfTestMode?()=>1_000_000:Date.now);const controller=new RandomSeoulController(store,places,stationLocations,selfTestMode?()=>0:Math.random,selfTestMode?()=>1_000_000:Date.now);const settingsView=new SettingsModalView();let busy=false;let toastTimer:number|undefined;function notify(message:string){const t=byId<HTMLElement>('toast');t.textContent=message;t.classList.add('show');if(toastTimer!==undefined)clearTimeout(toastTimer);toastTimer=window.setTimeout(()=>t.classList.remove('show'),2600)}function announce(message:string){const n=byId<HTMLElement>('announcer');n.textContent='';setTimeout(()=>n.textContent=message,10)}function currentRestaurantContext():RestaurantViewContext|undefined{const s=store.getSnapshot();if(!s.currentStation||!s.currentFood)return;return{stationName:s.currentStation.name,foodName:s.currentFood.name,query:`${s.currentStation.name}역 ${s.currentFood.searchQuery??s.currentFood.name}`}}function updateStatusCopy(){const s=store.getSnapshot(),p=byId<HTMLElement>('progress_note'),h=byId<HTMLElement>('helper');if(busy){h.textContent='두근두근, 결과를 정하는 중이에요.';return}if(!s.currentLine){p.textContent='출발 준비 완료';h.textContent='버튼을 눌러 오늘의 노선을 정해보세요.';return}if(!s.currentStation){p.textContent='노선 확정 · 다음은 역';h.textContent=`${s.currentLine.name} 선택 완료! 이제 한 번 더 눌러 역을 뽑으세요.`;return}if(!s.currentFood){p.textContent='역 확정 · 다음은 음식';h.textContent=`목적지는 ${s.currentStation.name}! 마지막으로 음식 종목을 뽑으세요.`;return}p.textContent='오늘의 외출 코스 완성';h.textContent='오늘의 외출 코스 완성!'}function renderState(){const s=store.getSnapshot();renderDrawView(s,{busy,modalOpen:settingsView.isOpen});renderHistory(s.history);if(s.currentStation)renderAttractions(s.currentStation.name,s.attractions);else resetAttractionView();updateStatusCopy();savePreferences(storage,s.preferences);saveHistory(storage,s.history);if(!s.currentFood)resetRestaurantView()}store.subscribe(renderState);function restaurantErrorMessage(e:unknown){return e instanceof Error&&e.message?`Google Places: ${e.message}`:'Google Places API 연결 또는 사용 설정을 확인해주세요.'}
-async function performDraw(action:()=>Promise<unknown>|unknown,loadsRestaurants:boolean,animationStage?:AnimatedDrawStage){if(busy||settingsView.isOpen)return;busy=true;renderState();try{if(animationStage)await animateDrawStage(animationStage,store.getSnapshot(),{instant:selfTestMode||store.getSnapshot().preferences.instantDraw});if(loadsRestaurants&&animationStage==='food'){await Promise.resolve(action());renderState();revealDrawStage('food');const context=currentRestaurantContext();if(context)renderRestaurantLoading(context);await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));await controller.loadRecommendations();const settled=currentRestaurantContext();if(settled)renderRestaurants(settled,store.getSnapshot().recommendations)}else{await Promise.resolve(action());if(animationStage)revealDrawStage(animationStage)}}catch(e){const c=currentRestaurantContext();if(c)renderRestaurantError(c,restaurantErrorMessage(e));notify('추천 정보를 불러오지 못했어요.');console.error(e)}finally{busy=false;renderState()}}
-async function runMainDraw(){const stage=controller.getStage();if(stage==='done'){store.resetCourse();await performDraw(()=>controller.redrawLine(),false,'line');const r=store.getSnapshot();if(r.currentLine)announce(`${r.currentLine.name}이 뽑혔습니다.`);return}await performDraw(()=>controller.drawNext(),stage==='food',stage);const s=store.getSnapshot();if(stage==='line'&&s.currentLine)announce(`${s.currentLine.name}이 뽑혔습니다.`);if(stage==='station'&&s.currentStation)announce(`${s.currentStation.name}역이 뽑혔습니다.`);if(stage==='food'&&s.currentFood)announce(`오늘의 음식은 ${s.currentFood.name}입니다.`)}function stationMapQuery(){const s=store.getSnapshot();return s.currentLine&&s.currentStation?`${s.currentStation.name}역 ${s.currentLine.name}`:undefined}function openNewTab(url:string){const o=window.open(url,'_blank','noopener,noreferrer');if(o){try{o.opener=null}catch{}}else notify('새 창 열기가 차단됐어요.')}function resultMessage(){const s=store.getSnapshot();if(!s.currentLine||!s.currentStation)return'';let t=`${s.currentLine.name} · 목록의 ${s.currentStation.ordinal}번째 역: ${s.currentStation.name}`;if(s.currentFood)t+=`\n음식: ${s.currentFood.name}\n예시: ${s.currentFood.examples}`;return t}async function copyResult(){const m=resultMessage();if(!m)return;try{await navigator.clipboard.writeText(m);notify('결과를 복사했어요.');return}catch{}const ta=byId<HTMLTextAreaElement>('copy_fallback');ta.value=m;ta.hidden=false;ta.focus();ta.select();let copied=false;try{copied=document.execCommand('copy')}catch{}if(copied){ta.hidden=true;notify('결과를 복사했어요.')}else notify('표시된 결과를 길게 눌러 복사해주세요.')}
-byId<HTMLButtonElement>('draw_btn').addEventListener('click',()=>void runMainDraw());byId<HTMLButtonElement>('restart_btn').addEventListener('click',()=>{store.resetCourse();void performDraw(()=>controller.redrawLine(),false,'line')});byId<HTMLButtonElement>('station_redraw_btn').addEventListener('click',()=>void performDraw(()=>controller.redrawStation(),false,'station'));byId<HTMLButtonElement>('food_redraw_btn').addEventListener('click',()=>void performDraw(()=>controller.redrawFood(),true,'food'));byId<HTMLButtonElement>('copy_btn').addEventListener('click',()=>void copyResult());byId<HTMLInputElement>('instant').addEventListener('change',e=>controller.setInstantDraw((e.currentTarget as HTMLInputElement).checked));byId<HTMLButtonElement>('naver_map_btn').addEventListener('click',()=>{const q=stationMapQuery();if(q)openNewTab(naverMapSearchUrl(q))});byId<HTMLButtonElement>('google_map_btn').addEventListener('click',()=>{const q=stationMapQuery();if(q)openNewTab(googleMapsSearchUrl(q))});byId<HTMLButtonElement>('settings_btn').addEventListener('click',()=>{settingsView.open('line',store.getSnapshot().preferences.selectedLineIds);renderState()});byId<HTMLButtonElement>('food_settings_btn').addEventListener('click',()=>{settingsView.open('food',store.getSnapshot().preferences.selectedFoodIds);renderState()});byId<HTMLButtonElement>('close_settings').addEventListener('click',()=>{settingsView.close();renderState()});byId<HTMLButtonElement>('cancel_settings').addEventListener('click',()=>{settingsView.close();renderState()});byId<HTMLButtonElement>('preset_all').addEventListener('click',()=>settingsView.selectAll());byId<HTMLButtonElement>('preset_none').addEventListener('click',()=>settingsView.selectNone());byId<HTMLButtonElement>('preset_metro').addEventListener('click',()=>settingsView.selectMetroOnly());byId<HTMLButtonElement>('apply_settings').addEventListener('click',()=>{const mode=settingsView.currentMode,d=settingsView.getDraftIds();if(!mode||!d.length)return;if(mode==='line')controller.setSelectedLines(d);else controller.setSelectedFoods(d);settingsView.close();renderState()});byId<HTMLElement>('settings_overlay').addEventListener('click',e=>{if(e.target===e.currentTarget){settingsView.close();renderState()}});byId<HTMLButtonElement>('clear_history').addEventListener('click',()=>controller.clearHistory());document.addEventListener('keydown',e=>{if(settingsView.isOpen){if(e.key==='Escape'){e.preventDefault();settingsView.close();renderState()}return}if(e.repeat||e.isComposing||e.ctrlKey||e.metaKey||e.altKey||![' ','Enter'].includes(e.key))return;let n=e.target as InteractiveTarget|null;while(n&&n!==document.body){if(/^(BUTTON|INPUT|SELECT|TEXTAREA|A|SUMMARY)$/.test(n.tagName)||n.isContentEditable)return;n=n.parentElement as InteractiveTarget|null}e.preventDefault();void runMainDraw()});async function runBrowserSelfTest(){try{await runMainDraw();await runMainDraw();await runMainDraw();const s=store.getSnapshot(),count=document.querySelectorAll('#restaurant_cards .restaurant-card').length;document.body.dataset.selftestRecommendations=String(s.recommendations.length);document.body.dataset.selftestCards=String(count);document.body.dataset.selftestFood=s.currentFood?.id??'';if(!s.currentLine||!s.currentStation||!s.currentFood||s.recommendations.length!==3||count!==3)throw new Error('Self-test failed');await runMainDraw();document.body.dataset.selftestCycleReset='true';document.body.dataset.selftest='passed'}catch(e){document.body.dataset.selftest='failed';document.body.dataset.selftestError=e instanceof Error?e.message:String(e)}}renderState();document.body.dataset.appReady='true';if(selfTestMode)void runBrowserSelfTest();
+import { RandomSeoulController } from './application/random-seoul-controller';
+import { AppStore } from './state/app-state';
+import { GoogleWebPlaceSearchService } from './services/places/google-web';
+import { PlaceSearchUnavailableError, type PlaceSearchService } from './services/places/place-search';
+import { StationLocationService } from './services/places/station-location';
+import { loadPersistedInitialState, saveHistory, savePreferences } from './services/storage/app-persistence';
+import { WebStorageService } from './services/storage/web-storage';
+import { googleMapsSearchUrl, naverMapSearchUrl } from './services/maps/web-map-links';
+import { animateDrawStage, revealDrawStage, type AnimatedDrawStage } from './ui/draw-animation';
+import { renderDrawView } from './ui/draw-view';
+import { renderHistory } from './ui/history-view';
+import { renderAttractions, resetAttractionView } from './ui/attraction-view';
+import {
+  renderRestaurantError,
+  renderRestaurantLoading,
+  renderRestaurants,
+  resetRestaurantView,
+  type RestaurantViewContext,
+} from './ui/restaurant-view';
+import { SettingsModalView } from './ui/settings-view';
+import { byId } from './ui/dom';
+import { BrowserSmokePlaceSearchService } from './testing/browser-smoke-place-search';
+import { legacyBody, legacyGoogleMapsApiKey, legacyStyles } from './generated/legacy-shell';
+
+class UnavailablePlaceSearchService implements PlaceSearchService {
+  async searchText(): Promise<never[]> {
+    throw new PlaceSearchUnavailableError('Google Maps API key is not configured.');
+  }
+}
+
+const appRoot = document.getElementById('app');
+if (!appRoot) throw new Error('Missing #app root.');
+const style = document.createElement('style');
+style.textContent = legacyStyles;
+document.head.appendChild(style);
+appRoot.innerHTML = legacyBody;
+document.title = 'Random Seoul';
+const brandTitle = document.querySelector<HTMLElement>('.brand-title');
+if (brandTitle) brandTitle.textContent = 'RANDOM SEOUL';
+const brandSub = document.querySelector<HTMLElement>('.brand-sub');
+if (brandSub) brandSub.textContent = '서울 랜덤 외출 코스';
+const startupNotice = document.getElementById('startup_notice');
+if (startupNotice) startupNotice.hidden = true;
+const runtimeState = document.getElementById('runtime_state');
+if (runtimeState) runtimeState.textContent = '브라우저 실행 중';
+
+type InteractiveTarget = HTMLElement & { isContentEditable?: boolean };
+const selfTestMode = new URLSearchParams(window.location.search).get('selftest') === '1';
+const storage = new WebStorageService();
+const store = new AppStore(loadPersistedInitialState(storage));
+const apiKey = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY || legacyGoogleMapsApiKey || '').trim();
+const places: PlaceSearchService = selfTestMode
+  ? new BrowserSmokePlaceSearchService()
+  : apiKey
+    ? new GoogleWebPlaceSearchService(apiKey)
+    : new UnavailablePlaceSearchService();
+const stationLocations = new StationLocationService(places, storage, selfTestMode ? () => 1_000_000 : Date.now);
+const controller = new RandomSeoulController(store, places, stationLocations, selfTestMode ? () => 0 : Math.random, selfTestMode ? () => 1_000_000 : Date.now);
+const settingsView = new SettingsModalView();
+let busy = false;
+let toastTimer: number | undefined;
+let restaurantLookupKey: string | undefined;
+let restaurantLookupBusy = false;
+let restaurantLookupComplete = false;
+let restaurantLookupFailed = false;
+
+function ensureRestaurantRequestControl(): { wrap: HTMLElement; button: HTMLButtonElement } {
+  let wrap = document.getElementById('restaurant_request') as HTMLElement | null;
+  let button = document.getElementById('restaurant_request_btn') as HTMLButtonElement | null;
+  if (wrap && button) return { wrap, button };
+  wrap = document.createElement('div');
+  wrap.id = 'restaurant_request';
+  wrap.className = 'restaurant-request';
+  wrap.hidden = true;
+  button = document.createElement('button');
+  button.id = 'restaurant_request_btn';
+  button.className = 'restaurant-request-btn';
+  button.type = 'button';
+  button.textContent = '추천 식당 보기';
+  wrap.appendChild(button);
+  const panels = document.querySelector<HTMLElement>('.panels');
+  if (!panels) throw new Error('Missing .panels.');
+  panels.insertAdjacentElement('afterend', wrap);
+  return { wrap, button };
+}
+const restaurantRequest = ensureRestaurantRequestControl();
+
+function notify(message: string): void {
+  const toast = byId<HTMLElement>('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  if (toastTimer !== undefined) window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+}
+function announce(message: string): void {
+  const node = byId<HTMLElement>('announcer');
+  node.textContent = '';
+  window.setTimeout(() => { node.textContent = message; }, 10);
+}
+function currentRestaurantContext(): RestaurantViewContext | undefined {
+  const state = store.getSnapshot();
+  if (!state.currentStation || !state.currentFood) return undefined;
+  return { stationName: state.currentStation.name, foodName: state.currentFood.name, query: `${state.currentStation.name}역 ${state.currentFood.searchQuery ?? state.currentFood.name}` };
+}
+function currentRestaurantKey(): string | undefined {
+  const state = store.getSnapshot();
+  if (!state.currentLine || !state.currentStation || !state.currentFood) return undefined;
+  return `${state.currentLine.id}|${state.currentStation.name}|${state.currentFood.id}`;
+}
+function syncRestaurantDiscoveryState(): void {
+  const key = currentRestaurantKey();
+  if (key !== restaurantLookupKey) {
+    restaurantLookupKey = key;
+    restaurantLookupBusy = false;
+    restaurantLookupComplete = false;
+    restaurantLookupFailed = false;
+    resetRestaurantView();
+  }
+  if (!key) {
+    restaurantRequest.wrap.hidden = true;
+    return;
+  }
+  restaurantRequest.wrap.hidden = restaurantLookupComplete;
+  restaurantRequest.button.disabled = restaurantLookupBusy;
+  restaurantRequest.button.textContent = restaurantLookupBusy ? '추천 식당 찾는 중…' : restaurantLookupFailed ? '추천 식당 다시 찾기' : '추천 식당 보기';
+  if (restaurantLookupBusy) {
+    for (const id of ['draw_btn', 'restart_btn', 'station_redraw_btn', 'food_redraw_btn', 'settings_btn', 'food_settings_btn']) {
+      const control = document.getElementById(id) as HTMLButtonElement | null;
+      if (control) control.disabled = true;
+    }
+  }
+}
+function updateStatusCopy(): void {
+  const state = store.getSnapshot();
+  const progress = byId<HTMLElement>('progress_note');
+  const helper = byId<HTMLElement>('helper');
+  if (busy) { helper.textContent = '두근두근, 결과를 정하는 중이에요.'; return; }
+  if (!state.currentLine) { progress.textContent = '출발 준비 완료'; helper.textContent = '버튼을 눌러 오늘의 노선을 정해보세요.'; return; }
+  if (!state.currentStation) { progress.textContent = '노선 확정 · 다음은 역'; helper.textContent = `${state.currentLine.name} 선택 완료! 이제 한 번 더 눌러 역을 뽑으세요.`; return; }
+  if (!state.currentFood) { progress.textContent = '역 확정 · 다음은 음식'; helper.textContent = `목적지는 ${state.currentStation.name}! 마지막으로 음식 종목을 뽑으세요.`; return; }
+  progress.textContent = '오늘의 외출 코스 완성';
+  helper.textContent = '추천 명소를 보고, 원하면 추천 식당을 찾아보세요.';
+}
+function renderState(): void {
+  const state = store.getSnapshot();
+  renderDrawView(state, { busy, modalOpen: settingsView.isOpen });
+  renderHistory(state.history);
+  if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions); else resetAttractionView();
+  updateStatusCopy();
+  savePreferences(storage, state.preferences);
+  saveHistory(storage, state.history);
+  syncRestaurantDiscoveryState();
+}
+store.subscribe(renderState);
+function restaurantErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) return `Google Places: ${error.message}`;
+  return 'Google Places API 연결 또는 사용 설정을 확인해주세요.';
+}
+async function performDraw(action: () => Promise<unknown> | unknown, animationStage?: AnimatedDrawStage): Promise<void> {
+  if (busy || restaurantLookupBusy || settingsView.isOpen) return;
+  busy = true;
+  renderState();
+  try {
+    if (animationStage) await animateDrawStage(animationStage, store.getSnapshot(), { instant: selfTestMode || store.getSnapshot().preferences.instantDraw });
+    await Promise.resolve(action());
+    renderState();
+    if (animationStage) revealDrawStage(animationStage);
+  } catch (error) {
+    notify('추첨 중 문제가 생겼어요.');
+    console.error(error);
+  } finally {
+    busy = false;
+    renderState();
+  }
+}
+async function requestRestaurants(scrollToResults = true): Promise<void> {
+  if (busy || restaurantLookupBusy || restaurantLookupComplete || settingsView.isOpen) return;
+  const key = currentRestaurantKey();
+  const context = currentRestaurantContext();
+  if (!key || !context) return;
+  restaurantLookupBusy = true;
+  restaurantLookupFailed = false;
+  renderState();
+  renderRestaurantLoading(context);
+  try {
+    await controller.loadRecommendations();
+    if (currentRestaurantKey() !== key) return;
+    renderRestaurants(context, store.getSnapshot().recommendations);
+    restaurantLookupComplete = true;
+    restaurantLookupFailed = false;
+    announce('추천 식당을 찾았습니다.');
+  } catch (error) {
+    if (currentRestaurantKey() !== key) return;
+    restaurantLookupFailed = true;
+    renderRestaurantError(context, restaurantErrorMessage(error));
+    notify('추천 정보를 불러오지 못했어요.');
+    console.error(error);
+  } finally {
+    if (currentRestaurantKey() === key) {
+      restaurantLookupBusy = false;
+      renderState();
+      if (restaurantLookupComplete && scrollToResults) window.requestAnimationFrame(() => byId<HTMLElement>('restaurant_section').scrollIntoView({ behavior: selfTestMode ? 'auto' : 'smooth', block: 'start' }));
+    }
+  }
+}
+async function runMainDraw(): Promise<void> {
+  const stage = controller.getStage();
+  if (stage === 'done') {
+    store.resetCourse();
+    await performDraw(() => controller.redrawLine(), 'line');
+    const restarted = store.getSnapshot();
+    if (restarted.currentLine) announce(`${restarted.currentLine.name}이 뽑혔습니다.`);
+    return;
+  }
+  await performDraw(() => controller.drawNext(), stage);
+  const state = store.getSnapshot();
+  if (stage === 'line' && state.currentLine) announce(`${state.currentLine.name}이 뽑혔습니다.`);
+  if (stage === 'station' && state.currentStation) announce(`${state.currentStation.name}역이 뽑혔습니다.`);
+  if (stage === 'food' && state.currentFood) announce(`오늘의 음식은 ${state.currentFood.name}입니다.`);
+}
+function stationMapQuery(): string | undefined {
+  const state = store.getSnapshot();
+  if (!state.currentLine || !state.currentStation) return undefined;
+  return `${state.currentStation.name}역 ${state.currentLine.name}`;
+}
+function openNewTab(url: string): void {
+  const opened = window.open(url, '_blank', 'noopener,noreferrer');
+  if (opened) { try { opened.opener = null; } catch {} } else notify('새 창 열기가 차단됐어요. 브라우저 팝업 설정을 확인해주세요.');
+}
+function resultMessage(): string {
+  const state = store.getSnapshot();
+  if (!state.currentLine || !state.currentStation) return '';
+  let text = `${state.currentLine.name} · 목록의 ${state.currentStation.ordinal}번째 역: ${state.currentStation.name}`;
+  if (state.currentFood) text += `\n음식: ${state.currentFood.name}\n예시: ${state.currentFood.examples}`;
+  return text;
+}
+async function copyResult(): Promise<void> {
+  const message = resultMessage();
+  if (!message) return;
+  try { await navigator.clipboard.writeText(message); notify('결과를 복사했어요.'); return; } catch {}
+  const textarea = byId<HTMLTextAreaElement>('copy_fallback');
+  textarea.value = message; textarea.hidden = false; textarea.focus(); textarea.select();
+  let copied = false; try { copied = document.execCommand('copy'); } catch {}
+  if (copied) { textarea.hidden = true; notify('결과를 복사했어요.'); } else notify('표시된 결과를 길게 눌러 복사해주세요.');
+}
+byId<HTMLButtonElement>('draw_btn').addEventListener('click', () => { void runMainDraw(); });
+restaurantRequest.button.addEventListener('click', () => { void requestRestaurants(); });
+byId<HTMLButtonElement>('restart_btn').addEventListener('click', () => { store.resetCourse(); void performDraw(() => controller.redrawLine(), 'line'); });
+byId<HTMLButtonElement>('station_redraw_btn').addEventListener('click', () => { void performDraw(() => controller.redrawStation(), 'station'); });
+byId<HTMLButtonElement>('food_redraw_btn').addEventListener('click', () => { void performDraw(() => controller.redrawFood(), 'food'); });
+byId<HTMLButtonElement>('copy_btn').addEventListener('click', () => { void copyResult(); });
+byId<HTMLInputElement>('instant').addEventListener('change', (event) => controller.setInstantDraw((event.currentTarget as HTMLInputElement).checked));
+byId<HTMLButtonElement>('naver_map_btn').addEventListener('click', () => { const query = stationMapQuery(); if (query) openNewTab(naverMapSearchUrl(query)); });
+byId<HTMLButtonElement>('google_map_btn').addEventListener('click', () => { const query = stationMapQuery(); if (query) openNewTab(googleMapsSearchUrl(query)); });
+byId<HTMLButtonElement>('settings_btn').addEventListener('click', () => { if (restaurantLookupBusy) return; settingsView.open('line', store.getSnapshot().preferences.selectedLineIds); renderState(); });
+byId<HTMLButtonElement>('food_settings_btn').addEventListener('click', () => { if (restaurantLookupBusy) return; settingsView.open('food', store.getSnapshot().preferences.selectedFoodIds); renderState(); });
+byId<HTMLButtonElement>('close_settings').addEventListener('click', () => { settingsView.close(); renderState(); });
+byId<HTMLButtonElement>('cancel_settings').addEventListener('click', () => { settingsView.close(); renderState(); });
+byId<HTMLButtonElement>('preset_all').addEventListener('click', () => settingsView.selectAll());
+byId<HTMLButtonElement>('preset_none').addEventListener('click', () => settingsView.selectNone());
+byId<HTMLButtonElement>('preset_metro').addEventListener('click', () => settingsView.selectMetroOnly());
+byId<HTMLButtonElement>('apply_settings').addEventListener('click', () => {
+  const mode = settingsView.currentMode, draft = settingsView.getDraftIds();
+  if (!mode || !draft.length) return;
+  if (mode === 'line') controller.setSelectedLines(draft); else controller.setSelectedFoods(draft);
+  settingsView.close(); renderState();
+});
+byId<HTMLElement>('settings_overlay').addEventListener('click', (event) => { if (event.target === event.currentTarget) { settingsView.close(); renderState(); } });
+byId<HTMLButtonElement>('clear_history').addEventListener('click', () => controller.clearHistory());
+document.addEventListener('keydown', (event) => {
+  if (settingsView.isOpen) { if (event.key === 'Escape') { event.preventDefault(); settingsView.close(); renderState(); } return; }
+  if (event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || (event.key !== ' ' && event.key !== 'Enter')) return;
+  let node = event.target as InteractiveTarget | null;
+  while (node && node !== document.body) { if (/^(BUTTON|INPUT|SELECT|TEXTAREA|A|SUMMARY)$/.test(node.tagName) || node.isContentEditable) return; node = node.parentElement as InteractiveTarget | null; }
+  event.preventDefault(); void runMainDraw();
+});
+async function runBrowserSelfTest(): Promise<void> {
+  try {
+    await runMainDraw(); await runMainDraw(); await runMainDraw();
+    const beforeRestaurants = store.getSnapshot();
+    if (!beforeRestaurants.currentLine || !beforeRestaurants.currentStation || !beforeRestaurants.currentFood) throw new Error('Self-test did not complete draw.');
+    if (beforeRestaurants.recommendations.length !== 0) throw new Error('Restaurant lookup ran before request.');
+    document.body.dataset.selftestDeferredRestaurants = 'true';
+    await requestRestaurants(false);
+    const complete = store.getSnapshot();
+    const cardCount = document.querySelectorAll('#restaurant_cards .restaurant-card').length;
+    document.body.dataset.selftestRecommendations = String(complete.recommendations.length);
+    document.body.dataset.selftestCards = String(cardCount);
+    document.body.dataset.selftestFood = complete.currentFood?.id ?? '';
+    if (complete.recommendations.length !== 3 || cardCount !== 3) throw new Error('Self-test restaurant request failed.');
+    if (complete.recommendations.some((restaurant) => restaurant.id === 'selftest-far')) throw new Error('Self-test 2 km filter failed.');
+    await runMainDraw();
+    const restarted = store.getSnapshot();
+    if (!restarted.currentLine || restarted.currentStation || restarted.currentFood) throw new Error('Self-test reset failed.');
+    document.body.dataset.selftestCycleReset = 'true'; document.body.dataset.selftest = 'passed';
+  } catch (error) {
+    document.body.dataset.selftest = 'failed';
+    document.body.dataset.selftestError = error instanceof Error ? error.message : String(error);
+    console.error(error);
+  }
+}
+renderState(); document.body.dataset.appReady = 'true'; if (selfTestMode) void runBrowserSelfTest();
