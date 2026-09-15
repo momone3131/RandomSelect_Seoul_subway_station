@@ -5,10 +5,7 @@ const styles = [
   readFileSync(new URL('../src/ui/styles.css', import.meta.url), 'utf8'),
   readFileSync(new URL('../src/ui/mobile-overrides.css', import.meta.url), 'utf8'),
 ].join('\n');
-const primaryDrawPlacement = readFileSync(
-  new URL('../src/ui/primary-draw-placement.ts', import.meta.url),
-  'utf8',
-);
+const primaryDrawPlacement = readFileSync(new URL('../src/ui/primary-draw-placement.ts', import.meta.url), 'utf8');
 const drawAnimation = readFileSync(new URL('../src/ui/draw-animation.ts', import.meta.url), 'utf8');
 const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
 
@@ -37,11 +34,13 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('font-size: 16px');
   });
 
-  it('uses stronger structural lines and restrained radii', () => {
-    expect(styles).toContain('border: 2px solid #c7d0c5');
-    expect(styles).toContain('border: 1.5px solid var(--border)');
-    expect(styles).toContain('border-radius: 13px');
-    expect(styles).toContain('box-shadow: 0 5px 0 #dde2da');
+  it('removes redundant container and card borders', () => {
+    expect(styles).toContain('.draw-shell { border: 0;');
+    expect(styles).toContain('border: 0 !important;');
+    expect(styles).toContain('.restaurant-section { margin-top: 16px; padding: 16px; border: 0;');
+    expect(styles).toContain('.restaurant-card,.restaurant-skeleton { min-height: 150px; padding: 13px; border: 0;');
+    expect(styles).toContain('.station-item { min-height: 36px; padding: 7px 8px; border: 0;');
+    expect(styles).toContain('.history-item { padding: 11px 12px; border: 0;');
   });
 
   it('uses the whole next-result card as the primary draw target', () => {
@@ -54,29 +53,27 @@ describe('Random Seoul responsive visual contract', () => {
     expect(primaryDrawPlacement).toContain('actionZone.prepend(drawButton)');
   });
 
-  it('makes the active draw card feel physical without a soft gradient treatment', () => {
-    expect(styles).toContain('border: 2px solid var(--dark)');
+  it('reserves the strong outline for the active draw card', () => {
+    expect(styles).toContain('border: 2px solid var(--dark) !important');
     expect(styles).toContain('background: var(--lime)');
     expect(styles).toContain('box-shadow: 0 4px 0 #98aa5f');
     expect(styles).toContain('.panel.next-draw::after');
     expect(styles).toContain('content: "⚄"');
-    expect(styles).not.toContain('linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
   });
 
   it('adds tactile hold feedback to the integrated draw card', () => {
     expect(primaryDrawPlacement).toContain("addEventListener('pointerdown'");
     expect(primaryDrawPlacement).toContain("addEventListener('pointerup'");
     expect(primaryDrawPlacement).toContain("translateY(3px) scale(.985)");
-    expect(primaryDrawPlacement).toContain("boxShadow: '0 1px 0 #8ea055'");
     expect(primaryDrawPlacement).toContain('duration: 75');
   });
 
-  it('adds a short settled-result thump after the final render', () => {
+  it('uses a large unmistakable settled-result reveal', () => {
     expect(drawAnimation).toContain('window.requestAnimationFrame');
-    expect(drawAnimation).toContain('panel.getAnimations().forEach');
-    expect(drawAnimation).toContain("translateY(-4px) scale(1.018)");
-    expect(drawAnimation).toContain("0 4px 0 #203b2f, 0 0 0 4px #d7f775");
-    expect(drawAnimation).toContain('duration: 360');
+    expect(drawAnimation).toContain("translateY(-10px) scale(1.075)");
+    expect(drawAnimation).toContain("0 0 0 8px #d7f775");
+    expect(drawAnimation).toContain("translateY(3px) scale(.985)");
+    expect(drawAnimation).toContain('duration: 520');
   });
 
   it('hides nonessential explanatory copy from the main surface', () => {
