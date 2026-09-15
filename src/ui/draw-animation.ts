@@ -123,12 +123,44 @@ export async function animateDrawStage(
 }
 
 export function revealDrawStage(stage: AnimatedDrawStage): void {
-  const panel = panelFor(stage);
-  panel.classList.remove('bounce');
-  void panel.offsetWidth;
-  panel.classList.add('bounce');
-
   window.dispatchEvent(new CustomEvent<{ stage: AnimatedDrawStage }>('randomseoul:draw-revealed', {
     detail: { stage },
   }));
+
+  if (prefersReducedMotion()) return;
+
+  // performDraw() renders once more in its finally block. Defer the settled
+  // feedback by one frame so the final render cannot erase the effect.
+  window.requestAnimationFrame(() => {
+    const panel = panelFor(stage);
+    panel.getAnimations().forEach((animation) => animation.cancel());
+    panel.animate(
+      [
+        {
+          transform: 'translateY(0) scale(1)',
+          boxShadow: '0 0 0 0 rgba(215,247,117,0)',
+          offset: 0,
+        },
+        {
+          transform: 'translateY(-4px) scale(1.018)',
+          boxShadow: '0 4px 0 #203b2f, 0 0 0 4px #d7f775',
+          offset: 0.36,
+        },
+        {
+          transform: 'translateY(1px) scale(.996)',
+          boxShadow: '0 1px 0 #203b2f, 0 0 0 2px rgba(215,247,117,.65)',
+          offset: 0.72,
+        },
+        {
+          transform: 'translateY(0) scale(1)',
+          boxShadow: '0 0 0 0 rgba(215,247,117,0)',
+          offset: 1,
+        },
+      ],
+      {
+        duration: 360,
+        easing: 'cubic-bezier(.2,.8,.2,1)',
+      },
+    );
+  });
 }
