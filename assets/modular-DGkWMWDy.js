@@ -51,7 +51,7 @@ button svg,button svg *{pointer-events:none}
 @media(pointer:coarse){button.plain-btn,button.preset,button.apply-btn,button.text-btn,button.close-btn{min-height:44px}.close-btn{width:44px;height:44px;top:12px;right:12px}.dialog-head h2{padding-right:40px}.speed-label{min-height:44px;align-items:center;padding-right:7px}.speed-label input{width:18px;height:18px}.options-row{align-items:center}.line-choice input{width:18px;height:18px}.summary-left{min-height:20px}.secondary-actions .plain-btn{min-height:44px}.line-choices{padding:2px}.copy-fallback{font-size:16px}}
 @supports(padding:env(safe-area-inset-bottom)){.page{padding-bottom:calc(24px + env(safe-area-inset-bottom))}.toast{bottom:calc(20px + env(safe-area-inset-bottom))}.modal-overlay{padding-bottom:calc(15px + env(safe-area-inset-bottom));padding-top:calc(15px + env(safe-area-inset-top))}.settings-modal{max-height:calc(100dvh - 30px - env(safe-area-inset-bottom) - env(safe-area-inset-top))}}
 
-/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. */
+/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. Web release refresh marker: full-card dice CTA. */
 @media (max-width: 720px) {
   .restaurant-grid,
   .restaurant-loading {
@@ -88,11 +88,17 @@ button svg,button svg *{pointer-events:none}
   transition: border-color .16s, box-shadow .16s, background .16s, transform .12s;
 }
 
+/* Reserve the top-right corner for the dice affordance so labels never sit underneath it. */
+.panel.next-draw .panel-tag {
+  right: 66px;
+  max-width: calc(100% - 90px);
+}
+
 .panel.next-draw::after {
-  content: "→";
+  content: "⚄";
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   z-index: 2;
   display: grid;
   place-items: center;
@@ -102,8 +108,8 @@ button svg,button svg *{pointer-events:none}
   background: var(--dark);
   color: var(--lime);
   box-shadow: 0 3px 0 rgba(12, 36, 27, 0.18);
-  font-size: 21px;
-  font-weight: 900;
+  font-size: 26px;
+  font-weight: 800;
   line-height: 1;
   pointer-events: none;
 }
@@ -167,6 +173,21 @@ button svg,button svg *{pointer-events:none}
 
 .options-row {
   justify-content: flex-start;
+}
+
+@media (max-width: 430px) {
+  .panel.next-draw .panel-tag {
+    right: 59px;
+    max-width: calc(100% - 83px);
+  }
+
+  .panel.next-draw::after {
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    font-size: 23px;
+  }
 }
 `,$e=`<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
 <symbol id="train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="15" rx="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 11h14M12 4v7M8 18l-2 3m10-3 2 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="8.5" cy="14.5" r="1" fill="currentColor"/><circle cx="15.5" cy="14.5" r="1" fill="currentColor"/></symbol>
