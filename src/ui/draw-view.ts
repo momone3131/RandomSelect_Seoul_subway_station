@@ -15,6 +15,12 @@ function setTrailingText(element: HTMLElement, text: string): void {
   else element.append(document.createTextNode(text));
 }
 
+const REDRAW_INK: Record<'line_panel' | 'station_panel' | 'food_panel', string> = {
+  line_panel: '#8da877',
+  station_panel: '#7898a6',
+  food_panel: '#b18868',
+};
+
 function placeCardRedrawButton(
   button: HTMLButtonElement,
   panelId: 'line_panel' | 'station_panel' | 'food_panel',
@@ -25,6 +31,25 @@ function placeCardRedrawButton(
   button.className = 'card-redraw-btn';
   button.hidden = !visible;
   button.setAttribute('aria-label', label);
+  button.style.cssText = [
+    'position:absolute',
+    'top:7px',
+    'right:8px',
+    'z-index:4',
+    'display:grid',
+    'place-items:center',
+    'width:36px',
+    'height:36px',
+    'min-height:36px',
+    'padding:0',
+    'border:0',
+    'border-radius:0',
+    'background:transparent',
+    `color:${REDRAW_INK[panelId]}`,
+    'font-size:0',
+    'box-shadow:none',
+    'opacity:.88',
+  ].join(';');
   if (button.parentElement !== panel) panel.appendChild(button);
 }
 
