@@ -1,0 +1,48 @@
+/* Final palette simplification: preserve action/line accents, neutralize passive surfaces. */
+:root{
+  --bg:#f5f4f0;
+  --paper:#fffdfa;
+  --surface:#e9ebe7;
+}
+
+body{background:var(--bg)}
+.progress{display:none!important}
+.hero h1 span::after{background:var(--lime)}
+
+/* One passive structural surface across the app. */
+.draw-shell,
+.station-detail,
+.history-item,
+.line-choice,
+.restaurant-section,
+#attraction_section.attraction-section{
+  background:var(--surface);
+}
+
+/* Completed/passive content cards share a single paper tone. Active draw cards still override this with lime. */
+.line-panel,
+.station-panel,
+.food-panel,
+.restaurant-card,
+.restaurant-skeleton,
+.station-item,
+#attraction_section .attraction-card{
+  background:var(--paper);
+}
+
+/* Remove extra blue/green/beige utility tints. */
+.map-btn,
+.restaurant-map-link,
+#attraction_section .attraction-map-link,
+.map-actions #copy_btn{
+  background:var(--paper);
+}
+.restaurant-distance,
+.restaurant-rating,
+.restaurant-reviews{
+  background:var(--surface);
+}
+
+/* Food prompt uses the neutral system until the active lime card takes focus. */
+.food-panel.waiting .food-question{color:var(--muted);opacity:.48}
+.food-panel.ready .food-question{color:var(--dark);opacity:1}
