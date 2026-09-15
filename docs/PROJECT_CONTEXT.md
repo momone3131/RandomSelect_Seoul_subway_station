@@ -73,6 +73,31 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 
 ## 5. Main interaction / visual contract
 
+### Minimal palette
+
+현재 UI는 passive color 수를 줄인 중성 3-tone system을 사용합니다.
+
+- app background: `#f5f4f0`
+- paper/content: `#fffdfa`
+- structural surface: `#e9ebe7`
+- active random target의 lime + dark ink는 유지
+- 완료된 역은 selected subway-line color frame/badge 유지
+- 노선 badge는 실제 노선색 유지
+
+같은 structural surface를 공유:
+- main draw shell
+- 역 목록 panel
+- 최근 외출 코스 cards
+- 추천 명소 section
+- 추천 식당 section
+- 선택 modal의 choice surfaces
+
+완료/passive line/station/food cards는 별도 green/blue/peach 배경 대신 동일 paper tone을 사용합니다. 지도/복사/restaurant utility tint도 neutral tone으로 통일합니다.
+
+### Progress strip
+
+시각적 `01 노선 / 02 역 / 03 음식` strip은 숨깁니다. active lime card + dynamic headline + 결과 card가 현재 stage를 충분히 전달합니다. 내부 state/ARIA logic은 유지됩니다.
+
 ### Stage-aware headline
 
 `#page-title`은 상태에 따라 바뀝니다.
@@ -89,14 +114,14 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 - next-result card 자체가 primary draw target
 - completed line/station/food cards의 우측 상단 ↻로 해당 단계부터 부분 재추첨
 - refresh visual: 27 px / 2.7 stroke, transparent 36 px hit area
-- upstream redraw는 downstream result/attractions/recommendations를 기존 controller semantics대로 초기화
+- upstream redraw는 downstream result/attractions/recommendations를 controller semantics대로 초기화
 
 ### Station result
 
 완료 역은 실제 지하철 역명판 문법을 단순화한 형태입니다.
 
 - selected line color rounded frame
-- white interior
+- white/paper interior
 - left circular line-color badge
 - badge number = selected line list에서의 ordinal (“몇 번째 역”), 공식 역번호 아님
 - badge + station name vertically centered
@@ -106,8 +131,8 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 ### Food pending
 
 - 음식 선택 전 항상 `뭐 먹을까?`
-- 아직 food stage가 아니면 희미하게
-- food stage가 되면 선명하게
+- 아직 food stage가 아니면 희미한 neutral text
+- food stage가 되면 dark text on active lime card
 - 기존 food-card 높이는 늘리지 않음
 
 ### Utility actions / copy
@@ -159,31 +184,40 @@ Map target:
 
 ### Public Web
 
-- source/regression head: `8ea433d6f2920eabd1e9de936086a3590a732493`
-- main CI: `34978299548` — success
-- Web Release: `34978299383` — success
-- deployment commit: `bba8f6a7c49ada8726dc22a81116036e96af9e3d`
-- public bundle: `assets/modular-D8hThyDO.js`
-- GitHub Pages: `34978360339` — success
+- source/regression head: `394fc9188a669a63a45652e9cf018b76bdf06f4d`
+- main CI: `34980301473` — success
+- Web Release: `34980301797` — success
+- deployment commit carrying current bundle: `86a73df0f5d222268484aa02ddea3d0412c62c3f`
+- public bundle: `assets/modular-nSZu7knQ.js`
+- GitHub Pages: `34980299496` — success
+
+Public bundle directly contains `--surface:#e9ebe7` and `.progress{display:none!important}`.
 
 ### Android
 
-- branch/source head: `ced9c95f9f99c931e8b469d4cd4508d1ad078b83`
-- Android CI: `34978567418` — success
+- branch/source head: `934b984e55588c777678a17b75861686bf2e748a`
+- Android CI: `34980384360` — success
 - APK: `random-seoul-latest.apk`
-- size: `11,412,808` bytes
-- SHA-256: `71604b2bf31336777644e431bb6d66b1767a0b77a13f7c0128781417476b2e2a`
+- size: `11,413,240` bytes
+- SHA-256: `647e86ed5a7c73f0271a6898ed1e5d73c5021073d5600394a3b587dd69204d2f`
 
 Direct fixed URL:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
 
 ## 10. Build/deploy notes
 
-Web Release: tests → build → browser smoke → verified root promotion → deployment commit → GitHub Pages.
+Web Release: tests → build → browser smoke → verified root promotion → deployment commit when generated Web files change → GitHub Pages.
 
 Android CI: shared tests → native Web build → Capacitor sync → Gradle debug APK → artifact → fixed latest Release.
 
-`src/ui/subway-sign-overrides.css` is a permanent source stylesheet and `scripts/extract-legacy-shell.mjs` combines it with the base/mobile CSS into generated legacy shell assets.
+Permanent late-stage UI source styles are combined by `scripts/extract-legacy-shell.mjs` in this order:
+
+1. `styles.css`
+2. `mobile-overrides.css`
+3. `subway-sign-overrides.css`
+4. `minimal-palette-overrides.css`
+
+The final palette file intentionally wins passive color/progress-strip conflicts without disturbing the active lime target or line-colored station sign.
 
 ## 11. Documentation source of truth
 
