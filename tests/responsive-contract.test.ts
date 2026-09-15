@@ -35,6 +35,15 @@ describe('Random Seoul responsive visual contract', () => {
     expect(primaryDrawPlacement).toContain('actionZone.prepend(drawButton)');
   });
 
+  it('makes the active draw card read visually as a raised button', () => {
+    expect(styles).toContain('border: 2px solid var(--dark)');
+    expect(styles).toContain('background: linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
+    expect(styles).toContain('box-shadow: 0 7px 0 #a5bd63');
+    expect(styles).toContain('.panel.next-draw::after');
+    expect(styles).toContain('content: "→"');
+    expect(styles).toContain('transform: translateY(3px)');
+  });
+
   it('hides duplicate draw guidance copy from the main surface', () => {
     expect(styles).toContain('.progress-note,');
     expect(styles).toContain('.helper,');
