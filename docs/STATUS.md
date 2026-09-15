@@ -12,7 +12,7 @@ Last updated: 2026-09-15
 
 ## Public Web
 
-Status: **DEPLOYED — RESULT-FIRST / ON-DEMAND RESTAURANT FLOW + IN-CARD REDRAW LIVE**
+Status: **DEPLOYED — RESULT-FIRST / ON-DEMAND RESTAURANT FLOW + IN-CARD REDRAW + SUBWAY-SIGN STATION RESULT LIVE**
 
 Current completion flow:
 
@@ -35,12 +35,14 @@ Important behavior:
 
 Latest verified Web:
 
-- source/regression head: `53a5e8225f6b5157c1000393221c576da0e0f1e2`
-- main CI run `34970627625` — **success**
-- Web Release run `34970627663` — **success**
-- deployment-file commit carrying the current source bundle: `61069711566376e79eb034f26df361c9efd90e37`
-- public bundle `assets/modular-dUPTqcsm.js`
-- GitHub Pages run `34970626509` on latest main head — **success**
+- source/regression head: `a55e20cfb3f67e18205dd9b3a030476fe0459caa`
+- main CI run `34973302421` — **success**
+- Web Release run `34973302381` — **success**
+- deployment commit: `217125018a347dd708a2893cb7600e305b5cd022`
+- public bundle: `assets/modular-ChK-hdZi.js`
+- GitHub Pages run `34973314283` — **success**
+
+The deployed bundle was directly checked for the current UI contract, including the larger redraw glyph CSS, line-color station-sign rules, and food pending `?` rendering.
 
 Browser self-test verifies:
 
@@ -52,7 +54,7 @@ Browser self-test verifies:
 
 ## Primary draw / visual UI
 
-Status: **COMPACT PASTEL / LOW-CHROME UI + IN-CARD REDRAW LIVE**
+Status: **COMPACT PASTEL / LOW-CHROME UI + IN-CARD REDRAW + SUBWAY-SIGN STATION RESULT LIVE**
 
 Current main interaction:
 
@@ -61,6 +63,7 @@ Current main interaction:
 - explanatory copy largely hidden
 - completed course returns main CTA to `새 코스`
 - previously selected stages can be redrawn directly from their own cards
+- once a station has been selected, the waiting food card shows a clear `?` cue without increasing the food-card height
 
 ### In-card redraw controls
 
@@ -72,17 +75,41 @@ The old text redraw actions under the main CTA were replaced by subtle circular-
 - each control appears as soon as that stage has a committed result, including intermediate states such as “food is next but user wants to redraw line/station first”
 - redraw keeps the existing controller reset semantics, so stale attractions/recommendations are cleared with upstream changes
 - redraw controls reuse the existing buttons/handlers rather than duplicating action logic
-- visible treatment is icon-only: **no separate background, no border, no chip/pill**
-- actual button hit area remains `36 × 36 px`, while the existing refresh SVG stays visually small
-- line/station/food glyph colors are darker same-family tones of each pastel surface (`#8da877`, `#7898a6`, `#b18868`) so they remain discoverable without becoming a visual focal point
+- visible treatment remains icon-only: **no separate background, no border, no chip/pill**
+- actual button hit area remains `36 × 36 px`
+- refresh SVG is now visually stronger at **24 × 24 px** with **2.4 stroke width**
+- line/station/food glyph colors remain darker same-family tones so they are discoverable without becoming a visual focal point
 - each icon-only button keeps an accessible Korean `aria-label`
 - lower secondary area now only carries non-redraw actions such as copy when applicable
+
+### Subway-sign station result
+
+A completed station is styled as a compact Seoul-subway-sign-inspired result rather than a generic pastel card.
+
+- the selected line color is passed into the station card as `--station-line`
+- completed station surface uses a white interior with a thick rounded line-color frame
+- left circular badge uses the same line color
+- the number inside the circle is the app's **ordinal within the selected line list** (“몇 번째 역”), not a fabricated official station code
+- station name is large, bold, dark, and placed beside the circle
+- responsive sizes preserve the existing card footprint rather than making the result area taller
+- station-card redraw glyph follows the line color in a darker blend
+- this treatment intentionally borrows the visual grammar of real subway station signage without reproducing one operator's exact sign asset
+
+### Food pending cue
+
+When a station is already selected but food has not yet been drawn:
+
+- the food result area displays `?`
+- the question mark uses the existing food-card space (`min-height: 0` on the cue itself)
+- the food panel's existing mobile min-height remains unchanged
+- once food is selected, the normal emoji/category result replaces the cue
 
 Visual system:
 
 - body: warm cream
 - line: pastel green
-- station: pastel blue
+- station waiting state: pastel blue
+- completed station: white subway-sign surface framed in the selected line color
 - food: pastel peach
 - attraction: compact pastel mauve surface
 - ordinary card outlines largely removed
@@ -188,7 +215,7 @@ Status: **STATIC-FIRST ACTIVE**
 
 ## Android app
 
-Status: **ACTIVE — RESULT-FIRST / ON-DEMAND RESTAURANT + IN-CARD REDRAW IN LATEST DEV APK**
+Status: **ACTIVE — SUBWAY-SIGN RESULT / FOOD CUE / ON-DEMAND RESTAURANT FLOW IN LATEST DEV APK**
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
@@ -209,16 +236,19 @@ Implemented/synchronized:
 - compact attraction-first completion surface
 - **restaurant lookup only after `추천 식당 보기`**
 - auto-scroll after restaurant results render
-- line/station/food redraw controls moved into the corresponding completed cards as subtle icon-only controls
+- line/station/food redraw controls inside corresponding completed cards
+- enlarged/heavier refresh glyph visual while preserving 36 px hit area
+- line-color subway-sign completed station treatment
+- pending food `?` cue without increasing card height
 
 Latest verified Android:
 
-- branch/source head: `0501d99cce2c54a6493081630f4c9a6f2f5d5946`
-- Android CI run `34970661289` — **success**
+- branch/source head: `04cb963b1cf9c2aed10e19a3b316f13fad40f119`
+- Android CI run `34973468315` — **success**
 - shared tests → Vite native build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - asset: `random-seoul-latest.apk`
-- size: `11,411,564` bytes
-- SHA-256: `0c578b5ba97e677ff0a9f813b3d2b2044b09882e3e6216d0694a2f0329e0aea8`
+- size: `11,412,492` bytes
+- SHA-256: `418b78f667508ca902f3f6eb25bcf045328edb9d2b4399d4f4089d4f3ab811d4`
 
 Fixed direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -239,8 +269,14 @@ Key files:
   - existing redraw event handlers
 - `src/ui/draw-view.ts`
   - concise stage/result rendering
-  - moves existing redraw buttons into the completed line/station/food cards
-  - icon-only redraw styling/accessible labels
+  - moves existing redraw buttons into completed line/station/food cards
+  - passes selected line color to station result
+  - renders pending food `?`
+- `src/ui/subway-sign-overrides.css`
+  - larger/heavier redraw icon visuals
+  - completed station subway-sign treatment
+  - responsive station-sign sizing
+  - food pending cue styling
 - `src/ui/attraction-view.ts`
   - compact attraction section immediately after `.panels`
 - `src/ui/draw-animation.ts`
@@ -252,7 +288,7 @@ Key files:
 - `tests/random-seoul-controller.test.ts`
   - deferred lookup + 2 km contract
 - `tests/responsive-contract.test.ts`
-  - UX ordering/CTA/scroll/visual + in-card redraw contract
+  - UX ordering/CTA/scroll/visual/in-card redraw/subway-sign/food-cue contracts
 
 ## Build / CI gates
 
@@ -304,6 +340,9 @@ Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJ
 - Added full-width `추천 식당 보기` CTA.
 - Added loading state and smooth auto-scroll only after restaurant results are ready.
 - Moved line/station/food redraw actions from lower text buttons into the corresponding completed cards as low-contrast top-right refresh glyphs.
+- Enlarged the refresh glyph to 24 px and increased its stroke to 2.4 while keeping the transparent 36 px hit target.
+- Reworked completed station results into a line-color, white-interior subway-sign-inspired card with the selected ordinal in a circular badge.
+- Restored `?` in the ready-to-draw food card without increasing its card height.
 - Preserved upstream reset semantics and restaurant-state invalidation on partial redraw.
-- Updated Web and Android regression contracts for in-card redraw placement/styling.
-- Web CI/Web Release/Pages and Android latest dev APK verified for the redraw change.
+- Updated Web and Android regression contracts for the current visual behavior.
+- Web CI/Web Release/Pages and Android latest dev APK verified for the subway-sign / food-cue release.
