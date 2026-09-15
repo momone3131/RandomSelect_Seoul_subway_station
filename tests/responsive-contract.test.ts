@@ -9,6 +9,7 @@ const primaryDrawPlacement = readFileSync(
   new URL('../src/ui/primary-draw-placement.ts', import.meta.url),
   'utf8',
 );
+const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
 
 describe('Random Seoul responsive visual contract', () => {
   it('stacks restaurant cards vertically on phone-sized screens', () => {
@@ -46,11 +47,22 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('transform: translateY(3px)');
   });
 
-  it('hides duplicate draw guidance copy from the main surface', () => {
-    expect(styles).toContain('.progress-note,');
-    expect(styles).toContain('.helper,');
-    expect(styles).toContain('.keyboard-note,');
-    expect(styles).toContain('.scope-extra,');
-    expect(styles).toContain('.fair-note');
+  it('hides nonessential explanatory copy from the main surface', () => {
+    expect(styles).toContain('.scope-summary,');
+    expect(styles).toContain('.line-meta,');
+    expect(styles).toContain('.station-context,');
+    expect(styles).toContain('.food-examples,');
+    expect(styles).toContain('.hero-eyebrow,');
+    expect(styles).toContain('.restaurant-context,');
+  });
+
+  it('uses concise stage and action labels', () => {
+    expect(drawView).toContain("textContent = '노선'");
+    expect(drawView).toContain("textContent = '역'");
+    expect(drawView).toContain("textContent = '음식'");
+    expect(drawView).toContain("? '뽑는 중…'");
+    expect(drawView).not.toContain('수록 ${line.stations.length}개 역');
+    expect(drawView).not.toContain('종 중에서 하나를 뽑아요');
+    expect(drawView).not.toContain('구간 내 ${station.localIndex}번째');
   });
 });
