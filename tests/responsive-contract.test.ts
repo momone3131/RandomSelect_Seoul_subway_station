@@ -5,6 +5,7 @@ const styles = [
   readFileSync(new URL('../src/ui/styles.css', import.meta.url), 'utf8'),
   readFileSync(new URL('../src/ui/mobile-overrides.css', import.meta.url), 'utf8'),
   readFileSync(new URL('../src/ui/subway-sign-overrides.css', import.meta.url), 'utf8'),
+  readFileSync(new URL('../src/ui/minimal-palette-overrides.css', import.meta.url), 'utf8'),
 ].join('\n');
 const primaryDrawPlacement = readFileSync(new URL('../src/ui/primary-draw-placement.ts', import.meta.url), 'utf8');
 const drawAnimation = readFileSync(new URL('../src/ui/draw-animation.ts', import.meta.url), 'utf8');
@@ -29,11 +30,16 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('min-height:154px');
   });
 
-  it('uses distinct pastel surfaces without ordinary card outlines', () => {
-    expect(styles).toContain('.line-panel{background:#dfeecb}');
-    expect(styles).toContain('.station-panel{background:#dbeaf1}');
-    expect(styles).toContain('.food-panel{background:#f4dfc5}');
-    expect(styles).toContain('border:0!important');
+  it('uses a restrained neutral passive palette and hides the redundant progress strip', () => {
+    expect(styles).toContain('--bg:#f5f4f0');
+    expect(styles).toContain('--paper:#fffdfa');
+    expect(styles).toContain('--surface:#e9ebe7');
+    expect(styles).toContain('.progress{display:none!important}');
+    expect(styles).toContain('.draw-shell,');
+    expect(styles).toContain('.station-detail,');
+    expect(styles).toContain('.history-item,');
+    expect(styles).toContain('background:var(--surface)');
+    expect(styles).toContain('background:var(--paper)');
   });
 
   it('uses the whole next-result card as the primary target', () => {
@@ -108,8 +114,8 @@ describe('Random Seoul responsive visual contract', () => {
   it('keeps a centered food prompt visible before and during the food stage without enlarging the card', () => {
     expect(drawView).toContain("name.textContent = '뭐 먹을까?'");
     expect(drawView).toContain("name.className = 'food-name food-question'");
-    expect(styles).toContain('.food-panel.waiting .food-question{color:#a99683;opacity:.48}');
-    expect(styles).toContain('.food-panel.ready .food-question{color:#405548;opacity:1}');
+    expect(styles).toContain('.food-panel.waiting .food-question{color:var(--muted);opacity:.48}');
+    expect(styles).toContain('.food-panel.ready .food-question{color:var(--dark);opacity:1}');
     expect(styles).toContain('.food-panel.waiting .food-emoji');
   });
 
