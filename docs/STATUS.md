@@ -12,7 +12,7 @@ Last updated: 2026-09-15
 
 ## Public Web
 
-Status: **DEPLOYED — RESULT-FIRST / ON-DEMAND RESTAURANT FLOW LIVE**
+Status: **DEPLOYED — RESULT-FIRST / ON-DEMAND RESTAURANT FLOW + IN-CARD REDRAW LIVE**
 
 Current completion flow:
 
@@ -35,14 +35,14 @@ Important behavior:
 
 Latest verified Web:
 
-- source/regression head before deployment: `1d77dc232ea4ed18967b7e5b3e609987a41c2f96`
-- main CI run `34968413416` — **success**
-- Web Release run `34968413412` — **success**
-- deployment commit `8c6c11d5876074b82ba3205342ec8f6a297c6e4d`
-- public bundle `assets/modular-Cb_D_SvS.js`
-- GitHub Pages run `34968486363` — **success**
+- source/regression head: `53a5e8225f6b5157c1000393221c576da0e0f1e2`
+- main CI run `34970627625` — **success**
+- Web Release run `34970627663` — **success**
+- deployment-file commit carrying the current source bundle: `61069711566376e79eb034f26df361c9efd90e37`
+- public bundle `assets/modular-dUPTqcsm.js`
+- GitHub Pages run `34970626509` on latest main head — **success**
 
-Browser self-test now explicitly verifies:
+Browser self-test verifies:
 
 - line → station → food completes
 - food completion leaves `recommendations.length === 0`
@@ -52,7 +52,7 @@ Browser self-test now explicitly verifies:
 
 ## Primary draw / visual UI
 
-Status: **COMPACT PASTEL / LOW-CHROME UI LIVE**
+Status: **COMPACT PASTEL / LOW-CHROME UI + IN-CARD REDRAW LIVE**
 
 Current main interaction:
 
@@ -60,7 +60,23 @@ Current main interaction:
 - `노선 / 역 / 음식` labels only
 - explanatory copy largely hidden
 - completed course returns main CTA to `새 코스`
-- secondary actions remain concise
+- previously selected stages can be redrawn directly from their own cards
+
+### In-card redraw controls
+
+The old text redraw actions under the main CTA were replaced by subtle circular-arrow glyph controls inside completed cards.
+
+- completed **노선** card → top-right refresh glyph → redraw line and invalidate downstream station/food
+- completed **역** card → top-right refresh glyph → redraw station and invalidate downstream food
+- completed **음식** card → top-right refresh glyph → redraw food only
+- each control appears as soon as that stage has a committed result, including intermediate states such as “food is next but user wants to redraw line/station first”
+- redraw keeps the existing controller reset semantics, so stale attractions/recommendations are cleared with upstream changes
+- redraw controls reuse the existing buttons/handlers rather than duplicating action logic
+- visible treatment is icon-only: **no separate background, no border, no chip/pill**
+- actual button hit area remains `36 × 36 px`, while the existing refresh SVG stays visually small
+- line/station/food glyph colors are darker same-family tones of each pastel surface (`#8da877`, `#7898a6`, `#b18868`) so they remain discoverable without becoming a visual focal point
+- each icon-only button keeps an accessible Korean `aria-label`
+- lower secondary area now only carries non-redraw actions such as copy when applicable
 
 Visual system:
 
@@ -129,6 +145,8 @@ Persistence:
 
 `RandomSeoulController.drawFoodResult()` owns food selection only. `loadRecommendations()` owns restaurant lookup/ranking as a separate operation.
 
+Any line/station/food redraw changes the current restaurant key, resetting transient restaurant loading/complete/error state so a previous recommendation set cannot leak into a newly redrawn course.
+
 ## Curated nearby attractions
 
 Status: **LIVE / STATIC FIRST-PARTY / MAX 0–2**
@@ -170,7 +188,7 @@ Status: **STATIC-FIRST ACTIVE**
 
 ## Android app
 
-Status: **ACTIVE — RESULT-FIRST / ON-DEMAND RESTAURANT FLOW IN LATEST DEV APK**
+Status: **ACTIVE — RESULT-FIRST / ON-DEMAND RESTAURANT + IN-CARD REDRAW IN LATEST DEV APK**
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
@@ -191,15 +209,16 @@ Implemented/synchronized:
 - compact attraction-first completion surface
 - **restaurant lookup only after `추천 식당 보기`**
 - auto-scroll after restaurant results render
+- line/station/food redraw controls moved into the corresponding completed cards as subtle icon-only controls
 
 Latest verified Android:
 
-- branch/source head: `c56de64d43ae727552f30c337858675dd0f790d7`
-- Android CI run `34968697499` — **success**
+- branch/source head: `0501d99cce2c54a6493081630f4c9a6f2f5d5946`
+- Android CI run `34970661289` — **success**
 - shared tests → Vite native build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - asset: `random-seoul-latest.apk`
-- size: `11,411,336` bytes
-- SHA-256: `9766dde230dd0587eed6dddc7dba8093e5fda5d126c08003434ee2e214946e78`
+- size: `11,411,564` bytes
+- SHA-256: `0c578b5ba97e677ff0a9f813b3d2b2044b09882e3e6216d0694a2f0329e0aea8`
 
 Fixed direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -210,12 +229,18 @@ Key files:
 
 - `src/application/random-seoul-controller.ts`
   - synchronous line/station/food selection
+  - upstream redraw reset semantics
   - separate `loadRecommendations()`
 - `src/main.ts`
   - restaurant request lifecycle
   - `추천 식당 보기` CTA
   - loading/error/complete transient state
   - post-render smooth scroll
+  - existing redraw event handlers
+- `src/ui/draw-view.ts`
+  - concise stage/result rendering
+  - moves existing redraw buttons into the completed line/station/food cards
+  - icon-only redraw styling/accessible labels
 - `src/ui/attraction-view.ts`
   - compact attraction section immediately after `.panels`
 - `src/ui/draw-animation.ts`
@@ -227,7 +252,7 @@ Key files:
 - `tests/random-seoul-controller.test.ts`
   - deferred lookup + 2 km contract
 - `tests/responsive-contract.test.ts`
-  - UX ordering/CTA/scroll/visual contract
+  - UX ordering/CTA/scroll/visual + in-card redraw contract
 
 ## Build / CI gates
 
@@ -278,5 +303,7 @@ Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJ
 - Moved/compacted 추천 명소 directly under random-result panels.
 - Added full-width `추천 식당 보기` CTA.
 - Added loading state and smooth auto-scroll only after restaurant results are ready.
-- Updated browser self-test and Android shared tests for deferred restaurant lookup.
-- Web + GitHub Pages + Android latest dev APK verified for the new flow.
+- Moved line/station/food redraw actions from lower text buttons into the corresponding completed cards as low-contrast top-right refresh glyphs.
+- Preserved upstream reset semantics and restaurant-state invalidation on partial redraw.
+- Updated Web and Android regression contracts for in-card redraw placement/styling.
+- Web CI/Web Release/Pages and Android latest dev APK verified for the redraw change.
