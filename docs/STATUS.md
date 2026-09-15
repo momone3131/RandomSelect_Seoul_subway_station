@@ -13,12 +13,11 @@ Last updated: 2026-09-15
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED / MINIMAL MAIN UI LIVE**
+Status: **MODULAR WEB DEPLOYED / COMPACT MINIMAL UI LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
 - Public entry: root `index.html`, generated from the verified Vite modular build
-- Web remains a supported target and rapid validation surface
 - Main draw flow: line → station → food → new course
 - Restaurant recommendation: Google Places live TOP 3, hard radius 2 km
 - Supplemental station result: own curated 0–2 attractions / browse-worthy destinations
@@ -26,7 +25,7 @@ Status: **MODULAR WEB DEPLOYED / MINIMAL MAIN UI LIVE**
 - Web browser key remains separate from Android and is HTTP-referrer restricted
 - Random Seoul subway-sign + dice icon is published as Web app icon
 
-`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and also supports manual dispatch. Deployment commit creation fetches/rebases onto the latest `main` before push so harmless concurrent docs/test commits do not reject the release push.
+`web-release.yml` owns public-Web artifact promotion: test → build → browser smoke → root deployment artifact. It runs for relevant `main` source/build changes and supports manual dispatch. Deployment commit creation fetches/rebases onto latest `main` before push so harmless concurrent commits do not reject the release push.
 
 ## Phase 1 — Shared core + modular Web refactor
 
@@ -37,43 +36,56 @@ Main merge commit: `4d7808fd7a21c59991234d86792b141b0d02c150`
 
 Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine, state/storage boundaries, Web Places adapter, station resolver/cache, shared restaurant ranking, shared controller, typed UI modules, deterministic browser self-test, responsive mobile parity gates.
 
-## Primary draw UI
+## Primary draw / visual UI
 
-Status: **MINIMAL UI LIVE ON WEB / INCLUDED IN LATEST ANDROID DEV APK**
+Status: **COMPACT VISUAL SYSTEM LIVE ON WEB / INCLUDED IN LATEST ANDROID DEV APK**
 
 The main screen intentionally avoids explanatory copy that a user can infer from the interaction itself.
 
-Current behavior:
+Current interaction:
 
 - the same `draw_btn` is moved into the card that will receive the **next** random result
-- line stage → line card is the draw target
-- station stage → station card is the draw target
-- food stage → food card is the draw target
+- line stage → line card; station stage → station card; food stage → food card
 - completed course → CTA returns to the lower action area as `새 코스`
-- active card uses `.next-draw` emphasis and a dice affordance; the whole card is the touch target
-- progress labels are reduced to `노선 / 역 / 음식`
-- result card labels are reduced to `노선 / 역 / 음식`
+- the whole active card is the primary draw target and keeps the dice affordance
+- progress/result labels are `노선 / 역 / 음식`
 - secondary actions are concise: `처음부터 / 역 다시 / 음식 다시 / 복사`
-- the main surface hides redundant copy including brand subtitle/runtime status, hero eyebrow/prose, line/food counts, line metadata, station context, food examples, helper/keyboard/fairness explanations, map guidance label, restaurant eyebrow/context/count, and verbose station-list guidance
-- the completed line/station/food results themselves remain visible
-- touch target remains at least 44 px on narrow mobile layouts
+- redundant brand/runtime/hero/scope/card/helper/map/restaurant explanatory copy stays hidden
 - settings, partial redraw, map, copy, attraction and restaurant actions remain available
+
+Current visual-density policy:
+
+- removing copy must also reclaim vertical space; do not leave the old tall-card skeleton behind
+- desktop result cards target about **176 px** minimum height instead of the previous ~220–249 px treatment
+- phone line/station cards target about **164 px**, and about **154 px** on narrow phones
+- phone food card targets about **96 px**, and about **91 px** on narrow phones
+- tiny UI copy is raised toward **12–13 px** where practical; restaurant names are 16 px, section/summary text is also larger than the prior 9–11 px treatment
+- principal containers use roughly **2 px** structural borders; secondary cards/buttons use **1.5 px** borders
+- radii are reduced: result cards ~13 px, secondary cards ~7–11 px, main shell ~18 px
+- broad soft shadows and the previous active-card gradient are removed
+- active draw card uses **flat lime + 2 px dark border + short hard shadow**, giving a more deliberate physical-control feel
+- restaurant/attraction cards, station list, history and settings modal follow the same stronger-line / restrained-radius system instead of looking like unrelated soft cards
+- main result hierarchy remains large enough to scan quickly while small labels/actions no longer look undersized
 
 Implementation:
 
-- `src/ui/primary-draw-placement.ts` owns placement of the existing main draw button
-- `draw-view.ts` owns concise stage/result/action copy
-- `mobile-overrides.css` hides nonessential static shell copy and owns active-card emphasis
-- `responsive-contract.test.ts` guards both the integrated-card behavior and minimal-copy contract
+- `src/ui/primary-draw-placement.ts`: existing main-button placement
+- `src/ui/draw-view.ts`: concise stage/result/action copy
+- `src/ui/mobile-overrides.css`: final density, typography, border/radius/shadow system and responsive overrides
+- `tests/responsive-contract.test.ts`: integrated-card, minimal-copy, density, typography and visual-weight regression contract
 
 Verification:
 
-- minimal-copy Web source commits: `32fa4dcac834901c5b7ad2750ddec5c3fe96cecb` / `add7dce8396283ec2cdd6e0b4cdb1df08e9a92df`
-- minimal-copy contract test commit: `15d75ee76053a60d05ee32b56772a3844de318b2`; main CI passed
-- public Web deployment commit `2a1be33403501326dea45f94e5ab3dcbf091e52c` publishes `assets/modular-DHEzK8V5.js`
-- GitHub Pages run `34951081587` completed successfully
-- Android minimal-copy source/test changes are included before build head `9b8f29c7e846500470664e11bcbd895b4e94566b`
-- Android CI run `34951364029` passed shared tests → native build → Capacitor sync → Gradle `assembleDebug` → artifact upload → latest Release publish
+- visual-system source commit: `000ba269f118281accf1b8b4f53f4980674f9351`
+- visual regression contract commit: `36a0b048475f4ecb3e3e5e7b4b8f636346556e23`
+- main CI run `34952418260` — success (tests + Vite build + headless browser smoke)
+- Web Release run `34952389544` — success after rebuilding current verified `main`
+- public Web deployment commit: `4bb8548772464c21717957dbf23df9ba2a0749b1`
+- public Web bundle: `assets/modular-BQbRd3MQ.js`
+- Android visual source/test commits: `75d24a34fdc1665cfcf1e95d3c9beaccbd0a0d85` / `5fb8df50627538646bf012abc7274fa52564f033`
+- GitHub produced one transient `startup_failure` before a job started; this was not an app/test failure
+- Android build head `3443d9cbdb38f144cdb7c8a0e5952d2c6b3fffbc` also refreshes `actions/setup-java` to v5
+- Android CI run `34952826346` — success through tests → native build → Capacitor sync → Gradle APK → artifact → fixed latest Release
 
 ## Curated nearby attractions
 
@@ -84,15 +96,12 @@ Google Places attraction search/ranking has been removed from runtime.
 Current policy:
 
 - station draw remains random; attraction is supplemental information
-- first-party curated static data
-- maximum 2 places per station
-- no recommendation if a station has no worthwhile candidate
+- first-party curated static data, maximum 0–2 places per station
 - threshold is **actual browse/stay value + reasonable station accessibility**
-- practical question: “이 역에 내려서 30분~몇 시간 정도 둘러보거나 구경할 목적으로 추천해도 괜찮은가?”
-- Tier A: major metro-area landmark/destination → include
-- Tier B: markets, distinctive streets, cultural spaces, walks, parks/waterfronts, campuses and large browse-worthy shopping/lifestyle destinations → include
-- commercial facilities such as Starfield, IKEA, large malls/outlets/major department stores are eligible when browsing the facility itself is a worthwhile outing experience
-- Tier C: ordinary playground, apartment pocket park, generic neighborhood facility, ordinary mart/small shopping facility → exclude
+- Tier A: major metro-area landmark/destination
+- Tier B: markets, distinctive streets, cultural spaces, walks, parks/waterfronts, campuses and large browse-worthy shopping/lifestyle destinations
+- Starfield, IKEA, large malls/outlets/major department stores are eligible when browsing the facility itself is a worthwhile outing experience
+- Tier C ordinary playgrounds, apartment pocket parks, generic neighborhood facilities and ordinary marts/small shopping facilities are excluded
 - selection is editorial rather than a mechanical rating/review score
 - no Google attraction Text Search or attraction rating/review threshold
 
@@ -106,9 +115,7 @@ Data layout:
 
 ### Attraction map-target fix
 
-The attraction dataset does **not** store dedicated attraction latitude/longitude. `AttractionRecommendation.mapQuery` is the static Google Maps target.
-
-The previous UI appended the drawn station name to every attraction query (`mapQuery + stationName + 역`). That could make Google Maps prefer the station itself or a same-named nearby place. This has been removed globally.
+The attraction dataset does not store dedicated attraction latitude/longitude. `AttractionRecommendation.mapQuery` is the static Google Maps target.
 
 Current behavior:
 
@@ -118,18 +125,9 @@ Current behavior:
 - broad linear/waterfront destinations use a concrete nearby anchor when possible
 - vague targets are removed rather than forcing a misleading pin
 
-Representative corrections:
+Representative correction: 검암의 broad `경인아라뱃길` target is now the concrete nearby `경인아라뱃길 시천가람터` / `인천광역시 서구 시천동 158-11` target. The vague 오목교·목동 상권 entry was removed.
 
-- 검암: broad `경인아라뱃길` → `경인아라뱃길 시천가람터`, map target `시천가람터 인천광역시 서구 시천동 158-11`
-- 천호 로데오거리: road context added
-- 정자동 카페거리: 성남/분당 context added
-- 수원역·범계·산본·서현 로데오거리: city/road context added
-- 안양1번가·부평 문화의거리·강촌유원지: regional context added
-- 오목교의 vague `오목교·목동 상권` recommendation removed; the station keeps the stronger 현대백화점 목동점 candidate only
-
-Regression coverage verifies the station-key set, max-2 rule, exact ambiguous target example, absence of station-only map targets, and that attraction URL generation does not append a station name.
-
-The 0–2 rule remains unchanged; weak places are not added merely to fill slots.
+Regression coverage verifies station keys, max-2, ambiguous targets, absence of station-only map targets and no automatic station suffixing.
 
 ## Static station centers
 
@@ -137,11 +135,11 @@ Status: **STATIC-FIRST ACTIVE**
 
 - `station-coordinates.ts` is checked before Google station resolution
 - covered stations skip Google station-resolution calls entirely
-- uncovered/new stations retain the existing Google fallback
+- uncovered/new stations retain Google fallback
 - fallback Google station coordinates keep the existing 30-day cache behavior
 - initial static coverage prioritizes curated-attraction stations and major interchanges
 
-Reference/source policy: public station-master data such as Seoul Metropolitan Government / TOPIS `서울시 역사마스터 정보`, published under 공공누리 제1유형 (attribution; commercial use and modification allowed).
+Reference/source policy: public station-master data such as Seoul Metropolitan Government / TOPIS `서울시 역사마스터 정보`, published under 공공누리 제1유형.
 
 ## Restaurant recommendation policy
 
@@ -151,11 +149,10 @@ Restaurants remain **live Google Places data**.
 - ranking continues to use rating, review volume, Google relevance and distance
 - TOP 3 recommendation result is not persisted as a reusable restaurant DB
 - Google rating/review values are not harvested into a long-term database
-- restaurant UI/data can therefore stay current while static product data removes avoidable calls elsewhere
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — MINIMAL MAIN UI INCLUDED IN LATEST DEV APK**
+Status: **ACTIVE — COMPACT VISUAL UI INCLUDED IN LATEST DEV APK**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -170,22 +167,19 @@ Implemented/verified:
 - native share, haptics, back handling, map intents
 - no GPS/location permission
 - Galaxy S20: install/launch, line → station → food, live restaurant TOP 3 verified
-- station/food haptic event-based fix built
-- Random Seoul subway-sign + dice launcher/adaptive icon applied
-- curated-attraction/static-station-center shared changes synchronized to Android branch
-- exact attraction map-target behavior/data/tests synchronized to Android branch
-- integrated primary draw-card CTA + minimal-copy UI synchronized to Android branch
-- Android CI runs on relevant pushes to `feature/random-seoul-android`
-- Android CI path filter now includes `tests/**`, so shared test-only corrections also trigger a fresh APK validation
-- successful branch builds create `random-seoul-debug-apk` Actions artifact and update fixed Release tag `android-dev-latest`
+- Random Seoul launcher/adaptive icon applied
+- curated attractions/static station centers/map-target fixes synchronized
+- integrated primary draw-card + minimal-copy + compact visual system synchronized
+- Android CI runs on relevant branch pushes and includes `tests/**` in its path filter
+- successful builds create `random-seoul-debug-apk` and update fixed Release tag `android-dev-latest`
 
 Latest verified development APK:
 
-- source/build head: `9b8f29c7e846500470664e11bcbd895b4e94566b`
-- Android CI run: `34951364029` — success
+- source/build head: `3443d9cbdb38f144cdb7c8a0e5952d2c6b3fffbc`
+- Android CI run: `34952826346` — success
 - asset: `random-seoul-latest.apk`
-- size: 11,408,660 bytes
-- SHA-256: `085d090c55ae5cf22c7d87f026c14dac2709e790a3a3fd202b3fdf7fb031c334`
+- size: 11,410,672 bytes
+- SHA-256: `2558c618f711d6d9628bad5c3554985d865f6a0994def21ccdf846ab447fc361`
 - checksum asset: `random-seoul-latest.apk.sha256`
 
 Easy download locations remain linked at the top of `README.md`.
@@ -208,13 +202,13 @@ Status: **ACTIVE / REQUIRED**
 
 The repository itself is the durable project memory for future chats and development sessions.
 
-- `docs/PROJECT_CONTEXT.md`: fast handoff / project recovery document
+- `docs/PROJECT_CONTEXT.md`: fast handoff / project recovery
 - `docs/STATUS.md`: current implementation state and recent verified changes
 - `docs/PROJECT_PLAN.md`: product intent, platform strategy and roadmap
 - `docs/ARCHITECTURE.md`: technical structure and design ownership
 - `docs/ATTRACTION_CURATION.md`: attraction inclusion/exclusion and map-target integrity policy
 
-Meaningful feature, architecture, policy, branch-role or validation changes must update the relevant documentation in the same change/PR. New sessions should read `PROJECT_CONTEXT.md` first, then `STATUS.md`, and verify actual GitHub branches/PRs/CI before modifying code.
+Meaningful feature, architecture, policy, branch-role or validation changes must update the relevant documentation. New sessions should read `PROJECT_CONTEXT.md`, then `STATUS.md`, then verify live branches/PR/CI.
 
 ## Current automated gates
 
@@ -223,53 +217,49 @@ Web PR/CI:
 - TypeScript/unit tests
 - integrated primary draw placement/style contract
 - minimal main-surface copy contract
-- curated-attraction regression + station-key/map-target integrity tests
-- map-link regression test preventing automatic station-name suffixes
-- static-station-center regression test
+- compact density / larger-small-type / stronger-line visual contract
+- curated-attraction regression + station-key/map-target integrity
+- map-link regression preventing automatic station-name suffixes
+- static station-center regression
 - Vite modular build
 - deterministic headless Chrome full-flow smoke
 - restaurant TOP 3 / 2 km contract
 - responsive mobile contract
 
-Android CI runs the same shared tests and additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report, APK artifact upload and latest-development Release publication. Android CI also triggers for `tests/**` changes.
+Android CI runs the same shared tests and additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report, artifact upload and latest-development Release publication.
 
 ## Change log
 
 ### 2026-09-15
 
-- Simplified the main UI copy aggressively: removed `YOUR LINE / YOUR STOP / YOUR FOOD`, line/food scope counts, per-card explanatory metadata, helper/keyboard/fairness copy, hero descriptive copy and other redundant guidance from the visible main surface.
-- Reduced stage/result labels to `노선 / 역 / 음식`; shortened actions to `처음부터 / 역 다시 / 음식 다시 / 복사`, with `새 코스` after completion.
-- Kept the integrated next-result card interaction: the active card itself remains the main random-draw target.
-- Added a minimal-copy regression contract so verbose guidance is not accidentally restored.
-- Web minimal UI passed CI and was published by deployment `2a1be334...` as bundle `modular-DHEzK8V5.js`; GitHub Pages run `34951081587` succeeded.
-- Synchronized the minimal UI to Android. The first intermediate Android run used the prior responsive test and failed before APK build; this exposed that `tests/**` did not trigger Android CI.
-- Added `tests/**` to the Android CI path filter and reran from head `9b8f29c7...`; run `34951364029` passed all shared/native/APK/release steps and republished `android-dev-latest`.
-- Polished the main draw UI by integrating the primary draw action into the card that receives the next random result instead of keeping a separate large button row below all cards.
-- Investigated attraction map links opening same-named stations/unrelated places; removed automatic station-name suffixing from attraction map queries and hardened ambiguous map targets.
-- Added map-target regression tests and synchronized the fixes to Web/Android.
-- Hardened `web-release.yml` against concurrent docs/test commits by rebasing the generated deployment commit onto latest `main` before push.
+- Rebalanced the entire visible UI after explanatory-copy removal: reclaimed stale vertical space instead of leaving empty tall cards.
+- Reduced result-card heights and surrounding padding/gaps across desktop, phone and narrow-phone layouts.
+- Increased formerly tiny labels/actions/meta copy toward a 12–13 px small-type scale while retaining strong result hierarchy.
+- Increased structural borders from the previous mostly-1px treatment to a 1.5–2px system and reduced excessive corner radii.
+- Removed the active-card soft gradient / large soft shadow treatment; active draw card is now flat lime with a dark 2px border and short hard shadow.
+- Applied the same visual language to restaurant/attraction cards, station list, history and settings modal.
+- Added regression tests for density, typography, line weight, restrained radii and no-gradient active card.
+- Main CI `34952418260` passed; Web Release `34952389544` succeeded and deployment `4bb85487...` published `modular-BQbRd3MQ.js`.
+- Synchronized the visual system to Android. A GitHub runner startup failure occurred before one job could start; a fresh head upgraded setup-java to v5 and run `34952826346` then passed completely, publishing the new latest APK.
+- Earlier the main UI copy was simplified aggressively to `노선 / 역 / 음식` and concise actions, with the next-result card itself acting as the primary draw target.
+- Attraction map targets were hardened by removing automatic station-name suffixing and disambiguating ambiguous curated map queries.
 
 ### 2026-09-14
 
-- Added a persistent Android development distribution path: successful Android branch builds publish `random-seoul-latest.apk` to fixed Release tag `android-dev-latest` and keep the Actions artifact as a secondary path.
-- Added direct latest-APK and Release links to the repository `README.md` so the APK can be downloaded without navigating Actions internals.
-- Broadened attraction acceptance from mainly landmark/region-representative destinations to **places that are genuinely worth browsing or spending time at after a random station draw**.
-- Added commercial/lifestyle destinations such as IKEA 광명/고양, 스타필드 수원/고양, 더현대 서울, 대형 몰·아울렛·백화점 alongside markets, parks, waterfronts, campuses and cultural spaces.
-- Kept ordinary playgrounds, apartment pocket parks and weak generic neighborhood facilities excluded.
-- Split curated attraction data into base + extra layers while keeping `curated-attractions.ts` as the stable public lookup entry.
-- Added regression coverage for browse-worthy commercial destinations, base+extra supplement behavior and invalid station-key detection.
-- Added `docs/ATTRACTION_CURATION.md` and established repository documentation as durable cross-chat project memory.
+- Added persistent Android development distribution through fixed Release tag `android-dev-latest` and direct README download links.
+- Broadened attraction acceptance to places genuinely worth browsing/spending time at, including IKEA/Starfield/major commercial destinations where appropriate.
+- Split curated attraction data into base + extra layers and added curation documentation/regression coverage.
 - Clarified platform roles: Android primary, Web supported/reference validation surface, iOS later.
-- Decided not to persist Google-derived restaurant TOP 3 results as a reusable DB.
-- Removed live Google attraction Text Search/ranking and added static-first station coordinate lookup with live fallback.
+- Kept restaurant results live rather than persisting Google rating/review-derived TOP 3 as a reusable DB.
+- Added static-first station coordinate lookup with live fallback.
 
 ### 2026-09-13
 
 - Galaxy S20 core Android flow and live restaurant TOP 3 verified.
-- Nearby attraction recommendation first introduced.
+- Nearby attraction recommendation introduced.
 - Public modular Web deployed while unfinished Android native work remained isolated in PR #3.
 - Random Seoul official subway-sign + dice icon applied to Web and Android.
 
 ### 2026-09-12
 
-- Random Seoul branding, permanent Web support, shared-core architecture, Phase 1 modular refactor, Android native foundation, Places bridge, and CI foundations established.
+- Random Seoul branding, permanent Web support, shared-core architecture, Phase 1 modular refactor, Android native foundation, Places bridge and CI foundations established.
