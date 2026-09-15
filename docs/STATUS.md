@@ -12,7 +12,7 @@ Last updated: 2026-09-15
 
 ## Public Web
 
-Status: **DEPLOYED — DYNAMIC STAGE PROMPTS / SUBWAY-SIGN RESULT / COMPACT UTILITY ROW LIVE**
+Status: **DEPLOYED — MINIMAL NEUTRAL PALETTE / DYNAMIC STAGE PROMPTS / SUBWAY-SIGN RESULT LIVE**
 
 Current completion flow:
 
@@ -34,20 +34,60 @@ Important behavior:
 
 Latest verified Web:
 
-- source/regression head: `8ea433d6f2920eabd1e9de936086a3590a732493`
-- main CI run `34978299548` — **success**
-- Web Release run `34978299383` — **success**
-- deployment commit: `bba8f6a7c49ada8726dc22a81116036e96af9e3d`
-- public bundle: `assets/modular-D8hThyDO.js`
-- GitHub Pages run `34978360339` — **success**
+- source/regression head: `394fc9188a669a63a45652e9cf018b76bdf06f4d`
+- main CI run `34980301473` — **success**
+- Web Release run `34980301797` — **success**
+- deployment commit carrying the current bundle: `86a73df0f5d222268484aa02ddea3d0412c62c3f`
+- public bundle: `assets/modular-nSZu7knQ.js`
+- GitHub Pages run `34980299496` — **success**
 
-The deployed bundle was directly checked for the current dynamic headline, centered food prompt, compact utility-row behavior, and updated station-sign CSS.
+The deployed bundle was directly checked for the minimal palette override and `.progress{display:none!important}` contract.
 
 ## Primary draw / visual UI
 
+### Minimal passive palette
+
+Passive surfaces were simplified to a three-neutral system while preserving the strong functional accents:
+
+- app background: `#f5f4f0`
+- paper/content surface: `#fffdfa`
+- structural surface: `#e9ebe7`
+- active random target remains lime with dark ink
+- completed station sign still uses the selected subway-line color
+- line badges still use their real line colors
+
+The following now share the same structural neutral surface:
+
+- main draw shell
+- station list panel
+- recent-course cards
+- restaurant section
+- attraction section
+- selection-choice surfaces
+
+Completed/passive line, station, food, restaurant, attraction and station-list cards use the same paper tone rather than separate green/blue/peach/mauve surfaces.
+
+Extra utility color tints were also neutralized:
+
+- station map buttons
+- copy button
+- restaurant map links
+- restaurant metadata chips
+- hero underline now reuses the same lime accent instead of adding another highlight hue
+
+### Progress strip removed
+
+The visual `01 노선 / 02 역 / 03 음식` strip is hidden. Stage is already communicated by:
+
+- the active lime draw card
+- stage-aware hero headline
+- the selected line/station/food results
+
+The underlying state/ARIA logic remains intact; only the redundant visual strip is removed.
+
 ### Dynamic hero prompt
 
-The main headline now follows the draw state instead of remaining static:
+The main headline follows the draw state:
 
 - initial: `어디로 가볼까?`
 - line selected: `어느 역에서 내릴까?`
@@ -62,8 +102,7 @@ The headline deliberately avoids `오늘` or other time-specific wording.
 - redraw semantics remain line → downstream reset, station → food reset, food → food only
 - no icon background/border/chip
 - actual hit area remains `36 × 36 px`
-- refresh glyph is now **27 × 27 px** with **2.7 stroke width**
-- same-family darker tones remain so the icon is visible without dominating the card
+- refresh glyph is **27 × 27 px** with **2.7 stroke width**
 
 ### Subway-sign station result
 
@@ -72,51 +111,43 @@ A completed station uses a Seoul-subway-sign-inspired surface:
 - selected line color drives the thick rounded frame and circular ordinal badge
 - white sign interior
 - circular badge contains the app's ordinal within the selected line list, not a fabricated official station code
-- badge + station name are vertically centered in the card
-- station-name type scale now matches the line result more closely:
-  - desktop `28px`
-  - mobile `23px`
-  - small phone `21px`
-- long station names continue using responsive reduced sizes (`23 / 18 / 16px`) to stay inside the card
+- badge + station name are vertically centered
+- station-name scale: desktop `28px`, mobile `23px`, small phone `21px`
+- long station names continue using responsive reduced sizes to stay inside the card
 
 ### Food pending state
 
-The food card now remains informative even before it becomes the active draw target:
-
 - pending copy: `뭐 먹을까?`
-- before the food stage: faint (`opacity .48`)
-- when food becomes the current stage: full-strength prompt
-- prompt is centered in the existing food-card footprint
-- pending emoji is hidden
-- no food-card min-height increase
+- before food stage: faint neutral text
+- active food stage: full-strength dark text on the lime target card
+- centered in the existing food-card footprint
+- pending emoji hidden
+- no card-height increase
 
 ### Utility row
 
-After a station is selected, the station actions now use one compact row:
+After a station is selected:
 
 **복사 / 네이버지도 / 구글지도**
 
-- three equal columns
-- copy is reparented into `map_actions`
-- old lower secondary-action row is hidden
-- mobile button height remains usable without consuming two separate rows
+- three equal columns in one row
+- old lower secondary-action row hidden
+- mobile button height remains usable
 
 ### Copy behavior
-
-Copy is now a conversational invitation instead of internal draw metadata:
 
 - station + food: `신설동에서 떡볶이 먹자!` style
 - station only: `신설동 가자!` style
 - line name/number omitted
 - ordinal omitted
 - food examples omitted
-- recommended restaurant name is **never** inserted, even after recommendations have been loaded
+- recommended restaurant name is never inserted
 
 ## Draw feedback
 
 - next-result card itself is the primary draw target
 - press/hold physically depresses card
-- settled result: ~900 ms, max `translateY(-12px) scale(1.09)` + pastel-gold ring
+- settled result: ~900 ms, max `translateY(-12px) scale(1.09)` + reveal ring
 - Android native haptic event remains
 - reduced-motion skips visual reveal motion
 
@@ -126,7 +157,7 @@ Copy is now a conversational invitation instead of internal draw metadata:
 - max 2 compact attraction cards; 0 means section hidden
 - `추천 식당 보기` follows attractions
 - restaurant lookup is opt-in
-- completed restaurant results then auto-scroll into view
+- completed restaurant results auto-scroll into view
 
 ## Restaurant recommendation policy
 
@@ -161,7 +192,7 @@ Representative map-target fixes remain:
 
 ## Android app
 
-Status: **ACTIVE — SAME UX IN LATEST DEV APK**
+Status: **ACTIVE — SAME MINIMAL-PALETTE UX IN LATEST DEV APK**
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
@@ -169,12 +200,12 @@ App id: `io.github.momone3131.randomseoul`
 
 Latest verified Android:
 
-- branch/source head: `ced9c95f9f99c931e8b469d4cd4508d1ad078b83`
-- Android CI run `34978567418` — **success**
+- branch/source head: `934b984e55588c777678a17b75861686bf2e748a`
+- Android CI run `34980384360` — **success**
 - shared tests → native Web build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - asset: `random-seoul-latest.apk`
-- size: `11,412,808` bytes
-- SHA-256: `71604b2bf31336777644e431bb6d66b1767a0b77a13f7c0128781417476b2e2a`
+- size: `11,413,240` bytes
+- SHA-256: `647e86ed5a7c73f0271a6898ed1e5d73c5021073d5600394a3b587dd69204d2f`
 
 Fixed direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -198,9 +229,13 @@ Key files:
   - copy reparent into map action row
 - `src/ui/subway-sign-overrides.css`
   - station-sign alignment/type sizing
-  - refresh icon visual sizing
+  - refresh icon sizing
   - food waiting/ready prompt treatment
   - compact 3-column utility row
+- `src/ui/minimal-palette-overrides.css`
+  - final passive palette simplification
+  - progress strip removal
+  - neutral card/section/map-control surfaces
 - `src/ui/attraction-view.ts`
   - compact attraction-first section
 - `src/ui/draw-animation.ts`
@@ -232,11 +267,11 @@ Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJ
 
 ## Change log — 2026-09-15
 
-- Kept card-as-button draw flow and in-card partial redraw controls.
-- Increased refresh glyph to 27 px / 2.7 stroke while preserving a transparent 36 px touch area.
-- Vertically centered completed station-sign content and enlarged station-name typography to match line-result scale.
-- Replaced food pending `?` with centered `뭐 먹을까?`; faint before its turn and strong when active, without increasing card height.
-- Consolidated `복사 / 네이버지도 / 구글지도` into one compact row.
-- Replaced technical copy payload with conversational `역에서 음식 먹자!` style text; no line/ordinal/examples/restaurant name.
-- Added stage-aware main headline: `어디로 가볼까? → 어느 역에서 내릴까? → 식사도 해야지? → 이 코스로 가자!`.
-- Web CI/Web Release/Pages and Android latest dev APK verified for this UX release.
+- Kept active random-target lime treatment and line-colored completed station sign.
+- Reduced passive UI to three neutral tones (`bg / paper / surface`).
+- Unified main shell, station list, history, attraction and restaurant section backgrounds.
+- Removed separate line/station/food pastel completed-state backgrounds in favor of one paper surface.
+- Neutralized map/copy/restaurant utility tints and reused lime for the hero underline.
+- Hid the redundant `01 노선 / 02 역 / 03 음식` visual progress strip.
+- Preserved dynamic headline, subway-sign station result, centered food prompt, compact utility row and conversational copy behavior.
+- Web CI/Web Release/Pages and Android latest dev APK verified for this palette simplification.
