@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-const styles=[readFileSync(new URL('../src/ui/styles.css',import.meta.url),'utf8'),readFileSync(new URL('../src/ui/mobile-overrides.css',import.meta.url),'utf8')].join('\n');
+const styles=[
+  readFileSync(new URL('../src/ui/styles.css',import.meta.url),'utf8'),
+  readFileSync(new URL('../src/ui/mobile-overrides.css',import.meta.url),'utf8'),
+  readFileSync(new URL('../src/ui/subway-sign-overrides.css',import.meta.url),'utf8'),
+].join('\n');
 const primaryDrawPlacement=readFileSync(new URL('../src/ui/primary-draw-placement.ts',import.meta.url),'utf8');
 const drawAnimation=readFileSync(new URL('../src/ui/draw-animation.ts',import.meta.url),'utf8');
 const drawView=readFileSync(new URL('../src/ui/draw-view.ts',import.meta.url),'utf8');
@@ -18,6 +22,8 @@ describe('Random Seoul responsive visual contract',()=>{
   it('defers restaurant lookup until requested',()=>{expect(main).toContain("button.textContent = '추천 식당 보기'");expect(main).toContain("restaurantRequest.button.addEventListener('click'");expect(main).toContain('await controller.loadRecommendations()');expect(main).toContain("document.body.dataset.selftestDeferredRestaurants = 'true'")});
   it('smooth-scrolls after restaurant results settle',()=>{expect(main.indexOf("scrollIntoView({")).toBeGreaterThan(main.indexOf('await controller.loadRecommendations()'));expect(main).toContain("behavior: selfTestMode ? 'auto' : 'smooth'")});
   it('uses dedicated restaurant CTA',()=>{expect(styles).toContain('.restaurant-request-btn{width:100%;min-height:48px')});
-  it('moves redraw actions into completed result cards as subtle icon-only controls',()=>{expect(drawView).toContain("placeCardRedrawButton(restart, 'line_panel'");expect(drawView).toContain("placeCardRedrawButton(stationRedraw, 'station_panel'");expect(drawView).toContain("placeCardRedrawButton(foodRedraw, 'food_panel'");expect(drawView).toContain("'background:transparent'");expect(drawView).toContain("'width:36px'");expect(drawView).toContain("'font-size:0'");expect(drawView).toContain("line_panel: '#8da877'");expect(drawView).toContain("station_panel: '#7898a6'");expect(drawView).toContain("food_panel: '#b18868'")});
+  it('uses larger, heavier in-card redraw glyphs',()=>{expect(drawView).toContain("placeCardRedrawButton(restart, 'line_panel'");expect(drawView).toContain("'background:transparent'");expect(drawView).toContain("'width:36px'");expect(styles).toContain('.card-redraw-btn svg{width:24px;height:24px}');expect(styles).toContain('.card-redraw-btn svg path{stroke-width:2.4}')});
+  it('renders a completed station as a line-colored subway sign',()=>{expect(drawView).toContain("panel.style.setProperty('--station-line', line.color)");expect(drawView).toContain("panel.style.setProperty('--station-line-ink', readableInk(line.color))");expect(styles).toContain('.station-panel.complete:not(.next-draw)');expect(styles).toContain('border:5px solid var(--station-line,#7898a6)!important');expect(styles).toContain('background:var(--station-line,#7898a6)')});
+  it('shows a food question mark after the station is ready without increasing card height',()=>{expect(drawView).toContain("name.textContent = station ? '?' : ''");expect(drawView).toContain("name.className = station ? 'food-name food-question' : 'food-name placeholder'");expect(styles).toContain('.food-panel.ready .food-question');expect(styles).toContain('min-height:0')});
   it('uses concise labels',()=>{expect(drawView).toContain("textContent = '노선'");expect(drawView).toContain("textContent = '역'");expect(drawView).toContain("textContent = '음식'")});
 });
