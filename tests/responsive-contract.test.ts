@@ -40,7 +40,9 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('background: linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
     expect(styles).toContain('box-shadow: 0 7px 0 #a5bd63');
     expect(styles).toContain('.panel.next-draw::after');
-    expect(styles).toContain('content: "→"');
+    expect(styles).toContain('content: "⚄"');
+    expect(styles).toContain('.panel.next-draw .panel-tag');
+    expect(styles).toContain('right: 66px');
     expect(styles).toContain('transform: translateY(3px)');
   });
 
