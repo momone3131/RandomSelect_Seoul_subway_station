@@ -176,7 +176,7 @@ function updateStatusCopy(): void {
   }
   if (!state.currentLine) {
     progress.textContent = '출발 준비 완료';
-    helper.textContent = '버튼을 눌러 오늘의 노선을 정해보세요.';
+    helper.textContent = '버튼을 눌러 노선을 정해보세요.';
     return;
   }
   if (!state.currentStation) {
@@ -189,7 +189,7 @@ function updateStatusCopy(): void {
     helper.textContent = `목적지는 ${state.currentStation.name}! 마지막으로 음식 종목을 뽑으세요.`;
     return;
   }
-  progress.textContent = '오늘의 외출 코스 완성';
+  progress.textContent = '외출 코스 완성';
   helper.textContent = '추천 명소를 보고, 원하면 추천 식당을 찾아보세요.';
 }
 
@@ -294,7 +294,7 @@ async function runMainDraw(): Promise<void> {
   const state = store.getSnapshot();
   if (stage === 'line' && state.currentLine) announce(`${state.currentLine.name}이 뽑혔습니다.`);
   if (stage === 'station' && state.currentStation) announce(`${state.currentStation.name}역이 뽑혔습니다.`);
-  if (stage === 'food' && state.currentFood) announce(`오늘의 음식은 ${state.currentFood.name}입니다.`);
+  if (stage === 'food' && state.currentFood) announce(`음식은 ${state.currentFood.name}입니다.`);
 }
 
 function stationMapQuery(): string | undefined {
@@ -314,11 +314,9 @@ function openNewTab(url: string): void {
 
 function resultMessage(): string {
   const state = store.getSnapshot();
-  if (!state.currentLine || !state.currentStation) return '';
-  let text = `${state.currentLine.name} · 목록의 ${state.currentStation.ordinal}번째 역: ${state.currentStation.name}`;
-  if (state.currentFood) text += `\n음식: ${state.currentFood.name}\n예시: ${state.currentFood.examples}`;
-  text += `\n(총 ${state.currentLine.stations.length}개 역, 본선→지선 목록 순번 기준)`;
-  return text;
+  if (!state.currentStation) return '';
+  if (state.currentFood) return `${state.currentStation.name}에서 ${state.currentFood.name} 먹자!`;
+  return `${state.currentStation.name} 가자!`;
 }
 
 async function copyResult(): Promise<void> {
