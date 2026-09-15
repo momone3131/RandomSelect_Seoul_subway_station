@@ -1,6 +1,5 @@
-/* Final responsive overrides. Kept after the base stylesheet so the compact visual system wins. */
+/* Final responsive overrides. Compact, low-chrome visual system. */
 
-/* Minimal main surface: keep only product, stage, result and action copy. */
 .brand-sub,
 .offline-pill,
 .hero-eyebrow,
@@ -20,826 +19,193 @@
 .restaurant-count,
 .station-detail .count-bubble,
 .number-rule,
-.detail-note {
-  display: none !important;
-}
+.detail-note { display: none !important; }
 
-:root {
-  --border: #cbd3c9;
-  --radius: 18px;
-}
+:root { --border: #d4dbd2; --radius: 18px; }
 
-/* Stronger structure, less soft-card / generated-design feel. */
-.masthead {
-  padding-bottom: 16px;
-  border-bottom: 2px solid #d3dad1;
-}
-
-.brand-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-}
-
-.brand-title {
-  font-size: 18px;
-  letter-spacing: .055em;
-}
-
-.hero {
-  padding-top: 18px;
-  padding-bottom: 14px;
-}
-
-.hero h1 {
-  font-size: clamp(30px, 4.3vw, 43px);
-  line-height: 1.2;
-}
-
-.hero h1 span::after {
-  height: 10px;
-  bottom: 2px;
-}
-
-.hero-art {
-  width: 188px;
-  height: 96px;
-  margin-right: 2px;
-}
-
-.toolbar {
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-
-.toolbar-actions {
-  gap: 8px;
-}
+/* Use spacing and surface tone for hierarchy; reserve strong outlines for actions. */
+.masthead { padding-bottom: 16px; border-bottom: 0; }
+.brand-icon { width: 42px; height: 42px; border-radius: 10px; }
+.brand-title { font-size: 18px; letter-spacing: .055em; }
+.hero { padding-top: 18px; padding-bottom: 14px; }
+.hero h1 { font-size: clamp(30px, 4.3vw, 43px); line-height: 1.2; }
+.hero h1 span::after { height: 10px; bottom: 2px; }
+.hero-art { width: 188px; height: 96px; margin-right: 2px; }
+.toolbar { justify-content: flex-end; margin-bottom: 8px; }
+.toolbar-actions { gap: 8px; }
 
 .plain-btn {
-  min-height: 42px;
-  padding: 8px 13px;
-  border: 1.5px solid var(--border);
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 700;
+  min-height: 42px; padding: 8px 13px; border: 1px solid #cbd3c9;
+  border-radius: 9px; font-size: 13px; font-weight: 700;
 }
 
-.draw-shell {
-  border: 2px solid #c7d0c5;
-  border-radius: 18px;
-  box-shadow: 0 5px 0 #dde2da;
-}
-
-.progress {
-  padding: 13px 18px 12px;
-  gap: 10px;
-  border-bottom: 2px solid #e0e5de;
-}
-
-.step {
-  gap: 7px;
-  font-size: 13px;
-  font-weight: 750;
-}
-
-.step-circle {
-  width: 24px;
-  height: 24px;
-  font-size: 11px;
-}
-
-.progress-line {
-  width: 28px;
-  height: 2px;
-}
-
-.panels {
-  padding: 13px 14px 12px;
-  gap: 12px;
-}
+.draw-shell { border: 0; border-radius: 18px; box-shadow: none; background: #f6f8f3; }
+.progress { padding: 13px 18px 12px; gap: 10px; border-bottom: 0; }
+.step { gap: 7px; font-size: 13px; font-weight: 750; }
+.step-circle { width: 24px; height: 24px; font-size: 11px; }
+.progress-line { width: 28px; height: 2px; opacity: .55; }
+.panels { padding: 13px 14px 12px; gap: 12px; }
 
 .panel {
-  min-height: 176px;
-  padding: 25px 14px 13px;
-  border-radius: 13px;
+  min-height: 176px; padding: 25px 14px 13px; border: 0 !important;
+  border-radius: 13px; box-shadow: none; background: #fff;
 }
+.line-panel { background: #f1f5e9; }
+.station-panel { background: #f6f7f3; }
+.food-panel { background: #f7f3eb; }
 
-.line-panel,
-.station-panel,
-.food-panel {
-  border: 1.5px solid #d1d9cf;
-}
+.panel-tag { top: 10px; left: 13px; font-size: 12px; font-weight: 800; letter-spacing: .035em; color: #667464; }
+.line-badge { width: 56px; height: 56px; margin-top: 5px; font-size: 27px; box-shadow: none; }
+.line-badge.wide { font-size: 17px; }
+.line-title { min-height: 38px; margin-top: 8px; font-size: 28px; line-height: 1.35; }
+.line-title.long { font-size: 23px; }
+.line-title.placeholder { min-height: 0; }
+.ordinal-row { height: 80px; gap: 6px; }
+.ordinal-number { min-width: 52px; font-size: 72px; line-height: 1.08; }
+.ordinal-number.three-digits { font-size: 58px; }
+.ordinal-caption { font-size: 13px; font-weight: 700; }
+.station-name { min-height: 31px; font-size: 22px; line-height: 1.35; }
+.station-name.long { font-size: 17px; }
+.station-panel.waiting .station-name { font-size: 16px; }
+.food-emoji { margin-top: 5px; margin-bottom: 5px; font-size: 40px; }
+.food-name,.food-name.long { min-height: 32px; margin: 2px 0 0; font-size: 23px; line-height: 1.35; }
+.food-name.placeholder { min-height: 0; }
 
-.line-panel {
-  background: #f3f6ed;
-}
+.action-zone { padding: 3px 14px 15px; }
+.draw-btn { min-height: 52px; border: 2px solid var(--dark); border-radius: 10px; font-size: 16px; box-shadow: 0 3px 0 #a7b66e; }
+.secondary-actions { gap: 7px; margin-top: 9px; }
+.secondary-actions .plain-btn { min-height: 40px; padding: 7px 11px; font-size: 13px; }
+.options-row { justify-content: flex-start; margin-top: 11px; font-size: 12px; }
+.speed-label { gap: 7px; font-weight: 650; }
+.speed-label input { width: 16px; height: 16px; }
+.speed-label span { display: none !important; }
+.map-actions { gap: 7px; margin-top: 10px; }
+.map-btn { min-height: 40px; padding: 7px 12px; border: 0; border-radius: 8px; font-size: 13px; background: #eef2ec; }
+.map-mark { border-radius: 5px; }
 
-.station-panel,
-.food-panel {
-  border-style: solid;
-}
-
-.station-panel.ready,
-.station-panel.complete {
-  border-color: #aebda8;
-}
-
-.food-panel.ready,
-.food-panel.complete {
-  border-color: #c6b38f;
-}
-
-.panel-tag {
-  top: 10px;
-  left: 13px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .035em;
-  color: #667464;
-}
-
-.line-badge {
-  width: 56px;
-  height: 56px;
-  margin-top: 5px;
-  font-size: 27px;
-  box-shadow: none;
-}
-
-.line-badge.wide {
-  font-size: 17px;
-}
-
-.line-title {
-  min-height: 38px;
-  margin-top: 8px;
-  font-size: 28px;
-  line-height: 1.35;
-}
-
-.line-title.long {
-  font-size: 23px;
-}
-
-.line-title.placeholder {
-  min-height: 0;
-}
-
-.ordinal-row {
-  height: 80px;
-  gap: 6px;
-}
-
-.ordinal-number {
-  min-width: 52px;
-  font-size: 72px;
-  line-height: 1.08;
-}
-
-.ordinal-number.three-digits {
-  font-size: 58px;
-}
-
-.ordinal-caption {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.station-name {
-  min-height: 31px;
-  font-size: 22px;
-  line-height: 1.35;
-}
-
-.station-name.long {
-  font-size: 17px;
-}
-
-.station-panel.waiting .station-name {
-  font-size: 16px;
-}
-
-.food-emoji {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 40px;
-}
-
-.food-name,
-.food-name.long {
-  min-height: 32px;
-  margin: 2px 0 0;
-  font-size: 23px;
-  line-height: 1.35;
-}
-
-.food-name.placeholder {
-  min-height: 0;
-}
-
-.action-zone {
-  padding: 3px 14px 15px;
-}
-
-.draw-btn {
-  min-height: 52px;
-  border: 2px solid var(--dark);
-  border-radius: 10px;
-  font-size: 16px;
-  box-shadow: 0 3px 0 #a7b66e;
-}
-
-.secondary-actions {
-  gap: 7px;
-  margin-top: 9px;
-}
-
-.secondary-actions .plain-btn {
-  min-height: 40px;
-  padding: 7px 11px;
-  font-size: 13px;
-}
-
-.options-row {
-  justify-content: flex-start;
-  margin-top: 11px;
-  font-size: 12px;
-}
-
-.speed-label {
-  gap: 7px;
-  font-weight: 650;
-}
-
-.speed-label input {
-  width: 16px;
-  height: 16px;
-}
-
-.speed-label span {
-  display: none !important;
-}
-
-.map-actions {
-  gap: 7px;
-  margin-top: 10px;
-}
-
-.map-btn {
-  min-height: 40px;
-  padding: 7px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-size: 13px;
-}
-
-.map-mark {
-  border-radius: 5px;
-}
-
-/* The next-result card is the primary button: flat color, stronger line, restrained depth. */
+/* Only the current draw target gets a strong structural outline. */
 .panel.next-draw {
-  border: 2px solid var(--dark);
-  background: var(--lime);
-  box-shadow: 0 4px 0 #98aa5f;
-  cursor: pointer;
-  overflow: hidden;
-  transform: translateY(-1px);
+  border: 2px solid var(--dark) !important; background: var(--lime); box-shadow: 0 4px 0 #98aa5f;
+  cursor: pointer; overflow: hidden; transform: translateY(-1px);
   transition: background .14s, box-shadow .14s, transform .1s;
 }
-
-.panel.next-draw .panel-tag {
-  right: 58px;
-  max-width: calc(100% - 76px);
-  color: #42563f;
-}
-
+.panel.next-draw .panel-tag { right: 58px; max-width: calc(100% - 76px); color: #42563f; }
 .panel.next-draw::after {
-  content: "⚄";
-  position: absolute;
-  top: 9px;
-  right: 10px;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: var(--dark);
-  color: var(--lime);
-  font-size: 24px;
-  font-weight: 850;
-  line-height: 1;
-  pointer-events: none;
+  content: "⚄"; position: absolute; top: 9px; right: 10px; z-index: 2; display: grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 9px; background: var(--dark); color: var(--lime);
+  font-size: 24px; font-weight: 850; line-height: 1; pointer-events: none;
 }
-
-.panel.next-draw:has(> .draw-btn.integrated:not(:disabled)):hover {
-  background: #def582;
-  box-shadow: 0 5px 0 #8ea055;
-  transform: translateY(-2px);
-}
-
-.panel.next-draw:has(> .draw-btn.integrated:not(:disabled)):active {
-  box-shadow: 0 1px 0 #8ea055;
-  transform: translateY(2px);
-}
-
-.panel.next-draw:has(> .draw-btn.integrated:focus-visible) {
-  outline: 3px solid #43855e;
-  outline-offset: 3px;
-}
-
-.panel.next-draw:has(> .draw-btn.integrated:disabled) {
-  cursor: default;
-}
-
+.panel.next-draw:has(> .draw-btn.integrated:not(:disabled)):hover { background: #def582; box-shadow: 0 5px 0 #8ea055; transform: translateY(-2px); }
+.panel.next-draw:has(> .draw-btn.integrated:not(:disabled)):active { box-shadow: 0 1px 0 #8ea055; transform: translateY(2px); }
+.panel.next-draw:has(> .draw-btn.integrated:focus-visible) { outline: 3px solid #43855e; outline-offset: 3px; }
+.panel.next-draw:has(> .draw-btn.integrated:disabled) { cursor: default; }
 .panel.next-draw > .draw-btn.integrated {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: inherit;
-  background: transparent;
-  box-shadow: none;
-  opacity: 0;
+  position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; min-height: 0; padding: 0;
+  border: 0; border-radius: inherit; background: transparent; box-shadow: none; opacity: 0;
 }
+.panel.next-draw > .draw-btn.integrated:hover,.panel.next-draw > .draw-btn.integrated:active,.panel.next-draw > .draw-btn.integrated:focus-visible { background: transparent; box-shadow: none; transform: none; }
+.draw-shell:not([data-stage="done"]) .action-zone { padding-top: 0; }
 
-.panel.next-draw > .draw-btn.integrated:hover,
-.panel.next-draw > .draw-btn.integrated:active,
-.panel.next-draw > .draw-btn.integrated:focus-visible {
-  background: transparent;
-  box-shadow: none;
-  transform: none;
-}
+/* Secondary content: fewer boxes, clearer whitespace. */
+.restaurant-section { margin-top: 16px; padding: 16px; border: 0; border-radius: 13px; box-shadow: none; background: #f6f8f4; }
+.restaurant-head { margin-bottom: 11px; }
+.restaurant-head h2 { font-size: 20px; }
+.restaurant-grid,.restaurant-loading { gap: 9px; }
+.restaurant-card,.restaurant-skeleton { min-height: 150px; padding: 13px; border: 0; border-radius: 10px; background: #fff; }
+.restaurant-rank { width: 25px; height: 25px; margin-bottom: 8px; border-radius: 5px; font-size: 11px; }
+.restaurant-name { font-size: 16px; }
+.restaurant-desc { margin-top: 4px; font-size: 12px; }
+.restaurant-meta { margin-top: 7px; font-size: 11px; }
+.restaurant-distance,.restaurant-rating,.restaurant-reviews { border: 0; border-radius: 6px; padding: 2px 7px; font-size: 11px; background: #eef2ec; }
+.restaurant-map-link { min-height: 40px; border: 0; border-radius: 8px; font-size: 12px; background: #eef2ec; }
+.google-attribution,.google-attribution a { font-size: 12px; }
 
-.draw-shell:not([data-stage="done"]) .action-zone {
-  padding-top: 0;
-}
+.station-detail { margin-top: 16px; border: 0; border-radius: 11px; background: #f6f8f4; }
+.station-detail summary { padding: 13px 16px; }
+.summary-left { font-size: 14px; }
+.segment-heading { margin: 13px 0 7px; font-size: 12px; }
+.station-grid { gap: 6px; }
+.station-item { min-height: 36px; padding: 7px 8px; border: 0; border-radius: 7px; font-size: 12px; background: #fff; }
+.station-index { font-size: 11px; }
 
-/* Secondary content follows the same stronger-line, larger-small-type system. */
-.restaurant-section {
-  margin-top: 16px;
-  padding: 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 13px;
-  box-shadow: none;
-}
+.history { margin-top: 22px; }
+.section-head h2 { font-size: 14px; }
+.text-btn { font-size: 12px; }
+.history-list { gap: 8px; }
+.history-item { padding: 11px 12px; border: 0; border-radius: 10px; background: #f6f8f4; }
+.history-name { font-size: 14px; }
+.history-meta,.history-food,.history-food.pending { font-size: 11px; }
 
-.restaurant-head {
-  margin-bottom: 11px;
-}
+.settings-modal { border: 0; border-radius: 16px; box-shadow: 0 18px 50px rgba(32,59,47,.18); }
+.close-btn,.preset { border-width: 1px; }
+.line-choice { border: 0; }
+.close-btn,.preset { border-radius: 8px; }
+.line-choice { border-radius: 9px; background: #f6f8f4; }
+.choice-name { font-size: 13px; }
+.choice-count,.draft-count,.dialog-foot .dialog-note { font-size: 11px; }
+.preset,.apply-btn { font-size: 12px; }
 
-.restaurant-head h2 {
-  font-size: 20px;
-}
-
-.restaurant-grid,
-.restaurant-loading {
-  gap: 9px;
-}
-
-.restaurant-card,
-.restaurant-skeleton {
-  min-height: 150px;
-  padding: 13px;
-  border: 1.5px solid #d7ded4;
-  border-radius: 10px;
-}
-
-.restaurant-rank {
-  width: 25px;
-  height: 25px;
-  margin-bottom: 8px;
-  border-radius: 5px;
-  font-size: 11px;
-}
-
-.restaurant-name {
-  font-size: 16px;
-}
-
-.restaurant-desc {
-  margin-top: 4px;
-  font-size: 12px;
-}
-
-.restaurant-meta {
-  margin-top: 7px;
-  font-size: 11px;
-}
-
-.restaurant-distance,
-.restaurant-rating,
-.restaurant-reviews {
-  border-width: 1.5px;
-  border-radius: 6px;
-  padding: 2px 7px;
-  font-size: 11px;
-}
-
-.restaurant-map-link {
-  min-height: 40px;
-  border-width: 1.5px;
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-.google-attribution,
-.google-attribution a {
-  font-size: 12px;
-}
-
-.station-detail {
-  margin-top: 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 11px;
-}
-
-.station-detail summary {
-  padding: 13px 16px;
-}
-
-.summary-left {
-  font-size: 14px;
-}
-
-.segment-heading {
-  margin: 13px 0 7px;
-  font-size: 12px;
-}
-
-.station-grid {
-  gap: 6px;
-}
-
-.station-item {
-  min-height: 36px;
-  padding: 7px 8px;
-  border: 1.5px solid #dce2da;
-  border-radius: 7px;
-  font-size: 12px;
-}
-
-.station-index {
-  font-size: 11px;
-}
-
-.history {
-  margin-top: 22px;
-}
-
-.section-head h2 {
-  font-size: 14px;
-}
-
-.text-btn {
-  font-size: 12px;
-}
-
-.history-list {
-  gap: 8px;
-}
-
-.history-item {
-  padding: 11px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-}
-
-.history-name {
-  font-size: 14px;
-}
-
-.history-meta,
-.history-food,
-.history-food.pending {
-  font-size: 11px;
-}
-
-.settings-modal {
-  border: 2px solid #c7d0c5;
-  border-radius: 16px;
-}
-
-.close-btn,
-.preset,
-.line-choice {
-  border-width: 1.5px;
-}
-
-.close-btn,
-.preset {
-  border-radius: 8px;
-}
-
-.line-choice {
-  border-radius: 9px;
-}
-
-.choice-name {
-  font-size: 13px;
-}
-
-.choice-count,
-.draft-count,
-.dialog-foot .dialog-note {
-  font-size: 11px;
-}
-
-.preset,
-.apply-btn {
-  font-size: 12px;
-}
-
-@media (min-width: 721px) {
-  .panel {
-    min-height: 176px;
-  }
-}
+@media (min-width: 721px) { .panel { min-height: 176px; } }
 
 @media (max-width: 720px) {
-  .page {
-    padding: 16px 16px 22px;
-  }
-
-  .masthead {
-    padding-bottom: 14px;
-  }
-
-  .hero {
-    padding-top: 14px;
-    padding-bottom: 11px;
-  }
-
-  .hero h1 {
-    font-size: 31px;
-  }
-
-  .hero-art {
-    width: 82px;
-    height: 72px;
-    margin-right: -2px;
-  }
-
-  .toolbar {
-    margin-bottom: 7px;
-  }
-
-  .progress {
-    padding: 11px 12px;
-    gap: 7px;
-  }
-
-  .step {
-    gap: 5px;
-    font-size: 12px;
-  }
-
-  .step-circle {
-    width: 22px;
-    height: 22px;
-    font-size: 10px;
-  }
-
-  .progress-line {
-    width: 18px;
-  }
-
-  .panels {
-    padding: 11px;
-    gap: 9px;
-  }
-
-  .panel:not(.food-panel) {
-    min-height: 164px;
-    padding: 25px 8px 10px;
-  }
-
-  .food-panel {
-    min-height: 96px;
-    padding: 25px 12px 10px;
-    gap: 9px;
-  }
-
-  .panel-tag,
-  .food-panel .panel-tag {
-    top: 9px;
-    left: 10px;
-    font-size: 11px;
-  }
-
-  .line-badge {
-    width: 49px;
-    height: 49px;
-    margin-top: 4px;
-    font-size: 24px;
-  }
-
-  .line-badge.wide {
-    font-size: 15px;
-  }
-
-  .line-title {
-    min-height: 31px;
-    margin-top: 7px;
-    font-size: 23px;
-  }
-
-  .line-title.long {
-    font-size: 18px;
-  }
-
-  .ordinal-row {
-    height: 69px;
-    gap: 4px;
-  }
-
-  .ordinal-number {
-    min-width: 42px;
-    font-size: 60px;
-  }
-
-  .ordinal-number.three-digits {
-    font-size: 46px;
-  }
-
-  .ordinal-caption {
-    font-size: 12px;
-  }
-
-  .station-name {
-    min-height: 27px;
-    font-size: 19px;
-  }
-
-  .station-name.long {
-    font-size: 14px;
-  }
-
-  .food-emoji {
-    width: 42px;
-    margin: 0;
-    font-size: 33px;
-  }
-
-  .food-name,
-  .food-name.long {
-    min-height: 28px;
-    margin: 0;
-    font-size: 20px;
-  }
-
-  .restaurant-grid,
-  .restaurant-loading {
-    grid-template-columns: 1fr !important;
-  }
-
-  .restaurant-meta {
-    flex-wrap: wrap;
-  }
-
-  .restaurant-map-link {
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .restaurant-extra-actions {
-    justify-content: stretch;
-  }
-
-  .restaurant-extra-actions .restaurant-map-link {
-    width: 100%;
-    min-width: 0;
-  }
+  .page { padding: 16px 16px 22px; }
+  .masthead { padding-bottom: 14px; }
+  .hero { padding-top: 14px; padding-bottom: 11px; }
+  .hero h1 { font-size: 31px; }
+  .hero-art { width: 82px; height: 72px; margin-right: -2px; }
+  .toolbar { margin-bottom: 7px; }
+  .progress { padding: 11px 12px; gap: 7px; }
+  .step { gap: 5px; font-size: 12px; }
+  .step-circle { width: 22px; height: 22px; font-size: 10px; }
+  .progress-line { width: 18px; }
+  .panels { padding: 11px; gap: 9px; }
+  .panel:not(.food-panel) { min-height: 164px; padding: 25px 8px 10px; }
+  .food-panel { min-height: 96px; padding: 25px 12px 10px; gap: 9px; }
+  .panel-tag,.food-panel .panel-tag { top: 9px; left: 10px; font-size: 11px; }
+  .line-badge { width: 49px; height: 49px; margin-top: 4px; font-size: 24px; }
+  .line-badge.wide { font-size: 15px; }
+  .line-title { min-height: 31px; margin-top: 7px; font-size: 23px; }
+  .line-title.long { font-size: 18px; }
+  .ordinal-row { height: 69px; gap: 4px; }
+  .ordinal-number { min-width: 42px; font-size: 60px; }
+  .ordinal-number.three-digits { font-size: 46px; }
+  .ordinal-caption { font-size: 12px; }
+  .station-name { min-height: 27px; font-size: 19px; }
+  .station-name.long { font-size: 14px; }
+  .food-emoji { width: 42px; margin: 0; font-size: 33px; }
+  .food-name,.food-name.long { min-height: 28px; margin: 0; font-size: 20px; }
+  .restaurant-grid,.restaurant-loading { grid-template-columns: 1fr !important; }
+  .restaurant-meta { flex-wrap: wrap; }
+  .restaurant-map-link { width: 100%; min-height: 44px; }
+  .restaurant-extra-actions { justify-content: stretch; }
+  .restaurant-extra-actions .restaurant-map-link { width: 100%; min-width: 0; }
 }
 
 @media (max-width: 430px) {
-  .page {
-    padding: 13px 12px 20px;
-  }
-
-  .brand-icon {
-    width: 38px;
-    height: 38px;
-  }
-
-  .brand-title {
-    font-size: 16px;
-  }
-
-  .hero {
-    padding-top: 12px;
-    padding-bottom: 10px;
-  }
-
-  .hero h1 {
-    font-size: 29px;
-  }
-
-  .hero-art {
-    width: 66px;
-    height: 62px;
-    margin-right: -5px;
-  }
-
-  .plain-btn {
-    min-height: 40px;
-    padding: 7px 10px;
-    font-size: 12px;
-  }
-
-  .progress {
-    padding: 10px;
-    gap: 5px;
-  }
-
-  .step {
-    font-size: 11px;
-  }
-
-  .progress-line {
-    width: 12px;
-  }
-
-  .panels {
-    padding: 9px;
-    gap: 8px;
-  }
-
-  .panel:not(.food-panel) {
-    min-height: 154px;
-    border-radius: 11px;
-  }
-
-  .food-panel {
-    min-height: 91px;
-    border-radius: 11px;
-  }
-
-  .panel.next-draw .panel-tag {
-    right: 52px;
-    max-width: calc(100% - 65px);
-  }
-
-  .panel.next-draw::after {
-    top: 7px;
-    right: 7px;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    font-size: 21px;
-  }
-
-  .line-badge {
-    width: 46px;
-    height: 46px;
-    font-size: 23px;
-  }
-
-  .line-title {
-    font-size: 21px;
-  }
-
-  .line-title.long {
-    font-size: 16px;
-  }
-
-  .ordinal-row {
-    height: 64px;
-  }
-
-  .ordinal-number {
-    font-size: 55px;
-  }
-
-  .ordinal-number.three-digits {
-    font-size: 42px;
-  }
-
-  .station-name {
-    font-size: 18px;
-  }
-
-  .station-name.long {
-    font-size: 13px;
-  }
-
-  .restaurant-section {
-    margin-top: 14px;
-    padding: 12px;
-    border-radius: 11px;
-  }
-
-  .restaurant-card {
-    padding: 12px;
-  }
-
-  .station-detail {
-    margin-top: 14px;
-  }
+  .page { padding: 13px 12px 20px; }
+  .brand-icon { width: 38px; height: 38px; }
+  .brand-title { font-size: 16px; }
+  .hero { padding-top: 12px; padding-bottom: 10px; }
+  .hero h1 { font-size: 29px; }
+  .hero-art { width: 66px; height: 62px; margin-right: -5px; }
+  .plain-btn { min-height: 40px; padding: 7px 10px; font-size: 12px; }
+  .progress { padding: 10px; gap: 5px; }
+  .step { font-size: 11px; }
+  .progress-line { width: 12px; }
+  .panels { padding: 9px; gap: 8px; }
+  .panel:not(.food-panel) { min-height: 154px; border-radius: 11px; }
+  .food-panel { min-height: 91px; border-radius: 11px; }
+  .panel.next-draw .panel-tag { right: 52px; max-width: calc(100% - 65px); }
+  .panel.next-draw::after { top: 7px; right: 7px; width: 32px; height: 32px; border-radius: 8px; font-size: 21px; }
+  .line-badge { width: 46px; height: 46px; font-size: 23px; }
+  .line-title { font-size: 21px; }
+  .line-title.long { font-size: 16px; }
+  .ordinal-row { height: 64px; }
+  .ordinal-number { font-size: 55px; }
+  .ordinal-number.three-digits { font-size: 42px; }
+  .station-name { font-size: 18px; }
+  .station-name.long { font-size: 13px; }
+  .restaurant-section { margin-top: 14px; padding: 12px; border-radius: 11px; }
+  .restaurant-card { padding: 12px; }
+  .station-detail { margin-top: 14px; }
 }
