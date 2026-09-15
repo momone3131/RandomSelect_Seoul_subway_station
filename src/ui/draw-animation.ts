@@ -125,8 +125,7 @@ export async function animateDrawStage(
 export function revealDrawStage(stage: AnimatedDrawStage): void {
   if (prefersReducedMotion()) return;
 
-  // performDraw() renders once more in its finally block. Defer the settled
-  // feedback by one frame so the final render cannot erase the effect.
+  // Run after the final render so the chosen card gets an unmistakable payoff.
   window.requestAnimationFrame(() => {
     const panel = panelFor(stage);
     panel.getAnimations().forEach((animation) => animation.cancel());
@@ -134,28 +133,38 @@ export function revealDrawStage(stage: AnimatedDrawStage): void {
       [
         {
           transform: 'translateY(0) scale(1)',
+          filter: 'brightness(1)',
           boxShadow: '0 0 0 0 rgba(215,247,117,0)',
           offset: 0,
         },
         {
-          transform: 'translateY(-4px) scale(1.018)',
-          boxShadow: '0 4px 0 #203b2f, 0 0 0 4px #d7f775',
-          offset: 0.36,
+          transform: 'translateY(-10px) scale(1.075)',
+          filter: 'brightness(1.07)',
+          boxShadow: '0 10px 18px rgba(32,59,47,.18), 0 0 0 8px #d7f775',
+          offset: 0.30,
         },
         {
-          transform: 'translateY(1px) scale(.996)',
-          boxShadow: '0 1px 0 #203b2f, 0 0 0 2px rgba(215,247,117,.65)',
-          offset: 0.72,
+          transform: 'translateY(3px) scale(.985)',
+          filter: 'brightness(1.02)',
+          boxShadow: '0 3px 7px rgba(32,59,47,.12), 0 0 0 3px rgba(215,247,117,.72)',
+          offset: 0.68,
+        },
+        {
+          transform: 'translateY(-2px) scale(1.018)',
+          filter: 'brightness(1.03)',
+          boxShadow: '0 4px 9px rgba(32,59,47,.10), 0 0 0 2px rgba(215,247,117,.4)',
+          offset: 0.84,
         },
         {
           transform: 'translateY(0) scale(1)',
+          filter: 'brightness(1)',
           boxShadow: '0 0 0 0 rgba(215,247,117,0)',
           offset: 1,
         },
       ],
       {
-        duration: 360,
-        easing: 'cubic-bezier(.2,.8,.2,1)',
+        duration: 520,
+        easing: 'cubic-bezier(.16,.84,.22,1)',
       },
     );
   });
