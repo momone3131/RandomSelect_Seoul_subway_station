@@ -84,6 +84,19 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('.restaurant-request{padding:0 14px 12px}');
   });
 
+  it('moves redraw actions into completed result cards as subtle icon-only controls', () => {
+    expect(drawView).toContain("placeCardRedrawButton(restart, 'line_panel'");
+    expect(drawView).toContain("placeCardRedrawButton(stationRedraw, 'station_panel'");
+    expect(drawView).toContain("placeCardRedrawButton(foodRedraw, 'food_panel'");
+    expect(drawView).toContain("'background:transparent'");
+    expect(drawView).toContain("'width:36px'");
+    expect(drawView).toContain("'font-size:0'");
+    expect(drawView).toContain("line_panel: '#8da877'");
+    expect(drawView).toContain("station_panel: '#7898a6'");
+    expect(drawView).toContain("food_panel: '#b18868'");
+    expect(drawView).toContain("button.setAttribute('aria-label', label)");
+  });
+
   it('uses concise stage labels', () => {
     expect(drawView).toContain("textContent = '노선'");
     expect(drawView).toContain("textContent = '역'");
