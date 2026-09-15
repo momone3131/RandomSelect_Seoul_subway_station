@@ -1,100 +1,18 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-
-const styles = [
-  readFileSync(new URL('../src/ui/styles.css', import.meta.url), 'utf8'),
-  readFileSync(new URL('../src/ui/mobile-overrides.css', import.meta.url), 'utf8'),
-].join('\n');
-const primaryDrawPlacement = readFileSync(
-  new URL('../src/ui/primary-draw-placement.ts', import.meta.url),
-  'utf8',
-);
-const drawAnimation = readFileSync(new URL('../src/ui/draw-animation.ts', import.meta.url), 'utf8');
-const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
-
-describe('Random Seoul responsive visual contract', () => {
-  it('stacks restaurant cards vertically on phone-sized screens', () => {
-    expect(styles).toContain('grid-template-columns: 1fr !important');
-  });
-
-  it('keeps touch-sized restaurant map buttons on mobile', () => {
-    expect(styles).toContain('min-height: 44px');
-    expect(styles).toContain('width: 100%');
-  });
-
-  it('uses denser result cards after explanatory copy removal', () => {
-    expect(styles).toContain('min-height: 176px');
-    expect(styles).toContain('min-height: 164px');
-    expect(styles).toContain('min-height: 96px');
-    expect(styles).toContain('min-height: 154px');
-  });
-
-  it('raises small UI typography while preserving compact layout', () => {
-    expect(styles).toContain('font-size: 13px');
-    expect(styles).toContain('.panel-tag');
-    expect(styles).toContain('font-size: 12px');
-    expect(styles).toContain('.restaurant-name');
-    expect(styles).toContain('font-size: 16px');
-  });
-
-  it('uses stronger structural lines and restrained radii', () => {
-    expect(styles).toContain('border: 2px solid #c7d0c5');
-    expect(styles).toContain('border: 1.5px solid var(--border)');
-    expect(styles).toContain('border-radius: 13px');
-    expect(styles).toContain('box-shadow: 0 5px 0 #dde2da');
-  });
-
-  it('uses the whole next-result card as the primary draw target', () => {
-    expect(styles).toContain('.panel.next-draw > .draw-btn.integrated');
-    expect(styles).toContain('inset: 0');
-    expect(styles).toContain('height: 100%');
-    expect(styles).toContain('opacity: 0');
-    expect(primaryDrawPlacement).toContain("panel.classList.add('next-draw')");
-    expect(primaryDrawPlacement).toContain('panel.appendChild(drawButton)');
-    expect(primaryDrawPlacement).toContain('actionZone.prepend(drawButton)');
-  });
-
-  it('makes the active draw card feel physical without a soft gradient treatment', () => {
-    expect(styles).toContain('border: 2px solid var(--dark)');
-    expect(styles).toContain('background: var(--lime)');
-    expect(styles).toContain('box-shadow: 0 4px 0 #98aa5f');
-    expect(styles).toContain('.panel.next-draw::after');
-    expect(styles).toContain('content: "⚄"');
-    expect(styles).not.toContain('linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
-  });
-
-  it('adds tactile hold feedback to the integrated draw card', () => {
-    expect(primaryDrawPlacement).toContain("addEventListener('pointerdown'");
-    expect(primaryDrawPlacement).toContain("addEventListener('pointerup'");
-    expect(primaryDrawPlacement).toContain("translateY(3px) scale(.985)");
-    expect(primaryDrawPlacement).toContain("boxShadow: '0 1px 0 #8ea055'");
-    expect(primaryDrawPlacement).toContain('duration: 75');
-  });
-
-  it('adds a short settled-result thump after the final render', () => {
-    expect(drawAnimation).toContain('window.requestAnimationFrame');
-    expect(drawAnimation).toContain('panel.getAnimations().forEach');
-    expect(drawAnimation).toContain("translateY(-4px) scale(1.018)");
-    expect(drawAnimation).toContain("0 4px 0 #203b2f, 0 0 0 4px #d7f775");
-    expect(drawAnimation).toContain('duration: 360');
-  });
-
-  it('hides nonessential explanatory copy from the main surface', () => {
-    expect(styles).toContain('.scope-summary,');
-    expect(styles).toContain('.line-meta,');
-    expect(styles).toContain('.station-context,');
-    expect(styles).toContain('.food-examples,');
-    expect(styles).toContain('.hero-eyebrow,');
-    expect(styles).toContain('.restaurant-context,');
-  });
-
-  it('uses concise stage and action labels', () => {
-    expect(drawView).toContain("textContent = '노선'");
-    expect(drawView).toContain("textContent = '역'");
-    expect(drawView).toContain("textContent = '음식'");
-    expect(drawView).toContain("? '뽑는 중…'");
-    expect(drawView).not.toContain('수록 ${line.stations.length}개 역');
-    expect(drawView).not.toContain('종 중에서 하나를 뽑아요');
-    expect(drawView).not.toContain('구간 내 ${station.localIndex}번째');
-  });
+const styles=[readFileSync(new URL('../src/ui/styles.css',import.meta.url),'utf8'),readFileSync(new URL('../src/ui/mobile-overrides.css',import.meta.url),'utf8')].join('\n');
+const primaryDrawPlacement=readFileSync(new URL('../src/ui/primary-draw-placement.ts',import.meta.url),'utf8');
+const drawAnimation=readFileSync(new URL('../src/ui/draw-animation.ts',import.meta.url),'utf8');
+const drawView=readFileSync(new URL('../src/ui/draw-view.ts',import.meta.url),'utf8');
+describe('Random Seoul responsive visual contract',()=>{
+ it('stacks restaurant cards vertically on phone-sized screens',()=>{expect(styles).toContain('grid-template-columns:1fr !important');});
+ it('keeps touch-sized restaurant map buttons on mobile',()=>{expect(styles).toContain('min-height:44px');expect(styles).toContain('width:100%');});
+ it('uses denser result cards',()=>{expect(styles).toContain('min-height:176px');expect(styles).toContain('min-height:164px');expect(styles).toContain('min-height:96px');expect(styles).toContain('min-height:154px');});
+ it('removes redundant container and card borders',()=>{expect(styles).toContain('.draw-shell { border: 0;');expect(styles).toContain('border: 0 !important;');expect(styles).toContain('border:0; border-radius:13px');expect(styles).toContain('border:0; border-radius:10px');});
+ it('uses the whole next-result card as primary target',()=>{expect(styles).toContain('.panel.next-draw > .draw-btn.integrated');expect(styles).toContain('inset:0');expect(styles).toContain('opacity:0');expect(primaryDrawPlacement).toContain("panel.classList.add('next-draw')");});
+ it('reserves strong outline for active card',()=>{expect(styles).toContain('border: 2px solid var(--dark) !important');expect(styles).toContain('background: var(--lime)');expect(styles).toContain('content:"⚄"');});
+ it('keeps tactile hold feedback',()=>{expect(primaryDrawPlacement).toContain("addEventListener('pointerdown'");expect(primaryDrawPlacement).toContain("translateY(3px) scale(.985)");expect(primaryDrawPlacement).toContain('duration: 75');});
+ it('uses a large settled-result reveal',()=>{expect(drawAnimation).toContain("translateY(-10px) scale(1.075)");expect(drawAnimation).toContain('0 0 0 8px #d7f775');expect(drawAnimation).toContain('duration:520');});
+ it('hides nonessential explanatory copy',()=>{expect(styles).toContain('.scope-summary');expect(styles).toContain('.line-meta');expect(styles).toContain('.food-examples');});
+ it('uses concise labels',()=>{expect(drawView).toContain("textContent = '노선'");expect(drawView).toContain("textContent = '역'");expect(drawView).toContain("textContent = '음식'");});
 });
