@@ -15,6 +15,19 @@ function setTrailingText(element: HTMLElement, text: string): void {
   else element.append(document.createTextNode(text));
 }
 
+function placeCardRedrawButton(
+  button: HTMLButtonElement,
+  panelId: 'line_panel' | 'station_panel' | 'food_panel',
+  visible: boolean,
+  label: string,
+): void {
+  const panel = byId<HTMLElement>(panelId);
+  button.className = 'card-redraw-btn';
+  button.hidden = !visible;
+  button.setAttribute('aria-label', label);
+  if (button.parentElement !== panel) panel.appendChild(button);
+}
+
 function renderLine(line?: SubwayLine): void {
   const badge = byId<HTMLDivElement>('line_badge');
   const title = byId<HTMLDivElement>('line_title');
@@ -136,7 +149,7 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   drawButton.disabled = locked || state.preferences.selectedLineIds.length === 0 || state.preferences.selectedFoodIds.length === 0;
   byId<HTMLButtonElement>('settings_btn').disabled = locked;
   byId<HTMLButtonElement>('food_settings_btn').disabled = locked;
-  restart.disabled = locked;
+  restart.disabled = locked || !state.currentLine;
   stationRedraw.disabled = locked || !state.currentStation;
   foodRedraw.disabled = locked || !state.currentFood;
   copy.disabled = locked || !state.currentStation;
@@ -161,15 +174,13 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
           ? '음식 뽑기'
           : '새 코스';
 
-  setTrailingText(restart, '처음부터');
-  setTrailingText(stationRedraw, '역 다시');
-  setTrailingText(foodRedraw, '음식 다시');
   setTrailingText(copy, '복사');
+  placeCardRedrawButton(restart, 'line_panel', Boolean(state.currentLine), '노선 다시 뽑기');
+  placeCardRedrawButton(stationRedraw, 'station_panel', Boolean(state.currentStation), '역 다시 뽑기');
+  placeCardRedrawButton(foodRedraw, 'food_panel', Boolean(state.currentFood), '음식 다시 뽑기');
 
-  byId<HTMLElement>('secondary_actions').hidden = !state.currentLine;
-  stationRedraw.hidden = !state.currentStation;
-  foodRedraw.hidden = !state.currentFood;
   copy.hidden = !state.currentStation;
+  byId<HTMLElement>('secondary_actions').hidden = !state.currentStation;
   byId<HTMLElement>('map_actions').hidden = !state.currentStation;
   renderSteps(state);
   placePrimaryDrawButton(stage);
