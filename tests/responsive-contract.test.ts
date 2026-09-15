@@ -25,10 +25,21 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('.restaurant-card{padding:12px}');
   });
 
-  it('integrates the main draw action into the panel receiving the next result', () => {
+  it('uses the whole next-result card as the primary draw target', () => {
     expect(styles).toContain('.panel.next-draw > .draw-btn.integrated');
+    expect(styles).toContain('inset: 0');
+    expect(styles).toContain('height: 100%');
+    expect(styles).toContain('opacity: 0');
     expect(primaryDrawPlacement).toContain("panel.classList.add('next-draw')");
     expect(primaryDrawPlacement).toContain('panel.appendChild(drawButton)');
     expect(primaryDrawPlacement).toContain('actionZone.prepend(drawButton)');
+  });
+
+  it('hides duplicate draw guidance copy from the main surface', () => {
+    expect(styles).toContain('.progress-note,');
+    expect(styles).toContain('.helper,');
+    expect(styles).toContain('.keyboard-note,');
+    expect(styles).toContain('.scope-extra,');
+    expect(styles).toContain('.fair-note');
   });
 });
