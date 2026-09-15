@@ -13,7 +13,7 @@ Last updated: 2026-09-15
 
 ## Public Web
 
-Status: **MODULAR WEB DEPLOYED / INTEGRATED DRAW CTA + ATTRACTION MAP TARGET FIX LIVE**
+Status: **MODULAR WEB DEPLOYED / MINIMAL MAIN UI LIVE**
 
 - Deployment: GitHub Pages, existing public URL retained
 - Maintained source entry: `modular.html`
@@ -39,36 +39,41 @@ Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine
 
 ## Primary draw UI
 
-Status: **LIVE ON WEB / INCLUDED IN LATEST ANDROID DEV APK**
+Status: **MINIMAL UI LIVE ON WEB / INCLUDED IN LATEST ANDROID DEV APK**
 
-The main draw action is no longer a separate persistent full-width button below the three result cards during the line/station/food stages.
+The main screen intentionally avoids explanatory copy that a user can infer from the interaction itself.
 
 Current behavior:
 
 - the same `draw_btn` is moved into the card that will receive the **next** random result
-- current target card receives `.next-draw` emphasis and a compact in-card CTA
-- line stage → CTA inside the line card
-- station stage → CTA inside the station card
-- food stage → CTA inside the food card
-- completed course → CTA returns to the normal action area and keeps the existing “새 코스 다시 뽑기” behavior
-- the integrated CTA uses a compact dark-green treatment with lime text instead of a second large lime bar below the cards
+- line stage → line card is the draw target
+- station stage → station card is the draw target
+- food stage → food card is the draw target
+- completed course → CTA returns to the lower action area as `새 코스`
+- active card uses `.next-draw` emphasis and a dice affordance; the whole card is the touch target
+- progress labels are reduced to `노선 / 역 / 음식`
+- result card labels are reduced to `노선 / 역 / 음식`
+- secondary actions are concise: `처음부터 / 역 다시 / 음식 다시 / 복사`
+- the main surface hides redundant copy including brand subtitle/runtime status, hero eyebrow/prose, line/food counts, line metadata, station context, food examples, helper/keyboard/fairness explanations, map guidance label, restaurant eyebrow/context/count, and verbose station-list guidance
+- the completed line/station/food results themselves remain visible
 - touch target remains at least 44 px on narrow mobile layouts
-- partial redraw, map, copy and restaurant actions remain in their existing lower action area
+- settings, partial redraw, map, copy, attraction and restaurant actions remain available
 
 Implementation:
 
 - `src/ui/primary-draw-placement.ts` owns placement of the existing main draw button
-- `draw-view.ts` computes the current draw stage and delegates placement
-- `mobile-overrides.css` owns the active-card emphasis and integrated CTA layout
-- `responsive-contract.test.ts` guards the placement/style contract
+- `draw-view.ts` owns concise stage/result/action copy
+- `mobile-overrides.css` hides nonessential static shell copy and owns active-card emphasis
+- `responsive-contract.test.ts` guards both the integrated-card behavior and minimal-copy contract
 
 Verification:
 
-- main source commit `84e0f88cb1fe1abcf85befb825cd85f2b4f0db7c`
-- Web Release run `34908440921` passed tests → build → headless browser smoke → deployment promotion
-- public Web deployment commit `8356f8dfe67dcc5a51378f3e6e5781495e424af5` publishes bundle `assets/modular-ixAMeIFU.js`
-- Android branch source commit `2d7d4e09140dcaa46950ffa0613f21741f50eda2`
-- Android CI run `34908504671` passed shared tests → native build → Capacitor sync → Gradle `assembleDebug` → artifact upload → latest Release publish
+- minimal-copy Web source commits: `32fa4dcac834901c5b7ad2750ddec5c3fe96cecb` / `add7dce8396283ec2cdd6e0b4cdb1df08e9a92df`
+- minimal-copy contract test commit: `15d75ee76053a60d05ee32b56772a3844de318b2`; main CI passed
+- public Web deployment commit `2a1be33403501326dea45f94e5ab3dcbf091e52c` publishes `assets/modular-DHEzK8V5.js`
+- GitHub Pages run `34951081587` completed successfully
+- Android minimal-copy source/test changes are included before build head `9b8f29c7e846500470664e11bcbd895b4e94566b`
+- Android CI run `34951364029` passed shared tests → native build → Capacitor sync → Gradle `assembleDebug` → artifact upload → latest Release publish
 
 ## Curated nearby attractions
 
@@ -124,12 +129,6 @@ Representative corrections:
 
 Regression coverage verifies the station-key set, max-2 rule, exact ambiguous target example, absence of station-only map targets, and that attraction URL generation does not append a station name.
 
-Verification:
-
-- main CI run `34903621591` passed the map-target regression suite, Vite build and browser smoke gates.
-- Web Release run `34904203485` passed tests → build → release smoke → root promotion → deployment push.
-- public Web deployment commit `828b39a04bf2cc577347d6e7302ec55d96fe6509` published bundle `assets/modular-Chs_uZ61.js` with the corrected attraction map behavior/data; later UI deployment superseded the bundle while retaining these fixes.
-
 The 0–2 rule remains unchanged; weak places are not added merely to fill slots.
 
 ## Static station centers
@@ -156,7 +155,7 @@ Restaurants remain **live Google Places data**.
 
 ## Phase 2 — Android app
 
-Status: **ACTIVE — INTEGRATED DRAW CTA INCLUDED IN LATEST DEV APK**
+Status: **ACTIVE — MINIMAL MAIN UI INCLUDED IN LATEST DEV APK**
 
 Working branch: `feature/random-seoul-android`
 Working PR: `#3 android: build Random Seoul native shell`
@@ -175,18 +174,18 @@ Implemented/verified:
 - Random Seoul subway-sign + dice launcher/adaptive icon applied
 - curated-attraction/static-station-center shared changes synchronized to Android branch
 - exact attraction map-target behavior/data/tests synchronized to Android branch
-- integrated primary draw-card CTA synchronized to Android branch
+- integrated primary draw-card CTA + minimal-copy UI synchronized to Android branch
 - Android CI runs on relevant pushes to `feature/random-seoul-android`
-- Android SDK setup explicitly requests `platform-tools` and no longer requests the removed legacy `tools` package
+- Android CI path filter now includes `tests/**`, so shared test-only corrections also trigger a fresh APK validation
 - successful branch builds create `random-seoul-debug-apk` Actions artifact and update fixed Release tag `android-dev-latest`
 
 Latest verified development APK:
 
-- source commit: `2d7d4e09140dcaa46950ffa0613f21741f50eda2`
-- Android CI run: `34908504671` — success
+- source/build head: `9b8f29c7e846500470664e11bcbd895b4e94566b`
+- Android CI run: `34951364029` — success
 - asset: `random-seoul-latest.apk`
-- size: 11,408,240 bytes
-- SHA-256: `2646191154ebd9a35be949632d026e2f95c18db9fbfba75dfa7ebc9b60344e83`
+- size: 11,408,660 bytes
+- SHA-256: `085d090c55ae5cf22c7d87f026c14dac2709e790a3a3fd202b3fdf7fb031c334`
 - checksum asset: `random-seoul-latest.apk.sha256`
 
 Easy download locations remain linked at the top of `README.md`.
@@ -223,6 +222,7 @@ Web PR/CI:
 
 - TypeScript/unit tests
 - integrated primary draw placement/style contract
+- minimal main-surface copy contract
 - curated-attraction regression + station-key/map-target integrity tests
 - map-link regression test preventing automatic station-name suffixes
 - static-station-center regression test
@@ -231,26 +231,22 @@ Web PR/CI:
 - restaurant TOP 3 / 2 km contract
 - responsive mobile contract
 
-Android CI additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report, APK artifact upload and latest-development Release publication on Android branch pushes.
+Android CI runs the same shared tests and additionally verifies native Vite build, Capacitor sync, stable signing, Places secret detection, Gradle APK build, certificate report, APK artifact upload and latest-development Release publication. Android CI also triggers for `tests/**` changes.
 
 ## Change log
 
 ### 2026-09-15
 
-- Polished the main draw UI by integrating the primary draw button into the card that will receive the next random result instead of keeping a separate large button row below all cards.
-- Added `.next-draw` active-card emphasis and a compact dark-green in-card CTA; line/station/food stages now visually bind the action and result target together.
-- Preserved the existing completed-course behavior by returning the same main button to the lower action area for full-course restart.
-- Added `primary-draw-placement.ts` and responsive regression coverage for the integrated CTA/touch-target contract.
-- Web source `84e0f88c...` passed Web Release run `34908440921`; deployment `8356f8df...` published bundle `modular-ixAMeIFU.js`.
-- Synchronized the UI change to Android source `2d7d4e09...`; Android CI run `34908504671` passed and republished the latest development APK.
-- Investigated reports that attraction map links sometimes opened a same-named station or unrelated nearby place.
-- Confirmed there were no dedicated attraction coordinates; the root cause was Google Maps search query construction that appended the drawn station name to `mapQuery`.
-- Added `googleMapsAttractionUrl()` and changed attraction UI to use each curated `mapQuery` directly with no automatic station suffix.
-- Disambiguated high-risk market/street/park targets with city/district/road/address context.
-- Replaced 검암's broad `경인아라뱃길` target with the concrete nearby `경인아라뱃길 시천가람터` anchor and address target.
-- Removed the vague 오목교·목동 상권 entry rather than keeping a misleading map result.
-- Added regression tests for map-target integrity and no-station-suffix URL generation.
-- Synchronized all map-target fixes/tests to the Android branch and rebuilt the latest development APK.
+- Simplified the main UI copy aggressively: removed `YOUR LINE / YOUR STOP / YOUR FOOD`, line/food scope counts, per-card explanatory metadata, helper/keyboard/fairness copy, hero descriptive copy and other redundant guidance from the visible main surface.
+- Reduced stage/result labels to `노선 / 역 / 음식`; shortened actions to `처음부터 / 역 다시 / 음식 다시 / 복사`, with `새 코스` after completion.
+- Kept the integrated next-result card interaction: the active card itself remains the main random-draw target.
+- Added a minimal-copy regression contract so verbose guidance is not accidentally restored.
+- Web minimal UI passed CI and was published by deployment `2a1be334...` as bundle `modular-DHEzK8V5.js`; GitHub Pages run `34951081587` succeeded.
+- Synchronized the minimal UI to Android. The first intermediate Android run used the prior responsive test and failed before APK build; this exposed that `tests/**` did not trigger Android CI.
+- Added `tests/**` to the Android CI path filter and reran from head `9b8f29c7...`; run `34951364029` passed all shared/native/APK/release steps and republished `android-dev-latest`.
+- Polished the main draw UI by integrating the primary draw action into the card that receives the next random result instead of keeping a separate large button row below all cards.
+- Investigated attraction map links opening same-named stations/unrelated places; removed automatic station-name suffixing from attraction map queries and hardened ambiguous map targets.
+- Added map-target regression tests and synchronized the fixes to Web/Android.
 - Hardened `web-release.yml` against concurrent docs/test commits by rebasing the generated deployment commit onto latest `main` before push.
 
 ### 2026-09-14
