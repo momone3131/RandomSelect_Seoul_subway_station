@@ -1,4 +1,57 @@
-/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. Web release refresh marker: full-card dice CTA. */
+/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. */
+
+/* Minimal main surface: keep only the product title, stage labels, results and actions. */
+.brand-sub,
+.offline-pill,
+.hero-eyebrow,
+.hero p,
+.scope-summary,
+.progress-note,
+.line-meta,
+.station-context,
+.food-group,
+.food-examples,
+.helper,
+.keyboard-note,
+.fair-note,
+.map-actions .map-label,
+.restaurant-eyebrow,
+.restaurant-context,
+.restaurant-count,
+.station-detail .count-bubble,
+.number-rule,
+.detail-note {
+  display: none !important;
+}
+
+.hero {
+  padding-top: 24px;
+  padding-bottom: 20px;
+}
+
+.toolbar {
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.options-row {
+  justify-content: flex-start;
+}
+
+.speed-label span {
+  display: none !important;
+}
+
+.panel {
+  min-height: 215px;
+}
+
+@media (min-width: 721px) {
+  .panel {
+    min-height: 220px;
+  }
+}
+
 @media (max-width: 720px) {
   .restaurant-grid,
   .restaurant-loading {
@@ -35,7 +88,6 @@
   transition: border-color .16s, box-shadow .16s, background .16s, transform .12s;
 }
 
-/* Reserve the top-right corner for the dice affordance so labels never sit underneath it. */
 .panel.next-draw .panel-tag {
   right: 66px;
   max-width: calc(100% - 90px);
@@ -109,20 +161,12 @@
   padding-top: 0;
 }
 
-/* The cards and progress steps already communicate state, so remove duplicate explanatory copy. */
-.progress-note,
-.helper,
-.keyboard-note,
-.scope-extra,
-.fair-note {
-  display: none !important;
-}
-
-.options-row {
-  justify-content: flex-start;
-}
-
 @media (max-width: 430px) {
+  .hero {
+    padding-top: 16px;
+    padding-bottom: 14px;
+  }
+
   .panel.next-draw .panel-tag {
     right: 59px;
     max-width: calc(100% - 83px);
