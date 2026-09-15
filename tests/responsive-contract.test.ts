@@ -21,9 +21,26 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('width: 100%');
   });
 
-  it('contains the narrow-phone restaurant card override', () => {
-    expect(styles).toContain('@media(max-width:430px)');
-    expect(styles).toContain('.restaurant-card{padding:12px}');
+  it('uses denser result cards after explanatory copy removal', () => {
+    expect(styles).toContain('min-height: 176px');
+    expect(styles).toContain('min-height: 164px');
+    expect(styles).toContain('min-height: 96px');
+    expect(styles).toContain('min-height: 154px');
+  });
+
+  it('raises small UI typography while preserving compact layout', () => {
+    expect(styles).toContain('font-size: 13px');
+    expect(styles).toContain('.panel-tag');
+    expect(styles).toContain('font-size: 12px');
+    expect(styles).toContain('.restaurant-name');
+    expect(styles).toContain('font-size: 16px');
+  });
+
+  it('uses stronger structural lines and restrained radii', () => {
+    expect(styles).toContain('border: 2px solid #c7d0c5');
+    expect(styles).toContain('border: 1.5px solid var(--border)');
+    expect(styles).toContain('border-radius: 13px');
+    expect(styles).toContain('box-shadow: 0 5px 0 #dde2da');
   });
 
   it('uses the whole next-result card as the primary draw target', () => {
@@ -36,15 +53,13 @@ describe('Random Seoul responsive visual contract', () => {
     expect(primaryDrawPlacement).toContain('actionZone.prepend(drawButton)');
   });
 
-  it('makes the active draw card read visually as a raised button', () => {
+  it('makes the active draw card feel physical without a soft gradient treatment', () => {
     expect(styles).toContain('border: 2px solid var(--dark)');
-    expect(styles).toContain('background: linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
-    expect(styles).toContain('box-shadow: 0 7px 0 #a5bd63');
+    expect(styles).toContain('background: var(--lime)');
+    expect(styles).toContain('box-shadow: 0 4px 0 #98aa5f');
     expect(styles).toContain('.panel.next-draw::after');
     expect(styles).toContain('content: "⚄"');
-    expect(styles).toContain('.panel.next-draw .panel-tag');
-    expect(styles).toContain('right: 66px');
-    expect(styles).toContain('transform: translateY(3px)');
+    expect(styles).not.toContain('linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
   });
 
   it('hides nonessential explanatory copy from the main surface', () => {
