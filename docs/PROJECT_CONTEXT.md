@@ -13,8 +13,8 @@ Last updated: 2026-09-15
 1. 노선 랜덤
 2. 역 랜덤
 3. 음식 랜덤
-4. 해당 역의 first-party **추천 명소 0~2곳을 즉시 표시**
-5. 사용자가 원하면 **`추천 식당 보기`** 탭
+4. 해당 역의 first-party 추천 명소 0~2곳 즉시 표시
+5. 사용자가 원하면 `추천 식당 보기`
 6. 그때 Google Places live 식당 검색 → TOP 3
 7. 결과가 준비되면 추천 식당 섹션으로 부드럽게 자동 스크롤
 8. 지도 앱/웹으로 이동
@@ -50,7 +50,7 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 - `feature/random-seoul-android`: Android work
 - PR #3: Android native shell work
 
-공통 로직 변경은 가능한 한 Web + Android에 동기화하고 각각 CI로 확인합니다.
+공통 로직/UX 변경은 가능한 한 Web + Android에 동기화하고 각각 CI로 확인합니다.
 
 ## 4. Core architecture
 
@@ -66,34 +66,76 @@ Repository: `momone3131/RandomSelect_Seoul_subway_station`
 
 **노선 / 역 / 음식 → 추천 명소 → 추천 식당 보기**
 
-- attraction section은 `.panels` 바로 뒤에 배치
-- 최대 2개 compact cards, 모바일 2-column
-- 0개면 section 생략
-- restaurant CTA는 full-width touch target
-- CTA 누르기 전 `recommendations`는 빈 상태
-- search 중 현재 viewport 유지
-- search 완료 후 `restaurant_section.scrollIntoView({ behavior: 'smooth' })`
+- attraction section은 `.panels` 바로 뒤
+- 최대 2개 compact cards; 0개면 section 생략
+- restaurant CTA 전에는 `recommendations` 비어 있음
+- search 완료 후 restaurant section으로 smooth scroll
 
-## 5. Restaurant policy
+## 5. Main interaction / visual contract
+
+### Stage-aware headline
+
+`#page-title`은 상태에 따라 바뀝니다.
+
+- initial: `어디로 가볼까?`
+- line selected: `어느 역에서 내릴까?`
+- station selected: `식사도 해야지?`
+- food selected: `이 코스로 가자!`
+
+시간을 특정하는 `오늘` 표현은 headline에서 사용하지 않습니다.
+
+### Draw cards
+
+- next-result card 자체가 primary draw target
+- completed line/station/food cards의 우측 상단 ↻로 해당 단계부터 부분 재추첨
+- refresh visual: 27 px / 2.7 stroke, transparent 36 px hit area
+- upstream redraw는 downstream result/attractions/recommendations를 기존 controller semantics대로 초기화
+
+### Station result
+
+완료 역은 실제 지하철 역명판 문법을 단순화한 형태입니다.
+
+- selected line color rounded frame
+- white interior
+- left circular line-color badge
+- badge number = selected line list에서의 ordinal (“몇 번째 역”), 공식 역번호 아님
+- badge + station name vertically centered
+- station name: desktop 28 px / mobile 23 px / small phone 21 px
+- long name: 23 / 18 / 16 px fallback
+
+### Food pending
+
+- 음식 선택 전 항상 `뭐 먹을까?`
+- 아직 food stage가 아니면 희미하게
+- food stage가 되면 선명하게
+- 기존 food-card 높이는 늘리지 않음
+
+### Utility actions / copy
+
+역 선택 이후 `복사 / 네이버지도 / 구글지도`는 한 행 3-column으로 표시합니다.
+
+복사 payload:
+
+- station + food → `${역}에서 ${음식} 먹자!`
+- station only → `${역} 가자!`
+- line/ordinal/examples/추천식당 이름은 복사하지 않음
+
+## 6. Restaurant policy
 
 - live Google Places candidates
 - user-triggered lookup only
 - hard distance 2 km
 - max candidate 20 → TOP 3
-- shared ranking:
-  - Bayesian rating 55%
-  - review volume log 25%
-  - Google relevance 15%
-  - distance 5%
+- shared ranking: Bayesian rating 55%, review log 25%, Google relevance 15%, distance 5%
 - Google rating/review-derived results를 reusable DB로 영구 저장하지 않음
 
-## 6. Attraction policy
+## 7. Attraction policy
 
 - first-party static curated data, max 0–2
 - Google attraction Text Search 없음
-- 유명세보다 실제 browse/stay value + 역 접근성
-- markets/streets/culture/parks/waterfronts + browse-worthy major malls/IKEA/Starfield/outlets/department stores 가능
-- 약한 근린시설은 제외
+- 유명세보다 browse/stay value + 역 접근성
+- browse-worthy malls/IKEA/Starfield/outlets/department stores 가능
+- 약한 근린시설 제외
 - forced fill 금지
 
 Data:
@@ -101,73 +143,47 @@ Data:
 - `curated-attractions-extra.ts`
 - `curated-attractions.ts` merge/dedupe/max2
 
-### Map-target rule
+Map target:
+- attraction lat/lng 별도 저장하지 않음
+- `mapQuery`가 self-contained target
+- station name 자동 suffix 금지
+- ambiguous target은 주소/지역/도로로 보강
 
-- attraction lat/lng는 별도 저장하지 않음
-- `mapQuery`가 self-contained Google Maps target
-- UI가 `${stationName}역`을 자동 추가하지 않음
-- ambiguous target은 주소/지역/도로 정보로 보강
-- 정확히 특정하기 어렵다면 제거
-
-대표 수정:
-- 검암: `경인아라뱃길 시천가람터` / `시천가람터 인천광역시 서구 시천동 158-11`
-- 오목교 vague 상권 후보 제거
-
-## 7. Station centers
+## 8. Station centers
 
 - `station-coordinates.ts` static first
 - 없는 역만 live Google fallback
 - fallback 30-day cache
-- station center는 restaurant search/distance용이며 attraction mapQuery와 별개
-
-## 8. Current UI direction
-
-- 설명형 문구 최소화
-- main labels: `노선 / 역 / 음식`
-- next-result card 자체가 primary draw button
-- 일반 선/테두리 최소화, 색면과 spacing으로 hierarchy
-- higher-contrast pastel palette
-- active card만 강한 dark outline/hard depth
-- press feedback + ~900ms settled result reveal
-- Android result haptic 유지
-- 작은 글자/터치 타깃을 억지로 축소하지 않음
 
 ## 9. Latest verified snapshot
 
 ### Public Web
 
-On-demand restaurant flow verified:
-
-- main CI: `34968413416` — success
-- Web Release: `34968413412` — success
-- deployment commit: `8c6c11d5876074b82ba3205342ec8f6a297c6e4d`
-- public bundle: `assets/modular-Cb_D_SvS.js`
-- GitHub Pages: `34968486363` — success
-
-Browser self-test verifies:
-- line/station/food completes
-- recommendations remain empty before explicit request
-- explicit restaurant request renders 3 recommendations
-- 2 km contract
-- reset flow
+- source/regression head: `8ea433d6f2920eabd1e9de936086a3590a732493`
+- main CI: `34978299548` — success
+- Web Release: `34978299383` — success
+- deployment commit: `bba8f6a7c49ada8726dc22a81116036e96af9e3d`
+- public bundle: `assets/modular-D8hThyDO.js`
+- GitHub Pages: `34978360339` — success
 
 ### Android
 
-- branch head: `c56de64d43ae727552f30c337858675dd0f790d7`
-- Android CI: `34968697499` — success
-- latest dev APK source: same head
+- branch/source head: `ced9c95f9f99c931e8b469d4cd4508d1ad078b83`
+- Android CI: `34978567418` — success
 - APK: `random-seoul-latest.apk`
-- size: `11,411,336` bytes
-- SHA-256: `9766dde230dd0587eed6dddc7dba8093e5fda5d126c08003434ee2e214946e78`
+- size: `11,412,808` bytes
+- SHA-256: `71604b2bf31336777644e431bb6d66b1767a0b77a13f7c0128781417476b2e2a`
 
 Direct fixed URL:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
 
 ## 10. Build/deploy notes
 
-Web Release path filter includes `src/**` and `tests/**`. It performs test → build → browser smoke → root promotion. Deployment commit fetches/rebases latest main before pushing.
+Web Release: tests → build → browser smoke → verified root promotion → deployment commit → GitHub Pages.
 
-Android CI performs shared tests → native Web build → Capacitor sync → Gradle debug APK → artifact → fixed latest Release.
+Android CI: shared tests → native Web build → Capacitor sync → Gradle debug APK → artifact → fixed latest Release.
+
+`src/ui/subway-sign-overrides.css` is a permanent source stylesheet and `scripts/extract-legacy-shell.mjs` combines it with the base/mobile CSS into generated legacy shell assets.
 
 ## 11. Documentation source of truth
 
@@ -188,6 +204,6 @@ Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJ
 4. relevant architecture/plan/curation docs
 5. inspect actual source/CI before editing
 6. synchronize shared changes to Web + Android when applicable
-7. verify Web Release/public bundle separately from ordinary CI
+7. verify Web Release/public bundle/Pages separately
 8. verify Android fixed Release if APK changes
 9. update durable docs for meaningful changes
