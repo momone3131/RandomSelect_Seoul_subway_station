@@ -35,7 +35,7 @@
   transition: border-color .16s, box-shadow .16s, background .16s, transform .12s;
 }
 
-/* Reserve the top-right corner for the dice affordance so labels never sit underneath it. */
+/* Reserve the top-right corner for the dice affordance so labels never sit underneath it, including narrow phones. */
 .panel.next-draw .panel-tag {
   right: 66px;
   max-width: calc(100% - 90px);
