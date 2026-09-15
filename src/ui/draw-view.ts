@@ -10,6 +10,12 @@ export interface DrawViewStatus {
   modalOpen: boolean;
 }
 
+function setTrailingText(element: HTMLElement, text: string): void {
+  const lastNode = element.lastChild;
+  if (lastNode?.nodeType === Node.TEXT_NODE) lastNode.textContent = text;
+  else element.append(document.createTextNode(text));
+}
+
 function renderLine(line?: SubwayLine): void {
   const badge = byId<HTMLDivElement>('line_badge');
   const title = byId<HTMLDivElement>('line_title');
@@ -20,9 +26,9 @@ function renderLine(line?: SubwayLine): void {
     badge.className = 'line-badge';
     badge.style.removeProperty('--line');
     badge.style.removeProperty('--line-ink');
-    title.textContent = '어떤 노선을 탈까요?';
+    title.textContent = '';
     title.className = 'line-title placeholder';
-    meta.textContent = '먼저 노선을 뽑아주세요';
+    meta.textContent = '';
     return;
   }
 
@@ -32,7 +38,7 @@ function renderLine(line?: SubwayLine): void {
   badge.style.setProperty('--line-ink', readableInk(line.color));
   title.textContent = line.name;
   title.className = `line-title${line.name.length > 5 ? ' long' : ''}`;
-  meta.textContent = `수록 ${line.stations.length}개 역 · 1~${line.stations.length}번째`;
+  meta.textContent = '';
 }
 
 function renderStation(station?: SubwayStation, line?: SubwayLine): void {
@@ -45,9 +51,9 @@ function renderStation(station?: SubwayStation, line?: SubwayLine): void {
     panel.className = 'panel station-panel waiting';
     number.textContent = '?';
     number.className = 'ordinal-number';
-    name.textContent = '다음 뽑기를 기다리는 중';
+    name.textContent = '';
     name.className = 'station-name';
-    context.textContent = '노선을 먼저 뽑으면 역을 뽑을 수 있어요';
+    context.textContent = '';
     return;
   }
 
@@ -55,9 +61,9 @@ function renderStation(station?: SubwayStation, line?: SubwayLine): void {
     panel.className = 'panel station-panel ready';
     number.textContent = '?';
     number.className = 'ordinal-number';
-    name.textContent = '한 번 더 뽑아주세요';
+    name.textContent = '';
     name.className = 'station-name';
-    context.textContent = `1~${line.stations.length}번째 역 중 하나를 뽑아요`;
+    context.textContent = '';
     return;
   }
 
@@ -66,10 +72,10 @@ function renderStation(station?: SubwayStation, line?: SubwayLine): void {
   number.className = `ordinal-number${station.ordinal >= 100 ? ' three-digits' : ''}`;
   name.textContent = station.name;
   name.className = `station-name${station.name.length > 7 ? ' long' : ''}`;
-  context.textContent = `${station.segmentLabel} · 구간 내 ${station.localIndex}번째`;
+  context.textContent = '';
 }
 
-function renderFood(food: FoodCategory | undefined, station: SubwayStation | undefined, selectedCount: number): void {
+function renderFood(food: FoodCategory | undefined, station: SubwayStation | undefined): void {
   const panel = byId<HTMLElement>('food_panel');
   const emoji = byId<HTMLDivElement>('food_emoji');
   const group = byId<HTMLDivElement>('food_group');
@@ -79,19 +85,19 @@ function renderFood(food: FoodCategory | undefined, station: SubwayStation | und
   if (!food) {
     panel.className = `panel food-panel ${station ? 'ready' : 'waiting'}`;
     emoji.textContent = '🍴';
-    group.textContent = station ? '오늘의 한 끼는?' : '마지막 뽑기';
-    name.textContent = station ? '이제 음식을 뽑아요' : '무엇을 먹을까요?';
+    group.textContent = '';
+    name.textContent = '';
     name.className = 'food-name placeholder';
-    examples.textContent = station ? `${selectedCount}종 중에서 하나를 뽑아요` : '역을 정한 뒤 음식 종목을 뽑아요';
+    examples.textContent = '';
     return;
   }
 
   panel.className = 'panel food-panel complete';
   emoji.textContent = food.emoji;
-  group.textContent = food.group;
+  group.textContent = '';
   name.textContent = food.name;
   name.className = `food-name${food.name.length > 8 ? ' long' : ''}`;
-  examples.textContent = `예: ${food.examples}`;
+  examples.textContent = '';
 }
 
 function renderSteps(state: Readonly<AppState>): void {
@@ -102,6 +108,9 @@ function renderSteps(state: Readonly<AppState>): void {
   stepOne.className = `step ${!state.currentLine ? 'current' : 'done'}`;
   stepTwo.className = `step ${state.currentStation ? 'done' : state.currentLine ? 'current' : ''}`;
   stepThree.className = `step ${state.currentFood ? 'done' : state.currentStation ? 'current' : ''}`;
+  setTrailingText(stepOne, '노선');
+  setTrailingText(stepTwo, '역');
+  setTrailingText(stepThree, '음식');
 
   for (const step of [stepOne, stepTwo, stepThree]) {
     if (step.classList.contains('current')) step.setAttribute('aria-current', 'step');
@@ -139,18 +148,25 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   const drawShell = byId<HTMLElement>('draw_shell');
   drawShell.setAttribute('aria-busy', String(status.busy));
   drawShell.setAttribute('data-stage', stage);
+
+  byId<HTMLElement>('line_panel_label').textContent = '노선';
+  byId<HTMLElement>('station_panel_label').textContent = '역';
+  byId<HTMLElement>('food_panel_label').textContent = '음식';
   byId<HTMLElement>('draw_label').textContent = status.busy
-    ? '두근두근, 뽑는 중…'
+    ? '뽑는 중…'
     : stage === 'line'
       ? '노선 뽑기'
       : stage === 'station'
-        ? '역 순서 뽑기'
+        ? '역 뽑기'
         : stage === 'food'
-          ? '음식 종목 뽑기'
-          : '새 코스 다시 뽑기';
+          ? '음식 뽑기'
+          : '새 코스';
 
-  byId<HTMLElement>('scope_count').textContent = `${state.preferences.selectedLineIds.length}개 노선`;
-  byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`;
+  setTrailingText(restart, '처음부터');
+  setTrailingText(stationRedraw, '역 다시');
+  setTrailingText(foodRedraw, '음식 다시');
+  setTrailingText(copy, '복사');
+
   byId<HTMLElement>('secondary_actions').hidden = !state.currentLine;
   stationRedraw.hidden = !state.currentStation;
   foodRedraw.hidden = !state.currentFood;
@@ -170,15 +186,14 @@ function renderStationList(line?: SubwayLine, selected?: SubwayStation): void {
 
   detail.hidden = false;
   byId<HTMLElement>('detail_title').textContent = `${line.name} 역 목록`;
-  byId<HTMLElement>('detail_count').textContent = `${line.stations.length}개`;
-  byId<HTMLElement>('line_note').textContent = line.note || `${line.segments[0]?.label ?? ''} 순서로 셉니다. 첫 번째 역도 추첨 대상에 포함합니다.`;
+  byId<HTMLElement>('detail_count').textContent = '';
+  byId<HTMLElement>('line_note').textContent = '';
 
   const fragment = document.createDocumentFragment();
   line.segments.forEach((segment, segmentIndex) => {
     const stations = line.stations.filter((station) => station.segmentIndex === segmentIndex);
     if (!stations.length) return;
-    const lastStation = stations[stations.length - 1]!;
-    const heading = make('h3', 'segment-heading', `${segment.label} · ${stations[0]!.ordinal}~${lastStation.ordinal}번째`);
+    const heading = make('h3', 'segment-heading', segment.label);
     const grid = make('div', 'station-grid');
     for (const station of stations) {
       const picked = selected?.ordinal === station.ordinal;
@@ -199,7 +214,7 @@ function renderStationList(line?: SubwayLine, selected?: SubwayStation): void {
 export function renderDrawView(state: Readonly<AppState>, status: DrawViewStatus): void {
   renderLine(state.currentLine);
   renderStation(state.currentStation, state.currentLine);
-  renderFood(state.currentFood, state.currentStation, state.preferences.selectedFoodIds.length);
+  renderFood(state.currentFood, state.currentStation);
   renderControls(state, status);
   renderStationList(state.currentLine, state.currentStation);
   if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions ?? []);
