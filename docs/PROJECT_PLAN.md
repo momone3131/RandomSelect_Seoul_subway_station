@@ -1,182 +1,133 @@
 # Random Seoul — Project Plan
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
-이 문서는 Random Seoul 개발의 기준 계획입니다. 대화가 길어지거나 새 채팅으로 넘어가더라도 구현 방향이 흐려지지 않도록 저장소 안에서 계속 갱신합니다.
+이 문서는 Random Seoul의 제품 방향과 변경 불가 원칙을 기록합니다. 실제 최신 구현/검증 상태는 `STATUS.md`, 구조는 `ARCHITECTURE.md`를 우선 확인합니다.
 
 ## 1. Product goal
 
-사용자가 별도 계획 없이도 다음 흐름으로 서울/수도권 외출 코스를 정할 수 있게 합니다.
+사용자가 별도 계획 없이도 몇 번의 랜덤 선택만으로 서울/수도권 외출 코스를 정할 수 있게 합니다.
+
+현재 목표 흐름:
 
 1. 지하철 노선 무작위 추첨
 2. 해당 노선의 역 무작위 추첨
-3. 대표/둘러보기 좋은 볼거리 0~2곳 표시
-4. 음식 종목 무작위 추첨
-5. 뽑힌 역 주변 추천 식당 최대 3곳 표시
-6. 지도 앱/웹으로 이동
+3. 음식 종목 무작위 추첨
+4. 선택된 역의 first-party 추천 명소 0~2곳을 즉시 표시
+5. 사용자가 원할 때 **`추천 식당 보기`**를 눌러 Google Places 식당 검색
+6. 검색 완료 후 추천 식당 TOP 3를 표시하고 해당 섹션으로 자연스럽게 이동
+7. 지도 앱/웹으로 이동
 
-메인 버튼은 `노선 → 역 → 음식 → 새 코스 전체 재추첨` 순서로 동작합니다. 역/음식 부분 재추첨은 보조 버튼으로 제공합니다.
+식당 검색은 음식 추첨의 필수 대기 단계가 아닙니다. 랜덤 결과와 추천 명소를 먼저 보여주고, 식당 정보는 사용자가 명시적으로 요청할 때만 조회합니다.
 
-핵심 제품 경험은 사용자가 사전에 장소를 조사하지 않아도 몇 번의 추첨만으로 “오늘 어디로 가서 무엇을 먹을지” 결정하게 하는 것입니다.
+메인 추첨 버튼은 `노선 → 역 → 음식 → 새 코스` 순서로 동작하며 역/음식 부분 재추첨은 보조 액션으로 제공합니다.
 
 ## 2. Non-negotiable requirements
 
-- 앱 이름은 **Random Seoul**입니다.
-- **Android가 현재 주 개발/배포 대상이자 앱 본체입니다.**
-- Web은 Android 개발 중에도 계속 사용할 수 있어야 하며, 정식 Web 타깃과 빠른 기능/UX 검증용 reference implementation 역할을 함께 합니다.
-- 프로젝트 소유자가 iPhone 사용자이므로 Web은 Android 기기 없이 새 기능을 직접 확인할 수 있는 중요한 검증 경로입니다.
-- 모바일 앱 출시 후에도 Web은 지원 대상으로 유지합니다.
-- Android 먼저 안정화하고 iOS를 후속 지원합니다.
-- Android 때문에 공통 로직을 Kotlin/Java에 복제하지 않습니다.
-- iOS 때문에 공통 로직을 Swift에 복제하지 않습니다.
-- 플랫폼별 네이티브 코드는 Places SDK, 지도 열기, 저장, 공유, 햅틱, 뒤로가기 등 플랫폼 의존 기능에만 둡니다.
-- GPS/현재 위치 권한은 기본 기능에 필요하지 않으므로 요청하지 않는 방향을 유지합니다.
-- 새 채팅/세션에서 과거 대화가 없어도 저장소 문서만으로 개발 맥락을 복구할 수 있어야 합니다.
+- 앱 이름은 **Random Seoul**.
+- **Android가 현재 주 개발/배포 대상이자 앱 본체**.
+- Web은 계속 지원하며 Android 기능/UX를 빠르게 확인하는 reference implementation 역할도 수행.
+- Android 안정화 이후 iOS를 후속 지원.
+- 추첨/데이터/식당 필터·랭킹 같은 공통 로직을 Kotlin/Java/Swift에 복제하지 않음.
+- 플랫폼별 네이티브 코드는 Places SDK, 지도 열기, 공유, 햅틱, 뒤로가기 등 플랫폼 의존 기능에 한정.
+- GPS/현재 위치 권한은 현재 기본 기능에 필요하지 않으므로 요청하지 않음.
+- 사용자가 화면만 보고 이해 가능한 설명 문구는 최소화.
+- 모바일 터치 영역과 가독성을 지나치게 축소해 한 화면에 억지로 정보를 욱여넣지 않음.
+- 저장소 문서만으로 새 세션에서 프로젝트 맥락을 복구할 수 있어야 함.
 
-## 3. Current recommendation model
+## 3. Recommendation model
 
-식당 추천 규칙:
+### Restaurants
 
 - Google Places live candidate 사용
-- 역 기준 **직선거리 2 km 초과 제외**
-- 최대 20개 후보에서 재랭킹
+- **사용자가 `추천 식당 보기`를 누른 뒤에만 조회**
+- 역 기준 직선거리 2 km 초과 제외
+- 최대 20개 후보 재랭킹
 - 최종 TOP 3
+- 결과/별점/리뷰 수를 장기 추천 DB로 축적하지 않음
 
-현재 최종 점수:
+현재 점수:
 
-- Bayesian 보정 별점: **55%**
-- `log(1 + 평가 수)` 기반 평가량 신호: **25%**
-- Google 검색 관련성: **15%**
-- 역과의 거리: **5%**
+- Bayesian 보정 별점 55%
+- `log(1 + 평가 수)` 평가량 25%
+- Google 검색 관련성 15%
+- 역과의 거리 5%
 
-이 가중치는 제품 튜닝 대상이며 변경 시 `docs/STATUS.md`와 관련 테스트를 함께 갱신합니다.
+### Attractions
 
-대표 볼거리는 Google Places 랭킹이 아니라 first-party curated data를 사용하며, 역당 최대 2곳만 표시합니다.
+- Google Places popularity 검색이 아니라 first-party curated static data
+- 역당 최대 0~2곳
+- 음식/식당 네트워크 조회와 무관하게 즉시 표시
+- 모바일 완료 화면에서 랜덤 결과 바로 아래에 압축된 형태로 우선 노출
+- 적절한 후보가 없으면 0개 허용
 
-볼거리의 진입 기준은 더 이상 “광역급 랜드마크” 또는 “지역 대표 명소”에 한정하지 않습니다. **랜덤으로 해당 역에 갔을 때 30분~몇 시간 둘러보거나 구경할 만한가**를 실용적인 합격선으로 둡니다.
+합격선은 **그 역에 갔을 때 30분~몇 시간 실제로 둘러볼 가치 + 합리적인 역 접근성**입니다. 시장·특색 있는 거리·문화공간·공원/수변뿐 아니라 스타필드/IKEA/대형 복합몰·아울렛·주요 백화점도 구경 자체가 외출 경험이면 포함할 수 있습니다.
 
-- Tier A: 서울/수도권 차원의 대표 랜드마크·대형 문화/공원/관광 목적지 → 포함
-- Tier B: 시장·특색 있는 거리/상권·문화공간·산책지·호수공원·수목원뿐 아니라 스타필드/IKEA/대형 복합몰·아울렛·주요 백화점처럼 구경 자체가 외출 경험이 되는 목적지 → 포함
-- Tier C: 일반 동네 놀이터·아파트 앞 소공원·평범한 근린시설·일반 마트/소형 상가처럼 일부러 시간을 보낼 이유가 약한 곳 → 제외
-- A/B 후보가 없으면 0개를 허용하며, 숫자를 채우기 위해 억지로 추천하지 않음
+상세 기준은 `docs/ATTRACTION_CURATION.md`를 따릅니다.
 
-즉 품질 기준은 유명세나 지역 대표성 하나가 아니라 **실제 체류/구경 가치 + 합리적인 역 접근성**입니다. 점수 공식이 아니라 editorial judgment를 사용합니다.
+## 4. Mobile result-flow policy
 
-상세 기준은 `docs/ATTRACTION_CURATION.md`를 기준으로 합니다.
+완료 시 첫 화면의 우선순위는 다음과 같습니다.
 
-## 4. Delivery strategy
+**노선 / 역 / 음식 → 추천 명소 → 추천 식당 보기**
 
-### Phase 0 — Baseline preservation
+- 추천 명소는 최대 2개라 모바일에서 짧고 밀도 있게 표시.
+- 추천 명소가 0개면 그 영역을 생략하고 식당 CTA가 바로 올라옴.
+- 식당 CTA를 누르면 현재 위치에서 `추천 식당 찾는 중…` 상태를 보여줌.
+- 검색 중에는 빈 식당 섹션으로 먼저 스크롤하지 않음.
+- 결과 렌더가 완료된 뒤 추천 식당 섹션으로 smooth scroll.
+- 식당 검색을 원하지 않는 사용자는 Places 후보 검색 호출 없이 랜덤 결과/명소만 사용할 수 있음.
 
-- `main`의 Web을 안정 기준선으로 유지
-- GitHub Pages 계속 동작
-- 미완성 Android 작업은 별도 브랜치에서 진행
+## 5. Visual / interaction direction
 
-### Phase 1 — Modular web refactor
+- 설명형 카피보다 결과와 행동 단어 중심.
+- 선/테두리를 과도하게 사용하지 않고 배경색·공간으로 hierarchy 표현.
+- 파스텔 무드는 유지하되 인접 영역이 구분될 정도의 색 대비 확보.
+- 일반 카드 테두리는 최소화하고 현재 눌러야 하는 랜덤 카드에만 강한 구조적 강조 사용.
+- 랜덤 결과 확정은 눈에 띄는 짧은 물리적 reveal + Android 햅틱으로 피드백.
+- 작은 글자를 과도하게 축소하지 않고 모바일 주요 터치 타깃은 대체로 44 px 이상 유지.
 
-목표: 기능 변화 없이 단일 `index.html`을 모듈 프로젝트로 분해합니다.
+## 6. Delivery strategy
 
-- Vite + Vanilla TypeScript
-- 데이터 분리
-- 추첨 엔진 분리
-- 상태/저장 분리
-- Places service abstraction
-- 식당 랭킹 분리
-- UI rendering 분리
-- CSS 분리
-- 자동 테스트 도입
-
-완료 조건:
-
-- 기존 웹 UX/기능과 동등
-- GitHub Pages 배포 가능
-- 모바일 UI 회귀 없음
-- 추천 결과 계산 테스트 통과
+### Phase 1 — Shared modular Web
+완료. Vite + Vanilla TypeScript, 데이터/상태/서비스/UI 분리, 자동 테스트, GitHub Pages 배포.
 
 ### Phase 2 — Android shell
+진행 중. Capacitor 8, app id `io.github.momone3131.randomseoul`, shared Web/core 자산 재사용.
 
-- Capacitor 기반 Android 프로젝트 생성
-- 앱 표시명 `Random Seoul`
-- application id `io.github.momone3131.randomseoul`
-- targetSdk 36 기준
-- 공통 웹 UI/코어를 앱 내부 자산으로 포함
+### Phase 3 — Native Places adapter
+Android Places SDK bridge 구현. Native는 후보 데이터를 반환하고 2 km 필터/랭킹은 shared TypeScript가 수행.
 
-### Phase 3 — Native Android Places adapter
+### Phase 4 — Android UX
+햅틱, 공유, 지도 intent, back handling, icon 등 진행/구현. Web과 가능한 한 동일한 공통 UX를 유지.
 
-- 앱 내부 Web Places 의존 제거
-- Places SDK for Android로 검색
-- native layer는 후보 데이터를 공통 모델로 반환만 함
-- 최종 2 km 필터/Bayesian/log ranking은 공통 TypeScript에서 계속 수행
-
-### Phase 4 — Android-native UX
-
-- 햅틱
-- Android 공유 시트
-- Google/Naver 지도 앱 딥링크
-- 뒤로가기 처리
-- 네트워크 오류 UX
-- 앱 아이콘 / 스플래시
-- 상태 저장 개선
-
-### Phase 5 — CI and release
-
-- GitHub Actions lint/test/build
-- debug APK artifact
-- release AAB
-- Play App Signing 준비
-- 개인정보처리방침 / 데이터 보안 / 스토어 메타데이터
-- 비공개 테스트
-- 프로덕션 출시
+### Phase 5 — Release
+CI/debug APK → release AAB → Play signing/정책/비공개 테스트 → production.
 
 ### Phase 6 — iOS
+Android에서 검증된 shared core를 재사용해 후속 지원.
 
-Android에서 검증된 공통 코어를 유지하고 iOS 어댑터만 추가합니다.
+## 7. Web support and validation
 
-- Capacitor iOS
-- Swift Places adapter
-- iOS 지도/공유/햅틱 adapter
-- TestFlight / App Store
+Web은 폐기용 프로토타입이 아닙니다.
 
-## 5. Web support and validation policy
+- GitHub Pages 계속 배포
+- Web Places adapter 유지
+- 공통 추첨/랭킹 엔진 공유
+- 동일 디자인 시스템/반응형 UX
+- Android 공통 기능은 가능한 경우 Web에서도 함께 검증
 
-Web은 임시 폐기용 프로토타입이 아닙니다. 동시에 Android 기능을 가장 빠르게 확인하는 검증 surface로 사용합니다.
+## 8. Documentation continuity / change control
 
-최종 구조에서도 다음을 유지합니다.
-
-- GitHub Pages 배포
-- Web Places adapter
-- 동일한 공통 추첨/랭킹 엔진
-- 동일한 디자인 시스템
-- 모바일/데스크톱 반응형 UI
-- Android에 공통 기능을 추가할 때 가능하면 Web에서도 먼저 또는 함께 확인 가능한 형태 유지
-
-앱 전용 기능이 추가되어도 Web은 가능한 범위에서 graceful fallback을 제공합니다.
-
-## 6. Documentation continuity policy
-
-저장소 문서는 프로젝트의 장기 기억 역할을 합니다.
-
-- `PROJECT_CONTEXT.md`: 새 채팅/세션 인계용 핵심 요약
-- `STATUS.md`: 실제 현재 개발 위치와 검증 결과
-- `PROJECT_PLAN.md`: 제품 목표, 요구사항, 로드맵
-- `ARCHITECTURE.md`: 구조와 설계 결정
-- `ATTRACTION_CURATION.md`: 볼거리 큐레이션 운영 기준
-
-의미 있는 코드/기능/정책 변경 시 관련 문서를 같은 변경에서 함께 수정합니다. 세부 규칙은 `PROJECT_CONTEXT.md`를 따릅니다.
-
-## 7. Change-control rule
-
-다음 항목이 바뀌면 이 문서를 같은 변경에서 수정합니다.
+다음이 바뀌면 관련 문서를 같은 변경에서 갱신합니다.
 
 - 제품 흐름
-- 플랫폼 전략 및 각 플랫폼 역할
-- 식당 랭킹 공식
-- 볼거리 큐레이션 기준
-- 거리 제한
-- 외부 API 공급자
+- 플랫폼 역할
+- Places 호출 시점/provider
+- 식당 랭킹/거리 제한
+- 볼거리 큐레이션 정책
 - 앱 식별자/브랜드
-- Web 지원/검증 정책
-- 단계별 출시 계획
-- 프로젝트 인계/문서 유지 원칙
+- 배포 구조
+- 핵심 UI/interaction policy
 
-구현 세부 상태는 `docs/STATUS.md`, 구조 결정은 `docs/ARCHITECTURE.md`, 새 세션 인계 요약은 `docs/PROJECT_CONTEXT.md`를 기준으로 합니다.
+문서 우선순위는 **실제 코드/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJECT_CONTEXT/README** 입니다.
