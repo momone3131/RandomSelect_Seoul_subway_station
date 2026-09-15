@@ -1,4 +1,4 @@
-/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. */
+/* Final responsive overrides. Kept after the promoted legacy stylesheet so later base rules cannot undo mobile fixes. Web release refresh marker: full-card dice CTA. */
 @media (max-width: 720px) {
   .restaurant-grid,
   .restaurant-loading {
