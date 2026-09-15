@@ -16,6 +16,18 @@ function setTrailingText(element: HTMLElement, text: string): void {
   else element.append(document.createTextNode(text));
 }
 
+function renderHero(state: Readonly<AppState>): void {
+  const title = byId<HTMLElement>('page-title');
+  const copy = !state.currentLine
+    ? '어디로 가볼까?'
+    : !state.currentStation
+      ? '어느 역에서 내릴까?'
+      : !state.currentFood
+        ? '식사도 해야지?'
+        : '이 코스로 가자!';
+  replaceContent(title, make('span', '', copy));
+}
+
 const REDRAW_INK: Record<'line_panel' | 'station_panel' | 'food_panel', string> = {
   line_panel: '#8da877',
   station_panel: '#7898a6',
@@ -127,10 +139,10 @@ function renderFood(food: FoodCategory | undefined, station: SubwayStation | und
 
   if (!food) {
     panel.className = `panel food-panel ${station ? 'ready' : 'waiting'}`;
-    emoji.textContent = '🍴';
+    emoji.textContent = '';
     group.textContent = '';
-    name.textContent = station ? '?' : '';
-    name.className = station ? 'food-name food-question' : 'food-name placeholder';
+    name.textContent = '뭐 먹을까?';
+    name.className = 'food-name food-question';
     examples.textContent = '';
     return;
   }
@@ -210,9 +222,11 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   placeCardRedrawButton(stationRedraw, 'station_panel', Boolean(state.currentStation), '역 다시 뽑기');
   placeCardRedrawButton(foodRedraw, 'food_panel', Boolean(state.currentFood), '음식 다시 뽑기');
 
+  const mapActions = byId<HTMLElement>('map_actions');
+  if (copy.parentElement !== mapActions) mapActions.prepend(copy);
   copy.hidden = !state.currentStation;
-  byId<HTMLElement>('secondary_actions').hidden = !state.currentStation;
-  byId<HTMLElement>('map_actions').hidden = !state.currentStation;
+  byId<HTMLElement>('secondary_actions').hidden = true;
+  mapActions.hidden = !state.currentStation;
   renderSteps(state);
   placePrimaryDrawButton(stage);
 }
@@ -253,6 +267,7 @@ function renderStationList(line?: SubwayLine, selected?: SubwayStation): void {
 }
 
 export function renderDrawView(state: Readonly<AppState>, status: DrawViewStatus): void {
+  renderHero(state);
   renderLine(state.currentLine);
   renderStation(state.currentStation, state.currentLine);
   renderFood(state.currentFood, state.currentStation);
