@@ -6,11 +6,13 @@ on:
       - main
     paths:
       - 'src/**'
+      - 'tests/**'
       - 'scripts/**'
       - 'public/**'
       - 'modular.html'
       - 'vite.config.ts'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/web-release.yml'
   workflow_dispatch:
 
@@ -116,10 +118,6 @@ jobs:
             exit 0
           fi
           git commit -m 'deploy: publish modular Random Seoul web'
-          # Non-release commits (tests/docs) may advance main while this build is running.
-          # Rebase the generated deployment commit so a harmless concurrent commit does not
-          # reject the final fast-forward push. Relevant source changes start/cancel this
-          # workflow through the concurrency group, so the promoted bundle stays source-aligned.
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
