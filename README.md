@@ -21,14 +21,23 @@ Android 개발 최신본은 고정된 GitHub Release에서 받을 수 있습니�
 
 현재 안정 웹버전은 `main` 브랜치에서 관리하고, Android 앱 작업은 `feature/random-seoul-android` 브랜치에서 진행합니다. 공통 변경은 Web/Android 기능 동등성을 확인한 뒤 동기화합니다.
 
+## Current draw UX
+
+- 노선 → 역 → 음식 순서의 현재 추첨 대상 카드는 **카드 전체가 클릭/탭 영역**입니다.
+- 카드 아래에 별도의 작은 추첨 버튼을 두지 않습니다.
+- 실제 `draw_btn`은 접근성/키보드 동작을 유지한 채 현재 카드 전체를 덮는 투명 버튼으로 사용합니다.
+- 진행 단계가 이미 전달하는 중복 안내 문구(`progress-note`, helper, keyboard/fairness 보조 문구 등)는 메인 화면에서 숨겨 더 간결하게 유지합니다.
+- 코스가 완성된 뒤의 “새 코스 다시 뽑기” 및 부분 재추첨/지도/복사 기능은 기존 하단 액션 영역을 유지합니다.
+
 ## Project documentation
 
 새 채팅/새 개발 세션에서는 아래 순서로 확인하면 과거 대화 원문 없이도 프로젝트 맥락을 복구할 수 있습니다.
 
 1. `docs/PROJECT_CONTEXT.md` — 프로젝트 목적, 플랫폼 역할, 핵심 결정, 세션 인계 규칙
-2. `docs/STATUS.md` — 실제 현재 개발 진행 상태와 최근 변경
-3. `docs/PROJECT_PLAN.md` — 제품 요구사항과 로드맵
-4. `docs/ARCHITECTURE.md` — 코드/데이터/플랫폼 구조
-5. `docs/ATTRACTION_CURATION.md` — 역 주변 볼거리의 선정 및 제외 기준
+2. `docs/LATEST_CHANGE.md` — 가장 최근 기능/UI 변경과 동기화 상태
+3. `docs/STATUS.md` — 실제 현재 개발 진행 상태와 최근 변경
+4. `docs/PROJECT_PLAN.md` — 제품 요구사항과 로드맵
+5. `docs/ARCHITECTURE.md` — 코드/데이터/플랫폼 구조
+6. `docs/ATTRACTION_CURATION.md` — 역 주변 볼거리의 선정 및 제외 기준
 
 의미 있는 기능/설계/상태 변경은 코드와 같은 변경에서 관련 문서를 함께 갱신합니다. 세부 문서 업데이트 규칙은 `docs/PROJECT_CONTEXT.md`를 기준으로 합니다.
