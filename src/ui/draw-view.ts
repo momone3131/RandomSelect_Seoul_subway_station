@@ -86,6 +86,8 @@ function renderStation(station?: SubwayStation, line?: SubwayLine): void {
 
   if (!line) {
     panel.className = 'panel station-panel waiting';
+    panel.style.removeProperty('--station-line');
+    panel.style.removeProperty('--station-line-ink');
     number.textContent = '?';
     number.className = 'ordinal-number';
     name.textContent = '';
@@ -93,6 +95,9 @@ function renderStation(station?: SubwayStation, line?: SubwayLine): void {
     context.textContent = '';
     return;
   }
+
+  panel.style.setProperty('--station-line', line.color);
+  panel.style.setProperty('--station-line-ink', readableInk(line.color));
 
   if (!station) {
     panel.className = 'panel station-panel ready';
@@ -123,8 +128,8 @@ function renderFood(food: FoodCategory | undefined, station: SubwayStation | und
     panel.className = `panel food-panel ${station ? 'ready' : 'waiting'}`;
     emoji.textContent = '🍴';
     group.textContent = '';
-    name.textContent = '';
-    name.className = 'food-name placeholder';
+    name.textContent = station ? '?' : '';
+    name.className = station ? 'food-name food-question' : 'food-name placeholder';
     examples.textContent = '';
     return;
   }
