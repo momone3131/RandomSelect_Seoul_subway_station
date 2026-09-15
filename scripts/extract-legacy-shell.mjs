@@ -3,17 +3,19 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const stylesPath = new URL('../src/ui/styles.css', import.meta.url);
 const mobileOverridesPath = new URL('../src/ui/mobile-overrides.css', import.meta.url);
 const subwaySignOverridesPath = new URL('../src/ui/subway-sign-overrides.css', import.meta.url);
+const minimalPaletteOverridesPath = new URL('../src/ui/minimal-palette-overrides.css', import.meta.url);
 const shellPath = new URL('../src/ui/shell.html', import.meta.url);
 const outputDir = new URL('../src/generated/', import.meta.url);
 const outputPath = new URL('../src/generated/legacy-shell.ts', import.meta.url);
 
-const [styles, mobileOverrides, subwaySignOverrides, body] = await Promise.all([
+const [styles, mobileOverrides, subwaySignOverrides, minimalPaletteOverrides, body] = await Promise.all([
   readFile(stylesPath, 'utf8'),
   readFile(mobileOverridesPath, 'utf8'),
   readFile(subwaySignOverridesPath, 'utf8'),
+  readFile(minimalPaletteOverridesPath, 'utf8'),
   readFile(shellPath, 'utf8'),
 ]);
-const combinedStyles = `${styles.trim()}\n\n${mobileOverrides.trim()}\n\n${subwaySignOverrides.trim()}\n`;
+const combinedStyles = `${styles.trim()}\n\n${mobileOverrides.trim()}\n\n${subwaySignOverrides.trim()}\n\n${minimalPaletteOverrides.trim()}\n`;
 
 await mkdir(outputDir, { recursive: true });
 await writeFile(
