@@ -77,72 +77,74 @@ button svg,button svg *{pointer-events:none}
   }
 }
 
-/* The primary draw action lives inside the card that will receive the next random result. */
+/* The card receiving the next random result is itself the primary draw target. */
 .panel.next-draw {
   border-style: solid;
   border-color: #b8ca96;
   box-shadow: 0 10px 26px rgba(59, 83, 48, 0.10);
-  padding-bottom: 82px;
-  transition: border-color .18s, box-shadow .18s, background .18s;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .18s, box-shadow .18s, background .18s, transform .12s;
 }
 
+.panel.next-draw:has(> .draw-btn.integrated:not(:disabled)):hover {
+  border-color: #96ad72;
+  background: #f0f5e9;
+  box-shadow: 0 12px 30px rgba(59, 83, 48, 0.14);
+}
+
+.panel.next-draw:has(> .draw-btn.integrated:not(:disabled)):active {
+  transform: translateY(1px);
+}
+
+.panel.next-draw:has(> .draw-btn.integrated:focus-visible) {
+  outline: 3px solid #43855e;
+  outline-offset: 3px;
+}
+
+.panel.next-draw:has(> .draw-btn.integrated:disabled) {
+  cursor: default;
+}
+
+/* Keep the real button for semantics/keyboard access, but stretch it invisibly over the full card. */
 .panel.next-draw > .draw-btn.integrated {
   position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 14px;
-  z-index: 2;
-  width: auto;
-  min-height: 46px;
-  padding: 10px 13px;
-  justify-content: flex-start;
-  gap: 8px;
-  border-color: var(--dark);
-  border-radius: 12px;
-  background: var(--dark);
-  color: #efffc8;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
   box-shadow: none;
-  font-size: 14px;
+  opacity: 0;
 }
 
-.panel.next-draw > .draw-btn.integrated:not(:disabled):hover {
-  background: #294a3a;
+.panel.next-draw > .draw-btn.integrated:hover,
+.panel.next-draw > .draw-btn.integrated:active,
+.panel.next-draw > .draw-btn.integrated:focus-visible {
+  background: transparent;
   box-shadow: none;
-}
-
-.panel.next-draw > .draw-btn.integrated .arrow {
-  margin-left: auto;
+  transform: none;
 }
 
 .draw-shell:not([data-stage="done"]) .action-zone {
   padding-top: 0;
 }
 
-@media (max-width: 720px) {
-  .food-panel.next-draw {
-    min-height: 176px;
-    padding-bottom: 68px;
-  }
+/* The cards and progress steps already communicate state, so remove duplicate explanatory copy. */
+.progress-note,
+.helper,
+.keyboard-note,
+.scope-extra,
+.fair-note {
+  display: none !important;
 }
 
-@media (max-width: 430px) {
-  .panel.next-draw {
-    padding-bottom: 68px;
-  }
-
-  .panel.next-draw > .draw-btn.integrated {
-    left: 9px;
-    right: 9px;
-    bottom: 9px;
-    min-height: 44px;
-    padding: 9px 11px;
-    font-size: 13px;
-  }
-
-  .food-panel.next-draw {
-    min-height: 166px;
-    padding-bottom: 62px;
-  }
+.options-row {
+  justify-content: flex-start;
 }
 `,$e=`<svg style="display:none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
 <symbol id="train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="15" rx="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 11h14M12 4v7M8 18l-2 3m10-3 2 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="8.5" cy="14.5" r="1" fill="currentColor"/><circle cx="15.5" cy="14.5" r="1" fill="currentColor"/></symbol>
