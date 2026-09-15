@@ -124,7 +124,19 @@ export async function animateDrawStage(
 
 export function revealDrawStage(stage: AnimatedDrawStage): void {
   const panel = panelFor(stage);
-  panel.classList.remove('bounce');
-  void panel.offsetWidth;
-  panel.classList.add('bounce');
+  panel.classList.remove('result-hit');
+  if (prefersReducedMotion()) return;
+
+  // performDraw() renders once more in its finally block. Apply the result
+  // feedback on the next frame so that final render cannot erase the class.
+  window.requestAnimationFrame(() => {
+    const renderedPanel = panelFor(stage);
+    renderedPanel.classList.remove('result-hit');
+    void renderedPanel.offsetWidth;
+    renderedPanel.classList.add('result-hit');
+
+    const clear = () => renderedPanel.classList.remove('result-hit');
+    renderedPanel.addEventListener('animationend', clear, { once: true });
+    window.setTimeout(clear, 500);
+  });
 }
