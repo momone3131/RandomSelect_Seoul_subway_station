@@ -9,6 +9,7 @@ const primaryDrawPlacement = readFileSync(
   new URL('../src/ui/primary-draw-placement.ts', import.meta.url),
   'utf8',
 );
+const drawAnimation = readFileSync(new URL('../src/ui/draw-animation.ts', import.meta.url), 'utf8');
 const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
 
 describe('Random Seoul responsive visual contract', () => {
@@ -60,6 +61,22 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('.panel.next-draw::after');
     expect(styles).toContain('content: "⚄"');
     expect(styles).not.toContain('linear-gradient(145deg, #efffc4 0%, var(--lime) 100%)');
+  });
+
+  it('adds tactile hold feedback to the integrated draw card', () => {
+    expect(primaryDrawPlacement).toContain("addEventListener('pointerdown'");
+    expect(primaryDrawPlacement).toContain("addEventListener('pointerup'");
+    expect(primaryDrawPlacement).toContain("translateY(3px) scale(.985)");
+    expect(primaryDrawPlacement).toContain("boxShadow: '0 1px 0 #8ea055'");
+    expect(primaryDrawPlacement).toContain('duration: 75');
+  });
+
+  it('adds a short settled-result thump after the final render', () => {
+    expect(drawAnimation).toContain('window.requestAnimationFrame');
+    expect(drawAnimation).toContain('panel.getAnimations().forEach');
+    expect(drawAnimation).toContain("translateY(-4px) scale(1.018)");
+    expect(drawAnimation).toContain("0 4px 0 #203b2f, 0 0 0 4px #d7f775");
+    expect(drawAnimation).toContain('duration: 360');
   });
 
   it('hides nonessential explanatory copy from the main surface', () => {
