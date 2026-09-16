@@ -1,6 +1,6 @@
 # Random Seoul — Architecture
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 ## 1. Architecture goals
 
@@ -28,6 +28,8 @@ src/
 │  ├─ curated-attractions.ts
 │  ├─ curated-attractions-base.ts
 │  ├─ curated-attractions-extra.ts
+│  ├─ curated-attractions-local.ts
+│  ├─ curated-attraction-tiers.ts
 │  └─ station-coordinates.ts
 ├─ domain/
 │  ├─ types.ts
@@ -55,124 +57,158 @@ Provider는 후보 데이터를 반환하고 최종 추천 순위를 결정하�
 
 ## 4. Draw → attraction → restaurant data flow
 
-현재 완료 흐름은 두 단계로 분리됩니다.
-
 ### A. 즉시 결과 단계
 
 `line → station → food`
 
-- `drawLineResult()` / `drawStationResult()` / `drawFoodResult()`는 네트워크 식당 조회를 기다리지 않음.
-- station 선택 시 `getCuratedAttractions()`가 정적 0~2곳을 즉시 상태에 넣음.
-- food 선택 시 food와 history만 확정하고 `recommendations`는 빈 상태로 유지.
-- UI는 노선/역/음식 바로 아래에 compact attractions를 먼저 표시.
+- `drawLineResult()` / `drawStationResult()` / `drawFoodResult()`는 네트워크 식당 조회를 기다리지 않음
+- station 선택 시 `getCuratedAttractions()`가 정적 0~2곳을 즉시 상태에 넣음
+- attraction은 merge 시점에 visual tier가 붙음
+- food 선택 시 food와 history만 확정하고 `recommendations`는 빈 상태 유지
+- UI는 노선/역/음식 바로 아래에 compact attractions를 먼저 표시
 
 ### B. 사용자 요청 식당 단계
 
-사용자가 **`추천 식당 보기`**를 누른 뒤 `controller.loadRecommendations()`를 호출합니다.
+사용자가 `추천 식당 보기`를 누른 뒤 `controller.loadRecommendations()` 호출:
 
-1. 현재 line/station/food 조합을 request key로 캡처
-2. CTA를 `추천 식당 찾는 중…`으로 변경
+1. current line/station/food request key 캡처
+2. CTA loading state
 3. station center resolve
 4. Google Places 후보 조회
-5. 2 km 필터/공통 랭킹/TOP 3
-6. restaurant cards 렌더
-7. 결과가 준비된 후에만 `restaurant_section.scrollIntoView({ behavior: 'smooth' })`
+5. 2 km filter / shared ranking / TOP 3
+6. restaurant cards render
+7. 결과 준비 후 `restaurant_section.scrollIntoView({ behavior: 'smooth' })`
 
-검색 중 빈 식당 영역으로 먼저 스크롤하지 않습니다. 코스가 바뀌면 request key도 바뀌므로 이전 restaurant lookup UI 상태는 초기화됩니다.
-
-이 분리는 음식 선택 피드백을 네트워크 지연과 분리하고, 사용자가 식당 추천을 원하지 않을 때 Places 후보 조회를 생략하게 합니다.
+검색 중 빈 식당 영역으로 먼저 scroll하지 않습니다. 코스가 바뀌면 request key도 바뀌어 이전 restaurant lookup UI state가 초기화됩니다.
 
 ## 5. Restaurant ranking ownership
 
 `restaurant-ranking.ts`가 공통 랭킹을 소유합니다.
 
-1. 역 기준 직선거리 2 km 초과 제거
+1. station 기준 직선거리 2 km 초과 제거
 2. Bayesian rating
 3. `log(1 + review count)`
 4. Google relevance
 5. distance signal
 6. TOP 3
 
-가중치:
-
+Weights:
 - rating 55%
 - review volume 25%
 - relevance 15%
 - distance 5%
 
-Google 식당 결과/별점/리뷰 수는 장기 추천 DB로 저장하지 않습니다.
+Google restaurant result/rating/review values are not persisted as a reusable long-term DB.
 
 ## 6. Curated attractions
 
-명소는 first-party static data이며 역당 최대 0~2곳입니다.
+명소는 first-party static data이며 역당 최대 0~2곳입니다. Google attraction Text Search는 없습니다.
 
-- `curated-attractions-base.ts`: 기존 시드
-- `curated-attractions-extra.ts`: browse-worthy 확장
-- `curated-attractions.ts`: merge/dedupe/max-2 public entry
+### Data layers and priority
 
-품질 gate:
+`getCuratedAttractions()` merges in this exact order:
 
-- 자동 평점이 아닌 editorial curation
-- 실제 체류/구경 가치 + 합리적인 역 접근성
-- 시장/거리/문화/공원/수변과 browse-worthy 대형 상업시설 허용
-- 약한 근린시설은 제외
-- 적절한 후보 없으면 `[]`
+1. `curated-attractions-base.ts` — established strong seed
+2. `curated-attractions-extra.ts` — browse-worthy expansion
+3. `curated-attractions-local.ts` — broader local streets/markets/sizeable parks/campuses/etc.
+4. ID dedupe
+5. `slice(0, 2)`
+6. visual tier attachment via `curated-attraction-tiers.ts`
+
+The priority prevents a newly added weaker local stop from displacing an established stronger recommendation. The local layer primarily fills previously empty stations or remaining second slots.
+
+### Attraction domain type
+
+`AttractionRecommendation` includes optional:
+
+```ts
+tier?: 'gold' | 'silver' | 'standard'
+```
+
+The public merged result always attaches a tier.
+
+- gold: nationally iconic / destination-level
+- silver: major city/regional destination
+- standard: worthwhile local browse/stay stop
+
+Tier assignment is ID-based and centralized in `curated-attraction-tiers.ts`, so the same attraction keeps the same visual tier across stations.
+
+### Quality gate
+
+- editorial curation rather than automatic rating
+- real browse/stay value + reasonable station access
+- distinctive streets/markets/culture/sizeable parks/waterfronts/campuses/major commercial destinations allowed
+- tiny playgrounds and weak generic neighborhood facilities excluded
+- genuinely weak station may remain `[]`
 
 ### Attraction presentation
 
-`attraction-view.ts`는 attraction section을 `.panels` 바로 뒤에 배치합니다.
+`attraction-view.ts` places attraction section immediately after `.panels`.
 
-- 완료 결과의 1차 정보로 식당보다 먼저 노출
-- 모바일 최대 2개를 compact 2-column layout으로 표시
-- 1개면 single column
-- 0개면 section 전체 생략
-- compact 카드에서는 과도한 meta를 숨기고 이름/종류/지도 액션 중심
+- max 2 compact cards
+- 1 result → one-column
+- 0 → section hidden
+- tier is never printed as a text badge
+- class only: `attraction-tier-gold | attraction-tier-silver | attraction-tier-standard`
+
+A module-level `lastRenderedSignature` uses station + attraction IDs + tiers. If the same result is rendered again because unrelated app state changes, the attraction DOM is not rebuilt. This makes the initial tier effect truly a first-appearance effect rather than something that restarts on every `renderState()`.
+
+### Tier visuals
+
+`minimal-palette-overrides.css` owns final attraction-tier treatment so it can override the base borderless card style.
+
+- gold: metallic multi-stop gradient border + slow sheen + strong gold first-arrival pulse
+- silver: metallic silver gradient border + slow sheen + silver first-arrival pulse
+- standard: neutral borderless card
+- `prefers-reduced-motion: reduce` disables tier animation
 
 ### Attraction map-target strategy
 
-`AttractionRecommendation`은 명소 lat/lng를 저장하지 않고 self-contained `mapQuery`를 사용합니다.
+`AttractionRecommendation` does not store attraction lat/lng; it uses self-contained `mapQuery`.
 
-- UI가 역 이름을 자동 suffix하지 않음
-- 동명이인 가능 장소는 도시/구/도로/주소로 보강
-- 넓은 수변/선형 목적지는 구체적인 접근 anchor 사용
-- 애매하면 잘못된 pin 대신 후보 제거 가능
+- UI does not append station name
+- ambiguous places add city/district/road/address
+- broad waterfront/path destinations use a concrete access anchor where appropriate
+- ambiguous target may be removed instead of linking to the wrong pin
 
-`tests/curated-attractions.test.ts`와 `tests/map-links.test.ts`가 무결성을 검증합니다.
+`tests/curated-attractions.test.ts`, `tests/map-links.test.ts`, and `tests/responsive-contract.test.ts` guard data validity, max2, map targets, tier assignment and visual tier contracts.
 
 ## 7. Station center strategy
 
-식당 검색의 center/distance에는 `station-coordinates.ts` 정적 좌표를 우선 사용합니다.
+Restaurant search center/distance uses `station-coordinates.ts` first.
 
-1. 정적 좌표 존재 → live station resolution 없음
-2. 미수록 역만 Google fallback
-3. fallback 좌표는 기존 30일 cache
+1. static coordinate exists → no live station resolution
+2. missing station → Google fallback
+3. fallback coordinate cached for 30 days
 
-station center와 attraction mapQuery는 완전히 다른 데이터 경로입니다.
+Station center and attraction mapQuery are separate data paths.
 
 ## 8. State ownership
 
-`AppState` 주요 결과:
+`AppState` key result fields:
 
 - `currentLine`
 - `currentStation`
 - `currentFood`
-- `attractions`: 정적 0~2곳
-- `recommendations`: 사용자 요청 후 채워지는 live restaurant TOP 3
+- `attractions`: static 0–2 tiered results
+- `recommendations`: live restaurant TOP 3, filled only after user request
 - `history`
 
-Restaurant request의 UI lifecycle(`busy/complete/failed/current key`)은 현재 composition/UI layer에서 transient state로 관리하며 장기 저장하지 않습니다.
+Restaurant request lifecycle (`busy/complete/failed/current key`) stays transient in composition/UI layer and is not persisted.
+
+Attraction reveal signature is also transient UI-only state; it is not persisted.
 
 ## 9. Storage boundary
 
 - Web: localStorage
-- Android/iOS: 현재 WebView localStorage 호환 우선
-- preferences/history 유지
-- Google restaurant recommendations 장기 cache 없음
-- Google fallback station coordinates만 기존 30일 cache
+- Android/iOS: WebView localStorage compatibility first
+- preferences/history persisted
+- Google restaurant recommendations not long-term cached
+- only Google fallback station coordinates keep the 30-day cache
 
 ## 10. Platform services
 
-플랫폼 차이는 adapter/plugin 뒤에 둡니다.
+Platform differences stay behind adapters/plugins:
 
 - native place search
 - haptics
@@ -181,7 +217,7 @@ Restaurant request의 UI lifecycle(`busy/complete/failed/current key`)은 현재
 - back handling
 - persistent storage
 
-현재 GPS/current-location permission은 사용하지 않습니다.
+Current GPS/current-location permission: none.
 
 ## 11. API key strategy
 
@@ -189,7 +225,7 @@ Restaurant request의 UI lifecycle(`busy/complete/failed/current key`)은 현재
 - Android: package + signing certificate restriction
 - iOS: bundle identifier restriction
 
-공통 TypeScript에 production key를 하드코딩하지 않습니다.
+Do not hardcode production keys into shared TypeScript.
 
 ## 12. Build / deployment
 
@@ -197,40 +233,22 @@ Restaurant request의 UI lifecycle(`busy/complete/failed/current key`)은 현재
 
 `modular.html` → `npm run build` → Vite hashed assets.
 
-`web-release.yml`은 `src/**`, `tests/**` 등 관련 변경에서 test → build → headless browser smoke → root artifact promotion을 수행합니다. 최종 deployment commit은 최신 main에 rebase 후 push합니다.
+`web-release.yml` on relevant `src/**`, `tests/**`, build/workflow changes:
 
-Browser self-test는 현재 다음도 검증합니다.
-
-- line/station/food 완료 직후 recommendations = 0
-- explicit restaurant request 이후 TOP 3 렌더
-- 2 km contract
-- full reset flow
+1. tests
+2. Vite build
+3. headless browser smoke
+4. verified root promotion
+5. deployment commit rebased/pushed to latest main
+6. GitHub Pages
 
 ### Android
 
 Vite native build → Capacitor sync → Gradle `assembleDebug`.
 
-성공한 `feature/random-seoul-android` build는:
+Successful `feature/random-seoul-android` build updates:
 
 1. Actions artifact `random-seoul-debug-apk`
-2. fixed Release `android-dev-latest`의 `random-seoul-latest.apk`
+2. fixed Release `android-dev-latest` / `random-seoul-latest.apk`
 
-를 갱신합니다.
-
-Android shared UX는 Web과 같은 on-demand restaurant flow를 사용하고 실제 후보 조회만 native Places adapter를 통과합니다.
-
-### iOS
-
-향후 동일 shared core + native adapters.
-
-## 13. Architecture decision maintenance
-
-다음 변경은 코드와 문서를 함께 갱신합니다.
-
-- product flow / network request timing
-- ranking/filter thresholds
-- Places provider
-- attraction/station-coordinate/map-target policy
-- transient/persistent state ownership
-- platform bridge
-- Web/Android build/deploy structure
+Android shared UX/data includes the same static attraction tiers and local curation as Web; only live restaurant candidate lookup is platform-specific.
