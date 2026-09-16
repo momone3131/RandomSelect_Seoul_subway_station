@@ -6,20 +6,21 @@ Last updated: 2026-09-17
 
 Random Seoul은 Web / Android / iOS가 동일한 제품 로직을 공유하도록 설계합니다.
 
-- draw/static data/state/restaurant ranking = platform-independent TypeScript
+- draw/static data/state/ranking = platform-independent TypeScript
 - native code stays thin
-- restaurant candidates come from live provider; shared TypeScript ranks them
-- attractions and station centers are owned static data where possible
-- restaurant lookup runs only on explicit request
+- live provider lookup only after explicit user request
+- attractions and food taxonomy are first-party static data
 
-## 2. Repository structure
+## 2. Repository structure highlights
 
 ```text
 src/
 ├─ application/
+│  └─ random-seoul-controller.ts
 ├─ data/
 │  ├─ subway-lines.ts
 │  ├─ food-categories.ts
+│  ├─ food-category-features.ts
 │  ├─ curated-attractions.ts
 │  ├─ curated-attractions-base.ts
 │  ├─ curated-attractions-adjustments.ts
@@ -35,135 +36,96 @@ src/
 └─ ui/
 ```
 
-## 3. Draw → attraction → restaurant flow
+## 3. Draw flow
 
-`line → station → food`
+`line → station → food/alcohol category`
 
-Station draw calls `getCuratedAttractions()` and stores static 0–2 attractions immediately. Food draw does not trigger restaurant network lookup. After explicit `추천 식당 보기`, the provider returns restaurant candidates and shared TypeScript performs 2 km filtering/ranking/TOP3.
+Station draw immediately attaches static curated attractions. Category draw does **not** call Google Places.
 
-## 4. Curated attraction merge
+After the explicit recommendation CTA:
+1. resolve station center
+2. issue category-specific Google Places query
+3. type-gate candidates
+4. hard 2 km filter
+5. shared ranking
+6. TOP3 render
+7. smooth scroll after result settles
+
+## 4. Food taxonomy / alcohol feature
+
+`food-categories.ts` owns 42 draw categories.
+
+`food-category-features.ts` marks exactly six IDs as alcohol-primary:
+- `b_izakaya`
+- `b_wine`
+- `b_cocktail`
+- `b_craft_beer`
+- `b_traditional`
+- `b_whisky`
+
+This is a feature flag, not a second food hierarchy. Ordinary food categories are not alcohol-primary merely because the venue may serve drinks.
+
+`SettingsModalView` owns the dynamic alcohol preset:
+- any alcohol selected → `주류 제외`
+- zero alcohol selected → `주류 포함`
+
+The preset mutates draft selection only; `적용` persists it through the existing selected-food IDs contract.
+
+Persistence migration in `app-persistence.ts` treats an exact legacy full-36 selection as old “all selected” and expands it to current full-42. Any deliberately narrowed saved selection is preserved.
+
+`RandomSeoulController.isFoodCandidate()` uses:
+- normal food set for meal categories
+- alcohol-oriented type set for alcohol categories: `bar`, `night_club`, with `restaurant`/`food` fallback for venues such as izakaya and traditional liquor pubs
+
+Ranking remains shared and unchanged: hard 2 km, max20 candidates, rating 55%, review volume 25%, relevance 15%, distance 5%, TOP3.
+
+UI context carries `isAlcohol` so recommendation title/CTA/empty copy can say `술집` while normal categories keep `식당`. Result-copy wording uses `가자!` for alcohol and `먹자!` for meal categories.
+
+## 5. Curated attraction merge
 
 Exact order:
-
-1. `curated-attractions-base.ts`
-2. `curated-attractions-adjustments.ts`
-3. `curated-attractions-extra.ts`
-4. `curated-attractions-local.ts`
-5. `curated-attractions-night-viewpoints.ts`
+1. base
+2. station adjustments
+3. extra
+4. local
+5. dedicated night-viewpoints
 6. ID dedupe
-7. `slice(0, 2)`
+7. max2
 8. prominence tier attachment
 9. orthogonal feature attachment
 
-The dedicated night-viewpoint layer is deliberately **last**. It is intended to fill spare slots with valuable elevated viewpoints without displacing an already established stronger recommendation.
-
-### Domain model
-
-```ts
-tier?: 'diamond' | 'gold' | 'silver' | 'standard'
-nightscape?: boolean
-```
-
-Prominence and Nightscape are separate dimensions.
+The night-viewpoint layer is last so it only fills available capacity.
 
 ### Prominence
-
-Current classifier:
 - Diamond 4
 - Gold 25
 - Silver 88
-- remaining surfaced IDs Standard
+- remaining Standard
 
-Diamond is fixed to 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
-
-Latest night-viewpoint-related tiers:
-- N서울타워 = Gold
-- 응봉산 팔각정 / 남한산성 서문 전망대 / 수원화성 서장대 = Silver
-- 달맞이봉공원 / 매봉산 팔각정 / 용왕산 스카이워크 / 삼성해맞이공원 / 용마산 스카이워크 / 용양봉저정공원 = Standard
-
-### Nightscape feature
-
-`curated-attraction-features.ts` owns Nightscape tagging. It is not a fifth tier.
-
-Strict semantic rule: the destination should be an **elevated city-light viewing point where the night panorama itself is a primary reason to visit**.
+### Nightscape
+Nightscape is orthogonal to tier and means an elevated city-light viewpoint, not simply a place that looks good at night.
 
 Current 12 IDs:
-- `n-seoul-tower`
-- `naksan-park`
-- `eungbongsan-palgakjeong`
-- `dalmaji-bong-park`
-- `maebongsan-palgakjeong`
-- `yongwangsan-skywalk`
-- `samsung-haemaji-park`
-- `yongmasan-skywalk`
-- `yongyangbongjeojeong-park`
-- `lotte-world-tower`
-- `namhansanseong-west-gate-viewpoint`
-- `suwon-hwaseong-seojangdae`
+`n-seoul-tower`, `naksan-park`, `eungbongsan-palgakjeong`, `dalmaji-bong-park`, `maebongsan-palgakjeong`, `yongwangsan-skywalk`, `samsung-haemaji-park`, `yongmasan-skywalk`, `yongyangbongjeojeong-park`, `lotte-world-tower`, `namhansanseong-west-gate-viewpoint`, `suwon-hwaseong-seojangdae`.
 
-Not Nightscape merely because they are illuminated/pleasant at night: DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체. Their normal attraction data and prominence tier remain intact.
+## 6. UI composition
 
-### UI composition
+- attraction tier owns outer border/effect
+- Nightscape owns card interior/background
+- no tier/nightscape text badge
+- same-result signature guard prevents repeated reveal
+- reduced-motion disables tier motion
 
-`attraction-view.ts` adds:
-- `attraction-tier-${tier}`
-- independent `attraction-nightscape` when applicable
+## 7. Storage / platform boundary
 
-The render signature includes station + attraction ID + tier + `night/plain`, preventing unrelated rerenders from replaying arrival effects.
+- Web localStorage / Android WebView-compatible shared state
+- preferences/history persisted
+- live recommendation result not kept as long-term own DB
+- missing station center may use Google fallback with 30-day cache
+- no current-location/GPS permission required
 
-`minimal-palette-overrides.css` owns presentation:
-- Diamond: gemstone prism border and sparkle
-- Gold/Silver: metallic borders
-- Standard: borderless
-- Nightscape: card interior only, with dark navy/indigo/purple sky, star points and subtle city glow
+## 8. Build / deployment
 
-This allows combinations such as:
-- 롯데월드타워 = Diamond + Nightscape
-- 응봉산 팔각정 = Silver + Nightscape
-- 용왕산 스카이워크 = Standard + Nightscape
+Web: tests → Vite build → browser smoke → verified root promotion → Pages.
 
-## 5. New viewpoint mappings
-
-`curated-attractions-night-viewpoints.ts` currently maps:
-- 충무로 → N서울타워
-- 응봉 → 응봉산 팔각정
-- 옥수 → 달맞이봉공원
-- 버티고개 → 매봉산 팔각정
-- 신목동 → 용왕산 스카이워크
-- 청담 → 삼성해맞이공원
-- 사가정 → 용마산 스카이워크
-- 노들 → 용양봉저정공원
-- 산성 / 남한산성입구 → 남한산성 서문 전망대
-- 화서 → 수원화성 서장대
-
-All are still subject to the global max2 result cap and preceding layer priority.
-
-## 6. Attraction map-target strategy
-
-Attraction lat/lng is not stored. Each result uses a self-contained `mapQuery`.
-
-- no station-name suffix auto-append
-- ambiguous destinations add district/address context
-- broad viewpoints use a specific named viewpoint/entrance when possible
-- wrong pin risk > omit
-
-## 7. Restaurant ranking
-
-Hard 2 km radius, max20 candidates, TOP3. Weights: rating 55%, review volume 25%, Google relevance 15%, distance 5%.
-
-Provider result/rating/review values are not persisted as a reusable long-term restaurant DB.
-
-## 8. Station center / storage / platform boundary
-
-- static station coordinates first; missing only → Google fallback with 30-day cache
-- Web localStorage / Android WebView-compatible storage
-- Android native bridge owns platform Places/haptics/map/share behavior
-- current GPS/current-location permission: none
-
-## 9. Build / deployment
-
-Web: tests → Vite build → browser smoke → root promotion → Pages.
-
-Android: shared tests → native Web build → Capacitor sync → Gradle `assembleDebug` → artifact → fixed `android-dev-latest` Release.
-
-Web and Android share the same attraction data, tiers and Nightscape feature logic.
+Android: shared tests → native Web build → Capacitor sync → Gradle debug APK → artifact → fixed `android-dev-latest` Release.
