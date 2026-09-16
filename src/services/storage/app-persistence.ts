@@ -1,3 +1,4 @@
+import { isAlcoholFoodId } from '../../data/food-category-features';
 import { FOOD_BY_ID, FOOD_CATEGORIES } from '../../data/food-categories';
 import { SUBWAY_LINE_BY_ID, SUBWAY_LINES } from '../../data/subway-lines';
 import type { DrawHistoryItem } from '../../domain/types';
@@ -32,13 +33,23 @@ function validIds(value: unknown, allowed: ReadonlySet<string>, fallback: readon
   return result.length ? result : [...fallback];
 }
 
+function sameIds(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length && right.every((id) => left.includes(id));
+}
+
 export function loadPreferences(storage: StorageService): AppPreferences {
   const saved = storage.read<LegacySettings>(SETTINGS_STORAGE_KEY, {});
   const allLineIds = SUBWAY_LINES.map((line) => line.id);
   const allFoodIds = FOOD_CATEGORIES.map((food) => food.id);
+  const previousDefaultFoodIds = FOOD_CATEGORIES.filter((food) => !isAlcoholFoodId(food.id)).map((food) => food.id);
+  const loadedFoodIds = validIds(saved.selected_foods, new Set(allFoodIds), allFoodIds);
+  const selectedFoodIds = Array.isArray(saved.selected_foods) && sameIds(loadedFoodIds, previousDefaultFoodIds)
+    ? allFoodIds
+    : loadedFoodIds;
+
   return {
     selectedLineIds: validIds(saved.selected, new Set(allLineIds), allLineIds),
-    selectedFoodIds: validIds(saved.selected_foods, new Set(allFoodIds), allFoodIds),
+    selectedFoodIds,
     instantDraw: Boolean(saved.instant),
   };
 }
