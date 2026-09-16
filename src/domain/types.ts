@@ -69,7 +69,7 @@ export interface RestaurantRecommendation extends PlaceCandidate {
   score: number;
 }
 
-export type AttractionTier = 'gold' | 'silver' | 'standard';
+export type AttractionTier = 'diamond' | 'gold' | 'silver' | 'standard';
 
 export interface AttractionRecommendation {
   id: string;
