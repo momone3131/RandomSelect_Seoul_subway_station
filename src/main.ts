@@ -1,4 +1,5 @@
 import { RandomSeoulController } from './application/random-seoul-controller';
+import { isAlcoholFoodId } from './data/food-category-features';
 import { AppStore } from './state/app-state';
 import { GoogleWebPlaceSearchService } from './services/places/google-web';
 import { PlaceSearchUnavailableError, type PlaceSearchService } from './services/places/place-search';
@@ -125,6 +126,7 @@ function currentRestaurantContext(): RestaurantViewContext | undefined {
     stationName: state.currentStation.name,
     foodName: state.currentFood.name,
     query,
+    isAlcohol: isAlcoholFoodId(state.currentFood.id),
   };
 }
 
@@ -149,13 +151,15 @@ function syncRestaurantDiscoveryState(): void {
     return;
   }
 
+  const context = currentRestaurantContext();
+  const noun = context?.isAlcohol ? '술집' : '식당';
   restaurantRequest.wrap.hidden = restaurantLookupComplete;
   restaurantRequest.button.disabled = restaurantLookupBusy;
   restaurantRequest.button.textContent = restaurantLookupBusy
-    ? '추천 식당 찾는 중…'
+    ? `추천 ${noun} 찾는 중…`
     : restaurantLookupFailed
-      ? '추천 식당 다시 찾기'
-      : '추천 식당 보기';
+      ? `추천 ${noun} 다시 찾기`
+      : `추천 ${noun} 보기`;
 
   if (restaurantLookupBusy) {
     for (const id of ['draw_btn', 'restart_btn', 'station_redraw_btn', 'food_redraw_btn', 'settings_btn', 'food_settings_btn']) {
@@ -190,7 +194,7 @@ function updateStatusCopy(): void {
     return;
   }
   progress.textContent = '외출 코스 완성';
-  helper.textContent = '추천 명소를 보고, 원하면 추천 식당을 찾아보세요.';
+  helper.textContent = '추천 명소를 보고, 원하면 주변 추천 장소를 찾아보세요.';
 }
 
 function renderState(): void {
@@ -257,7 +261,7 @@ async function requestRestaurants(scrollToResults = true): Promise<void> {
     renderRestaurants(context, store.getSnapshot().recommendations);
     restaurantLookupComplete = true;
     restaurantLookupFailed = false;
-    announce('추천 식당을 찾았습니다.');
+    announce(context.isAlcohol ? '추천 술집을 찾았습니다.' : '추천 식당을 찾았습니다.');
   } catch (error) {
     if (currentRestaurantKey() !== key) return;
     restaurantLookupFailed = true;
@@ -315,7 +319,11 @@ function openNewTab(url: string): void {
 function resultMessage(): string {
   const state = store.getSnapshot();
   if (!state.currentStation) return '';
-  if (state.currentFood) return `${state.currentStation.name}에서 ${state.currentFood.name} 먹자!`;
+  if (state.currentFood) {
+    return isAlcoholFoodId(state.currentFood.id)
+      ? `${state.currentStation.name}에서 ${state.currentFood.name} 가자!`
+      : `${state.currentStation.name}에서 ${state.currentFood.name} 먹자!`;
+  }
   return `${state.currentStation.name} 가자!`;
 }
 
