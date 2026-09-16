@@ -1,5 +1,54 @@
 import type { FoodCategory } from '../domain/types';
 
-export const FOOD_CATEGORIES: readonly FoodCategory[] = [{"id":"k_home","group":"한식","name":"백반·한식 정식","examples":"제육볶음, 불고기, 반찬이 나오는 한 끼","emoji":"🍚","searchQuery":"백반 한정식"},{"id":"k_stew","group":"한식","name":"찌개·전골","examples":"김치찌개, 된장찌개, 부대찌개, 버섯전골","emoji":"🥘","searchQuery":"찌개 전골"},{"id":"k_soup","group":"한식","name":"국밥·탕","examples":"순대국, 돼지국밥, 설렁탕, 갈비탕","emoji":"🍲","searchQuery":"국밥 설렁탕"},{"id":"k_rice","group":"한식","name":"비빔밥·솥밥","examples":"돌솥비빔밥, 나물비빔밥, 재료를 올린 솥밥","emoji":"🍚","searchQuery":"솥밥 비빔밥"},{"id":"k_cold","group":"한식","name":"냉면·막국수","examples":"물냉면, 비빔냉면, 메밀막국수","emoji":"🍜","searchQuery":"냉면 막국수"},{"id":"k_noodle","group":"한식","name":"칼국수·수제비","examples":"바지락칼국수, 닭칼국수, 수제비","emoji":"🍜","searchQuery":"칼국수 수제비"},{"id":"k_snack","group":"한식","name":"분식","examples":"떡볶이, 김밥, 순대, 튀김","emoji":"🍢","searchQuery":"떡볶이 분식"},{"id":"k_pork","group":"한식","name":"돼지고기 구이","examples":"삼겹살, 목살, 돼지갈비","emoji":"🥓","searchQuery":"삼겹살 돼지고기 구이"},{"id":"k_beef","group":"한식","name":"소고기 구이","examples":"소갈비, 등심, 한우 구이","emoji":"🥩","searchQuery":"한우 소고기 구이"},{"id":"k_wrap","group":"한식","name":"족발·보쌈","examples":"족발, 보쌈, 불족발","emoji":"🥬","searchQuery":"족발 보쌈"},{"id":"k_dakgalbi","group":"한식","name":"닭갈비","examples":"철판닭갈비, 숯불닭갈비","emoji":"🍗","searchQuery":"닭갈비"},{"id":"k_braised","group":"한식","name":"찜닭·닭볶음탕","examples":"간장찜닭, 매콤한 닭볶음탕","emoji":"🥘","searchQuery":"찜닭 닭볶음탕"},{"id":"k_chicken","group":"한식","name":"치킨","examples":"후라이드, 양념, 간장치킨","emoji":"🍗","searchQuery":"치킨"},{"id":"k_seafood","group":"한식","name":"회·해산물","examples":"한국식 생선회, 물회, 해산물 모둠","emoji":"🐟","searchQuery":"횟집 회 해산물"},{"id":"k_fish","group":"한식","name":"해물찜·생선요리","examples":"아귀찜, 해물찜, 생선구이, 생선조림","emoji":"🐟","searchQuery":"해물찜 생선요리"},{"id":"j_sushi","group":"일식","name":"스시·초밥","examples":"모둠초밥, 회전초밥, 초밥 코스","emoji":"🍣","searchQuery":"초밥 스시"},{"id":"j_katsu","group":"일식","name":"돈까스·카츠","examples":"등심카츠, 안심카츠, 치즈돈까스","emoji":"🍱","searchQuery":"돈까스 돈카츠"},{"id":"j_ramen","group":"일식","name":"일본 라멘","examples":"돈코츠, 쇼유, 미소라멘, 츠케멘","emoji":"🍜","searchQuery":"일본 라멘"},{"id":"j_noodle","group":"일식","name":"우동·소바","examples":"가케우동, 붓카케우동, 메밀소바","emoji":"🍜","searchQuery":"우동 소바"},{"id":"j_donburi","group":"일식","name":"일본식 덮밥","examples":"규동, 가츠동, 텐동, 사케동","emoji":"🍚","searchQuery":"일본식 덮밥 텐동"},{"id":"j_curry","group":"일식","name":"일본 카레","examples":"카레라이스, 수프카레, 토핑 카레","emoji":"🍛","searchQuery":"일본 카레"},{"id":"c_classic","group":"중식","name":"중화요리","examples":"짜장면, 짬뽕, 볶음밥, 탕수육","emoji":"🥡","searchQuery":"중식 중국집"},{"id":"c_dimsum","group":"중식","name":"딤섬·중식 만두","examples":"샤오롱바오, 하가우, 중식 찐만두","emoji":"🥟","searchQuery":"딤섬"},{"id":"c_hotpot","group":"중식","name":"마라탕·훠궈","examples":"마라탕, 마라샹궈, 훠궈","emoji":"🌶️","searchQuery":"마라탕 훠궈"},{"id":"c_lamb","group":"중식","name":"양꼬치·양고기 구이","examples":"양꼬치, 양갈비, 중국식 양고기 구이","emoji":"🍢","searchQuery":"양꼬치 양갈비"},{"id":"a_shabu","group":"아시아·기타","name":"샤브샤브","examples":"고기·채소 샤브샤브, 월남쌈 샤브","emoji":"🍲","searchQuery":"샤브샤브"},{"id":"a_vietnam","group":"아시아·기타","name":"베트남 요리","examples":"쌀국수, 분짜, 반미","emoji":"🍜","searchQuery":"베트남 음식 쌀국수"},{"id":"a_thai","group":"아시아·기타","name":"태국 요리","examples":"팟타이, 똠얌꿍, 태국식 볶음밥","emoji":"🍤","searchQuery":"태국 음식"},{"id":"a_india","group":"아시아·기타","name":"인도 커리","examples":"커리와 난, 탄두리, 비리야니","emoji":"🍛","searchQuery":"인도 커리"},{"id":"w_pasta","group":"양식·기타","name":"파스타·리소토","examples":"오일·토마토·크림 파스타, 리소토","emoji":"🍝","searchQuery":"파스타 리소토"},{"id":"w_pizza","group":"양식·기타","name":"피자","examples":"화덕피자, 뉴욕식 피자, 토핑 피자","emoji":"🍕","searchQuery":"피자"},{"id":"w_steak","group":"양식·기타","name":"스테이크","examples":"소고기 스테이크, 그릴 요리","emoji":"🥩","searchQuery":"스테이크"},{"id":"w_burger","group":"양식·기타","name":"버거","examples":"수제버거, 치즈버거, 치킨버거","emoji":"🍔","searchQuery":"수제버거"},{"id":"w_mexican","group":"양식·기타","name":"멕시코 요리","examples":"타코, 부리토, 퀘사디아","emoji":"🌮","searchQuery":"멕시코 음식 타코"},{"id":"w_brunch","group":"가벼운 한 끼","name":"샌드위치·브런치","examples":"샌드위치, 에그 베네딕트, 브런치 플레이트","emoji":"🥪","searchQuery":"브런치"},{"id":"w_salad","group":"가벼운 한 끼","name":"샐러드·포케","examples":"토핑 샐러드, 포케, 곡물 볼","emoji":"🥗","searchQuery":"샐러드 포케"}];
+export const FOOD_CATEGORIES: readonly FoodCategory[] = [
+  { id: 'k_home', group: '한식', name: '백반·한식 정식', examples: '제육볶음, 불고기, 반찬이 나오는 한 끼', emoji: '🍚', searchQuery: '백반 한정식' },
+  { id: 'k_stew', group: '한식', name: '찌개·전골', examples: '김치찌개, 된장찌개, 부대찌개, 버섯전골', emoji: '🥘', searchQuery: '찌개 전골' },
+  { id: 'k_soup', group: '한식', name: '국밥·탕', examples: '순대국, 돼지국밥, 설렁탕, 갈비탕', emoji: '🍲', searchQuery: '국밥 설렁탕' },
+  { id: 'k_rice', group: '한식', name: '비빔밥·솥밥', examples: '돌솥비빔밥, 나물비빔밥, 재료를 올린 솥밥', emoji: '🍚', searchQuery: '솥밥 비빔밥' },
+  { id: 'k_cold', group: '한식', name: '냉면·막국수', examples: '물냉면, 비빔냉면, 메밀막국수', emoji: '🍜', searchQuery: '냉면 막국수' },
+  { id: 'k_noodle', group: '한식', name: '칼국수·수제비', examples: '바지락칼국수, 닭칼국수, 수제비', emoji: '🍜', searchQuery: '칼국수 수제비' },
+  { id: 'k_snack', group: '한식', name: '분식', examples: '떡볶이, 김밥, 순대, 튀김', emoji: '🍢', searchQuery: '떡볶이 분식' },
+  { id: 'k_pork', group: '한식', name: '돼지고기 구이', examples: '삼겹살, 목살, 돼지갈비', emoji: '🥓', searchQuery: '삼겹살 돼지고기 구이' },
+  { id: 'k_beef', group: '한식', name: '소고기 구이', examples: '소갈비, 등심, 한우 구이', emoji: '🥩', searchQuery: '한우 소고기 구이' },
+  { id: 'k_wrap', group: '한식', name: '족발·보쌈', examples: '족발, 보쌈, 불족발', emoji: '🥬', searchQuery: '족발 보쌈' },
+  { id: 'k_dakgalbi', group: '한식', name: '닭갈비', examples: '철판닭갈비, 숯불닭갈비', emoji: '🍗', searchQuery: '닭갈비' },
+  { id: 'k_braised', group: '한식', name: '찜닭·닭볶음탕', examples: '간장찜닭, 매콤한 닭볶음탕', emoji: '🥘', searchQuery: '찜닭 닭볶음탕' },
+  { id: 'k_chicken', group: '한식', name: '치킨', examples: '후라이드, 양념, 간장치킨', emoji: '🍗', searchQuery: '치킨' },
+  { id: 'k_seafood', group: '한식', name: '회·해산물', examples: '한국식 생선회, 물회, 해산물 모둠', emoji: '🐟', searchQuery: '횟집 회 해산물' },
+  { id: 'k_fish', group: '한식', name: '해물찜·생선요리', examples: '아귀찜, 해물찜, 생선구이, 생선조림', emoji: '🐟', searchQuery: '해물찜 생선요리' },
+
+  { id: 'j_sushi', group: '일식', name: '스시·초밥', examples: '모둠초밥, 회전초밥, 초밥 코스', emoji: '🍣', searchQuery: '초밥 스시' },
+  { id: 'j_katsu', group: '일식', name: '돈까스·카츠', examples: '등심카츠, 안심카츠, 치즈돈까스', emoji: '🍱', searchQuery: '돈까스 돈카츠' },
+  { id: 'j_ramen', group: '일식', name: '일본 라멘', examples: '돈코츠, 쇼유, 미소라멘, 츠케멘', emoji: '🍜', searchQuery: '일본 라멘' },
+  { id: 'j_noodle', group: '일식', name: '우동·소바', examples: '가케우동, 붓카케우동, 메밀소바', emoji: '🍜', searchQuery: '우동 소바' },
+  { id: 'j_donburi', group: '일식', name: '일본식 덮밥', examples: '규동, 가츠동, 텐동, 사케동', emoji: '🍚', searchQuery: '일본식 덮밥 텐동' },
+  { id: 'j_curry', group: '일식', name: '일본 카레', examples: '카레라이스, 수프카레, 토핑 카레', emoji: '🍛', searchQuery: '일본 카레' },
+
+  { id: 'c_classic', group: '중식', name: '중화요리', examples: '짜장면, 짬뽕, 볶음밥, 탕수육', emoji: '🥡', searchQuery: '중식 중국집' },
+  { id: 'c_dimsum', group: '중식', name: '딤섬·중식 만두', examples: '샤오롱바오, 하가우, 중식 찐만두', emoji: '🥟', searchQuery: '딤섬' },
+  { id: 'c_hotpot', group: '중식', name: '마라탕·훠궈', examples: '마라탕, 마라샹궈, 훠궈', emoji: '🌶️', searchQuery: '마라탕 훠궈' },
+  { id: 'c_lamb', group: '중식', name: '양꼬치·양고기 구이', examples: '양꼬치, 양갈비, 중국식 양고기 구이', emoji: '🍢', searchQuery: '양꼬치 양갈비' },
+
+  { id: 'a_shabu', group: '아시아·기타', name: '샤브샤브', examples: '고기·채소 샤브샤브, 월남쌈 샤브', emoji: '🍲', searchQuery: '샤브샤브' },
+  { id: 'a_vietnam', group: '아시아·기타', name: '베트남 요리', examples: '쌀국수, 분짜, 반미', emoji: '🍜', searchQuery: '베트남 음식 쌀국수' },
+  { id: 'a_thai', group: '아시아·기타', name: '태국 요리', examples: '팟타이, 똠얌꿍, 태국식 볶음밥', emoji: '🍤', searchQuery: '태국 음식' },
+  { id: 'a_india', group: '아시아·기타', name: '인도 커리', examples: '커리와 난, 탄두리, 비리야니', emoji: '🍛', searchQuery: '인도 커리' },
+
+  { id: 'w_pasta', group: '양식·기타', name: '파스타·리소토', examples: '오일·토마토·크림 파스타, 리소토', emoji: '🍝', searchQuery: '파스타 리소토' },
+  { id: 'w_pizza', group: '양식·기타', name: '피자', examples: '화덕피자, 뉴욕식 피자, 토핑 피자', emoji: '🍕', searchQuery: '피자' },
+  { id: 'w_steak', group: '양식·기타', name: '스테이크', examples: '소고기 스테이크, 그릴 요리', emoji: '🥩', searchQuery: '스테이크' },
+  { id: 'w_burger', group: '양식·기타', name: '버거', examples: '수제버거, 치즈버거, 치킨버거', emoji: '🍔', searchQuery: '수제버거' },
+  { id: 'w_mexican', group: '양식·기타', name: '멕시코 요리', examples: '타코, 부리토, 퀘사디아', emoji: '🌮', searchQuery: '멕시코 음식 타코' },
+
+  { id: 'w_brunch', group: '가벼운 한 끼', name: '샌드위치·브런치', examples: '샌드위치, 에그 베네딕트, 브런치 플레이트', emoji: '🥪', searchQuery: '브런치' },
+  { id: 'w_salad', group: '가벼운 한 끼', name: '샐러드·포케', examples: '토핑 샐러드, 포케, 곡물 볼', emoji: '🥗', searchQuery: '샐러드 포케' },
+
+  { id: 'b_izakaya', group: '주류·바', name: '이자카야', examples: '사케, 쇼추, 하이볼과 일본식 안주', emoji: '🍶', searchQuery: '이자카야' },
+  { id: 'b_wine', group: '주류·바', name: '와인바', examples: '글라스·보틀 와인과 페어링 안주', emoji: '🍷', searchQuery: '와인바' },
+  { id: 'b_cocktail', group: '주류·바', name: '칵테일바', examples: '클래식 칵테일, 시그니처 칵테일', emoji: '🍸', searchQuery: '칵테일바' },
+  { id: 'b_craft_beer', group: '주류·바', name: '수제맥주·펍', examples: '탭 비어, 로컬 브루어리 맥주, 펍 안주', emoji: '🍺', searchQuery: '수제맥주 펍' },
+  { id: 'b_traditional', group: '주류·바', name: '전통주·막걸리주점', examples: '막걸리, 약주, 증류주와 전통 안주', emoji: '🥂', searchQuery: '전통주 막걸리 주점' },
+  { id: 'b_whisky', group: '주류·바', name: '위스키바', examples: '싱글몰트, 버번, 위스키 하이볼', emoji: '🥃', searchQuery: '위스키바' },
+];
 
 export const FOOD_BY_ID = new Map(FOOD_CATEGORIES.map((food) => [food.id, food]));
