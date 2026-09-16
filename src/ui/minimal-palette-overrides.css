@@ -48,6 +48,7 @@ body{background:var(--bg)}
 .food-panel.ready .food-question{color:var(--dark);opacity:1}
 
 /* Attraction tiers are visual only: no text badge is rendered. */
+#attraction_section .attraction-card.attraction-tier-diamond,
 #attraction_section .attraction-card.attraction-tier-gold,
 #attraction_section .attraction-card.attraction-tier-silver{
   position:relative;
@@ -56,6 +57,16 @@ body{background:var(--bg)}
   background-clip:padding-box,border-box;
   background-size:100% 100%,240% 100%;
   background-position:0 0,0 0;
+}
+
+/* Ultra-rare jackpot tier: platinum with restrained prism reflections. */
+#attraction_section .attraction-card.attraction-tier-diamond{
+  border:3px solid transparent!important;
+  background-image:
+    linear-gradient(var(--paper),var(--paper)),
+    linear-gradient(112deg,#59636e 0%,#d8e1e8 12%,#ffffff 24%,#bfe9ef 36%,#dacdf4 49%,#fff1c8 62%,#d6f0f5 76%,#ffffff 88%,#626d79 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.76),0 4px 14px rgba(73,91,112,.20);
+  animation:attraction-diamond-sheen 3.8s linear infinite;
 }
 
 #attraction_section .attraction-card.attraction-tier-gold{
@@ -74,6 +85,12 @@ body{background:var(--bg)}
   animation:attraction-silver-sheen 5.4s linear infinite;
 }
 
+#attraction_section .attraction-card.attraction-tier-diamond.attraction-tier-reveal{
+  animation:
+    attraction-diamond-sheen 3.8s linear infinite,
+    attraction-diamond-arrive 1.65s cubic-bezier(.12,.82,.18,1) 1;
+}
+
 #attraction_section .attraction-card.attraction-tier-gold.attraction-tier-reveal{
   animation:
     attraction-gold-sheen 4.8s linear infinite,
@@ -86,6 +103,10 @@ body{background:var(--bg)}
     attraction-silver-arrive .72s cubic-bezier(.16,.82,.25,1) 1;
 }
 
+@keyframes attraction-diamond-sheen{
+  from{background-position:0 0,0% 0}
+  to{background-position:0 0,240% 0}
+}
 @keyframes attraction-gold-sheen{
   from{background-position:0 0,0% 0}
   to{background-position:0 0,220% 0}
@@ -93,6 +114,14 @@ body{background:var(--bg)}
 @keyframes attraction-silver-sheen{
   from{background-position:0 0,0% 0}
   to{background-position:0 0,220% 0}
+}
+@keyframes attraction-diamond-arrive{
+  0%{transform:scale(.95);filter:brightness(.94) saturate(.92);box-shadow:0 0 0 0 rgba(205,234,244,0)}
+  18%{transform:scale(1.06);filter:brightness(1.24) saturate(1.08);box-shadow:0 0 0 12px rgba(201,232,243,.42),0 0 28px rgba(204,184,255,.30),0 16px 30px rgba(54,69,88,.24)}
+  40%{transform:scale(1.022);filter:brightness(1.11) saturate(1.04);box-shadow:0 0 0 6px rgba(255,246,207,.30),0 0 20px rgba(190,232,239,.24),0 9px 20px rgba(54,69,88,.18)}
+  61%{transform:scale(1.042);filter:brightness(1.18) saturate(1.07);box-shadow:0 0 0 9px rgba(218,207,247,.31),0 0 24px rgba(191,233,239,.28),0 12px 24px rgba(54,69,88,.20)}
+  80%{transform:scale(1.012);filter:brightness(1.06) saturate(1.03);box-shadow:0 0 0 4px rgba(224,240,246,.23),0 6px 15px rgba(54,69,88,.15)}
+  100%{transform:scale(1);filter:brightness(1) saturate(1);box-shadow:0 0 0 1px rgba(255,255,255,.76),0 4px 14px rgba(73,91,112,.20)}
 }
 @keyframes attraction-gold-arrive{
   0%{transform:scale(.96);filter:brightness(.96);box-shadow:0 0 0 0 rgba(230,180,35,0)}
@@ -108,8 +137,10 @@ body{background:var(--bg)}
 }
 
 @media(prefers-reduced-motion:reduce){
+  #attraction_section .attraction-card.attraction-tier-diamond,
   #attraction_section .attraction-card.attraction-tier-gold,
   #attraction_section .attraction-card.attraction-tier-silver,
+  #attraction_section .attraction-card.attraction-tier-diamond.attraction-tier-reveal,
   #attraction_section .attraction-card.attraction-tier-gold.attraction-tier-reveal,
   #attraction_section .attraction-card.attraction-tier-silver.attraction-tier-reveal{
     animation:none;
