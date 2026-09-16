@@ -72,16 +72,20 @@ describe('Random Seoul responsive visual contract', () => {
     expect(attractionView).not.toContain("make('span', 'attraction-tier");
   });
 
-  it('gives diamond, gold and silver cards metallic borders and one-time arrival effects', () => {
+  it('renders diamond as a distinct gemstone while gold and silver stay metallic', () => {
     expect(styles).toContain('.attraction-card.attraction-tier-diamond');
     expect(styles).toContain('.attraction-card.attraction-tier-gold');
     expect(styles).toContain('.attraction-card.attraction-tier-silver');
-    expect(styles).toContain('attraction-diamond-sheen');
+    expect(styles).toContain('attraction-diamond-prism');
+    expect(styles).toContain('attraction-diamond-sparkle');
+    expect(styles).toContain('attraction-diamond-sparkle-arrive');
+    expect(styles).toContain('attraction-diamond-arrive 1.8s');
+    expect(styles).toContain('#43cfd8');
+    expect(styles).toContain('#c6b2ff');
+    expect(styles).toContain('0 0 0 16px rgba(84,224,232,.46)');
+    expect(styles).toContain('0 0 42px rgba(75,214,230,.38)');
     expect(styles).toContain('attraction-gold-sheen');
     expect(styles).toContain('attraction-silver-sheen');
-    expect(styles).toContain('attraction-diamond-arrive 1.65s');
-    expect(styles).toContain('attraction-gold-arrive');
-    expect(styles).toContain('attraction-silver-arrive');
     expect(styles).toContain('border:3px solid transparent!important');
     expect(styles).toContain('@media(prefers-reduced-motion:reduce)');
     expect(attractionView).toContain('lastRenderedSignature');
