@@ -4,6 +4,7 @@ import { attractionTierForId } from '../src/data/curated-attraction-tiers';
 import { getCuratedAttractions } from '../src/data/curated-attractions';
 import { EXTRA_CURATED_STATION_KEYS } from '../src/data/curated-attractions-extra';
 import { LOCAL_CURATED_STATION_KEYS } from '../src/data/curated-attractions-local';
+import { NIGHT_VIEWPOINT_STATION_KEYS } from '../src/data/curated-attractions-night-viewpoints';
 import { SUBWAY_LINES } from '../src/data/subway-lines';
 
 describe('curated attractions', () => {
@@ -26,7 +27,10 @@ describe('curated attractions', () => {
   it('broadens coverage with commercial streets, markets and sizeable parks', () => {
     expect(getCuratedAttractions('l2', '아현').map((item) => item.name)).toEqual(['아현시장']);
     expect(getCuratedAttractions('l7', '사가정').map((item) => item.name)).toEqual(['용마폭포공원']);
-    expect(getCuratedAttractions('l8', '남한산성입구').map((item) => item.name)).toEqual(['남한산성']);
+    expect(getCuratedAttractions('l8', '남한산성입구').map((item) => item.name)).toEqual([
+      '남한산성',
+      '남한산성 서문 전망대',
+    ]);
     expect(getCuratedAttractions('ic1', '인천시청').map((item) => item.name)).toEqual(['인천중앙공원']);
     expect(getCuratedAttractions('sl', '보라매공원').map((item) => item.name)).toEqual(['보라매공원']);
     expect(LOCAL_CURATED_STATION_KEYS.length).toBeGreaterThan(60);
@@ -92,6 +96,7 @@ describe('curated attractions', () => {
       'incheon-open-port-street',
       'imjingak-pyeonghwa-nuri',
       'cheonggyecheon-stream',
+      'n-seoul-tower',
     ]) {
       expect(attractionTierForId(id)).toBe('gold');
     }
@@ -112,6 +117,8 @@ describe('curated attractions', () => {
       'gocheok-sky-dome',
       'seokchon-dong-tombs',
       'seosomun-shrine-history-museum',
+      'eungbongsan-palgakjeong',
+      'namhansanseong-west-gate-viewpoint',
     ]) {
       expect(attractionTierForId(id)).toBe('silver');
     }
@@ -128,34 +135,46 @@ describe('curated attractions', () => {
       'hwagyesa-temple',
       'dongbaek-lake-park',
       'lotte-dept-dongtan',
+      'dalmaji-bong-park',
+      'maebongsan-palgakjeong',
+      'yongyangbongjeojeong-park',
     ]) {
       expect(attractionTierForId(id)).toBe('standard');
     }
   });
 
-  it('classifies nightscape independently from prominence tier', () => {
-    expect(NIGHTSCAPE_ATTRACTION_IDS).toHaveLength(10);
+  it('classifies nightscape as elevated city-view destinations independent from prominence tier', () => {
+    expect(NIGHTSCAPE_ATTRACTION_IDS).toHaveLength(8);
+    for (const id of [
+      'n-seoul-tower',
+      'naksan-park',
+      'eungbongsan-palgakjeong',
+      'dalmaji-bong-park',
+      'maebongsan-palgakjeong',
+      'yongyangbongjeojeong-park',
+      'lotte-world-tower',
+      'namhansanseong-west-gate-viewpoint',
+    ]) {
+      expect(isNightscapeAttraction(id)).toBe(true);
+    }
+
     for (const id of [
       'ddp',
-      'naksan-park',
       'nodeul-island',
       'banpo-hangang-park',
       'sebit-islands',
       'seokchon-lake',
-      'lotte-world-tower',
       'songdo-central-park',
       'gwanggyo-lake-park',
       'laveniche',
     ]) {
-      expect(isNightscapeAttraction(id)).toBe(true);
+      expect(isNightscapeAttraction(id)).toBe(false);
     }
-    expect(isNightscapeAttraction('seoul-forest')).toBe(false);
-    expect(isNightscapeAttraction('garosu-gil')).toBe(false);
 
     expect(getCuratedAttractions('l2', '잠실')).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'lotte-world-tower', tier: 'diamond', nightscape: true }),
-        expect.objectContaining({ id: 'seokchon-lake', tier: 'gold', nightscape: true }),
+        expect.objectContaining({ id: 'seokchon-lake', tier: 'gold' }),
       ]),
     );
     expect(getCuratedAttractions('l4', '혜화')).toEqual(
@@ -163,6 +182,29 @@ describe('curated attractions', () => {
         expect.objectContaining({ id: 'naksan-park', tier: 'silver', nightscape: true }),
       ]),
     );
+    expect(getCuratedAttractions('gc', '응봉')).toEqual([
+      expect.objectContaining({ id: 'eungbongsan-palgakjeong', tier: 'silver', nightscape: true }),
+    ]);
+    expect(getCuratedAttractions('l6', '버티고개')).toEqual([
+      expect.objectContaining({ id: 'maebongsan-palgakjeong', tier: 'standard', nightscape: true }),
+    ]);
+    expect(getCuratedAttractions('l9', '노들')).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'yongyangbongjeojeong-park', tier: 'standard', nightscape: true }),
+      ]),
+    );
+  });
+
+  it('adds specific elevated night viewpoints without replacing stronger established attractions', () => {
+    expect(getCuratedAttractions('l3', '충무로').map((item) => item.name)).toEqual([
+      '남산골한옥마을',
+      'N서울타워',
+    ]);
+    expect(getCuratedAttractions('l3', '옥수').map((item) => item.name)).toEqual(['달맞이봉공원']);
+    expect(getCuratedAttractions('l8', '남한산성입구').map((item) => item.name)).toEqual([
+      '남한산성',
+      '남한산성 서문 전망대',
+    ]);
   });
 
   it('uses an exact nearby anchor for broad or ambiguous attraction targets', () => {
@@ -194,6 +236,7 @@ describe('curated attractions', () => {
     );
     expect(EXTRA_CURATED_STATION_KEYS.filter((key) => !stationKeys.has(key))).toEqual([]);
     expect(LOCAL_CURATED_STATION_KEYS.filter((key) => !stationKeys.has(key))).toEqual([]);
+    expect(NIGHT_VIEWPOINT_STATION_KEYS.filter((key) => !stationKeys.has(key))).toEqual([]);
   });
 
   it('never stores a station-only target for an attraction', () => {
