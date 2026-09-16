@@ -92,6 +92,19 @@ describe('Random Seoul responsive visual contract', () => {
     expect(attractionView).toContain('if (signature === lastRenderedSignature && !section.hidden) return;');
   });
 
+  it('layers nightscape atmosphere independently from the prominence border', () => {
+    expect(attractionView).toContain("const nightscapeClass = attraction.nightscape ? ' attraction-nightscape' : ''");
+    expect(attractionView).toContain("card.dataset.attractionNightscape = 'true'");
+    expect(attractionView).toContain("item.nightscape ? 'night' : 'plain'");
+    expect(styles).toContain('.attraction-card.attraction-nightscape::before');
+    expect(styles).toContain('linear-gradient(148deg,#081227 0%,#132343 53%,#241a40 100%)');
+    expect(styles).toContain('.attraction-tier-gold.attraction-nightscape::before');
+    expect(styles).toContain('.attraction-tier-silver.attraction-nightscape::before');
+    expect(styles).toContain('.attraction-tier-diamond.attraction-nightscape::before{inset:3px}');
+    expect(styles).toContain('.attraction-card.attraction-nightscape>*{position:relative;z-index:2}');
+    expect(attractionView).not.toContain("make('span', 'attraction-nightscape");
+  });
+
   it('defers restaurant lookup until the user asks for it', () => {
     expect(main).toContain("button.textContent = '추천 식당 보기'");
     expect(main).toContain("restaurantRequest.button.addEventListener('click'");
