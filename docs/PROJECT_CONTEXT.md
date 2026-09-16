@@ -98,10 +98,11 @@ Ultra-rare jackpot tier, fixed to exactly four:
 
 It is a fun/rarity mechanic above Gold, not an absolute quality score. Do not casually add more Diamond IDs.
 
-Visual:
-- 3px platinum/prism metallic border
-- 3.8s continuous reflective sheen
-- deliberately noticeable 1.65s first-arrival multi-stage reveal with two pulse moments
+Visual — **gemstone, not platinum metal**:
+- 3px icy cyan / sky-blue / white / pale-violet prism border
+- moving faceted prism (`4.2s`) plus tiny facet sparkles (`3.4s`)
+- first-arrival reveal is `1.8s`, with several visible pulse/sparkle beats
+- peak scale `1.075`, cyan outer ring up to `16px`, glow roughly `42–58px`
 - same signature guard as other tiers; ordinary rerender does not replay
 - reduced-motion disables motion
 
@@ -147,20 +148,21 @@ Representative: 검암 → `경인아라뱃길 시천가람터` / `시천가람�
 
 ## 9. Latest verified snapshot
 
-### Web — Diamond release
-- source/regression head `45331b014b275da6f0d5506de36b1255f7ecbdb3`
-- CI `35107346536` — success
-- Web Release `35107346782` — success
-- public bundle `assets/modular-CkBsRXsr.js`
-- Pages `35107343850` — success
-- public bundle directly checked for the four Diamond IDs and the 1.65s Diamond reveal
+### Web — gemstone Diamond release
+- source/regression head `ada83825726afd43ceed202d40be5b0da4a902e9`
+- CI `35109359593` — success
+- Web Release `35109359439` — success
+- deployment commit `459545c14cbda1d87fe12aac2833691e1fda4c5f`
+- public bundle `assets/modular-IguZemH4.js`
+- Pages `35109358128` — success
+- public bundle directly checked for the four Diamond IDs, prism/sparkle treatment and `1.8s` reveal
 
-### Android — Diamond release
-- source head `8fa480321054c0ef6494b472c08c6e405acc6947`
-- Android CI `35107400302` — success
+### Android — gemstone Diamond release
+- source head `37755a7f3b02101b334286a6e16ff4212dce6ecd`
+- Android CI `35109420952` — success
 - APK `random-seoul-latest.apk`
-- size `11,420,072` bytes
-- SHA-256 `80b12e1cfff02855cf5aeb0d72a864d905f2eeadeba009fa94c5bf1cfeb7bd07`
+- size `11,420,860` bytes
+- SHA-256 `3b7e6d66d17a8600a6fb70428e11085a3e9e7c3a6275e8cb911624861aaad285`
 
 Direct APK:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
