@@ -20,42 +20,27 @@ Last updated: 2026-09-16
 6. 사용자 요청 시에만 Google Places 식당 검색
 7. TOP 3 렌더 후 추천 식당 section으로 smooth scroll
 
-음식 선택만으로 restaurant lookup을 자동 호출하지 않습니다. Attraction은 Google live search가 아닌 static curation입니다.
+음식 선택만으로 restaurant lookup을 자동 호출하지 않습니다. Attraction은 live Google attraction search가 아닌 static curation입니다.
 
-## UI baseline
+## Main UI baseline
 
 - passive palette: `#f5f4f0 / #fffdfa / #e9ebe7`
 - active random target: lime + dark ink
-- completed station: selected subway-line color의 지하철 역명판 스타일
+- completed station: selected line-color subway-sign style
 - `01 노선 / 02 역 / 03 음식` visual strip hidden
-- dynamic headline:
-  - `어디로 가볼까?`
-  - `어느 역에서 내릴까?`
-  - `식사도 해야지?`
-  - `이 코스로 가자!`
+- headline: `어디로 가볼까? → 어느 역에서 내릴까? → 식사도 해야지? → 이 코스로 가자!`
 - in-card ↻: 27 px / stroke 2.7 / 36×36 hit area
 - food pending: centered `뭐 먹을까?`
-- utility row: `복사 / 네이버지도 / 구글지도`
+- actions: `복사 / 네이버지도 / 구글지도` one row
 - copy: `${역}에서 ${음식} 먹자!`; line/ordinal/examples/restaurant name omitted
 
 ## Attraction coverage
 
-Status: **STATIC FIRST-PARTY / MAX 0–2 / BROAD LOCAL COVERAGE / FOUR VISUAL PROMINENCE TIERS**
+Status: **STATIC FIRST-PARTY / MAX 0–2 / BROAD LOCAL COVERAGE / FOUR PROMINENCE TIERS + ORTHOGONAL NIGHTSCAPE FEATURE**
 
-Allowed candidates include:
-- major landmarks / heritage / museums
-- distinctive commercial, food, cafe and rodeo streets
-- traditional / specialty markets
-- sizeable parks, lake parks, riverside and ecology destinations
-- browse-worthy campuses
-- cultural, sports, exhibition and experiential destinations
-- large browse-worthy retail/lifestyle complexes
+Merge priority:
 
-Tiny playgrounds, ordinary apartment parks and generic neighborhood facilities remain excluded. A weak station may still legitimately return zero attractions.
-
-Data priority:
-
-**base → station adjustments → extra → local → ID dedupe → max2 → tier attachment**
+**base → station adjustments → extra → local → ID dedupe → max2 → prominence tier + orthogonal feature attachment**
 
 Key files:
 - `curated-attractions-base.ts`
@@ -63,78 +48,75 @@ Key files:
 - `curated-attractions-extra.ts`
 - `curated-attractions-local.ts`
 - `curated-attraction-tiers.ts`
+- `curated-attraction-features.ts`
 - `curated-attractions.ts`
 
-`curated-attractions-local.ts` adds 60+ station keys beyond the older seed layers.
+Tiny playgrounds, ordinary apartment parks and generic weak neighborhood facilities remain excluded. A weak station may legitimately return zero attractions.
 
 ## Attraction prominence tiers
 
-The tier name is **never shown as text**.
+Tier name is **never shown as text**.
 
 Current classifier:
 - **Diamond: 4**
 - **Gold: 24**
-- **Silver: 84**
-- all other surfaced attraction IDs: Standard
+- **Silver: 85**
+- all other surfaced IDs: Standard
 
-### Diamond — ultra-rare jackpot tier
+### Diamond
 
-Exactly four attractions:
-- 경복궁
-- 국립중앙박물관
-- 롯데월드타워
-- 북촌한옥마을
+Exactly four: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
 
-Diamond exists primarily as a rare/fun jackpot experience above Gold. It is intentionally kept extremely small and should not be expanded casually.
+Diamond is an intentionally rare jackpot layer, not an absolute quality score. Visual is gemstone rather than metal:
+- 3 px icy cyan / sky-blue / white / pale-violet prism border
+- `4.2s` prism motion + `3.4s` facet sparkle
+- `1.8s` large multi-stage first-arrival reveal
+- peak scale `1.075`, `16px` cyan ring, roughly `42–58px` glow
+- signature guard prevents replay on unrelated rerenders
+- reduced-motion disables motion
 
-Visual contract — **gemstone, not metal**:
-- 3 px icy cyan / sky blue / white / pale-violet prism border
-- faceted color movement via `attraction-diamond-prism` rather than a platinum metallic sheen
-- tiny white/cyan/violet facet sparkles around the card
-- resting prism cycle: `4.2s`; sparkle cycle: `3.4s`
-- first-arrival reveal: **1.8s**, deliberately stronger than Gold/Silver
-- peak expansion: scale `1.075`, cyan outer ring up to `16px`, glow out to roughly `42–58px`
-- multiple pulse moments + sparkle burst so the user can clearly notice a jackpot result
-- reveal only when a genuinely new station/attraction signature appears
-- reduced-motion disables all tier animation
+### Gold / Silver / Standard
 
-### Gold
+- Gold: nationwide / destination-grade recognition; metallic gold border
+- Silver: strong city/region destination or nationally known niche place; metallic silver border
+- Standard: worthwhile local stop; neutral borderless card
 
-Nationwide / destination-grade recognition. Representative current Gold:
-- 창덕궁 / 종묘
-- 광화문광장 / 청계천
-- 광장시장 / 남대문시장
-- DDP / 명동거리 / 홍대
-- 성수 연무장길 / 서울숲
+Latest tier correction:
+- **서소문성지역사박물관** was already Silver and remains Silver.
+- **서울 석촌동 고분군** was Standard and is now promoted to Silver.
+
+Full rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
+
+## Nightscape feature — independent of tier
+
+Nightscape is **not a fifth tier and not a ranking**. It is an orthogonal attraction feature, so the same card can simultaneously be Diamond/Gold/Silver/Standard **and** Nightscape.
+
+Source of truth: `src/data/curated-attraction-features.ts`.
+
+Current conservative Nightscape set — **10 attractions**:
+- DDP
+- 낙산공원
+- 노들섬
 - 반포한강공원
-- 석촌호수 / 올림픽공원
-- 코엑스 / 서울대공원 / 에버랜드
-- 두물머리 / 남한산성 / 임진각 평화누리
-- 송도 센트럴파크 / 인천 차이나타운 / 개항장거리
+- 세빛섬
+- 석촌호수
+- 롯데월드타워
+- 송도 센트럴파크
+- 광교호수공원
+- 라베니체 마치에비뉴
 
-Visual: metallic gold border + continuing sheen + strong first-arrival gold pulse.
+Selection rule: night itself must be a meaningful reason to visit. Seasonal-only night opening or overly broad destinations are not statically tagged.
 
-### Silver
+Visual contract:
+- prominence tier continues to own the **outer border/effect**
+- Nightscape owns the **card interior/background**
+- dark navy → indigo/purple night-sky gradient
+- tiny star points + subtle warm city-light glow near the bottom
+- near-white attraction name / muted blue secondary text / translucent map action
+- no visible `야경` text badge
+- Diamond + Nightscape therefore renders Diamond gemstone border/sparkles over a night-sky interior; Gold/Silver keep their own metallic borders over the same night interior
 
-Strong city/region destination or nationally known niche place. Examples include 가로수길, 용리단길, 대학로, 낙산공원, 서울식물원, 보라매공원, 국립과천과학관, 일산호수공원, 모란민속5일장, 고척스카이돔, 잠실종합운동장, 동구릉, 인천대공원, 강촌유원지, 라베니체 등.
-
-Visual: metallic silver border + continuing sheen + first-arrival silver pulse.
-
-### Standard
-
-Worthwhile local stop without metallic prominence. Demotion does not remove a recommendation; it only removes the special border/effect.
-
-Full audit rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
-
-## Attraction visual implementation
-
-- type: `AttractionTier = 'diamond' | 'gold' | 'silver' | 'standard'`
-- classifier: `src/data/curated-attraction-tiers.ts`
-- render class: `attraction-tier-${tier}`
-- no visible tier badge/text
-- `attraction-view.ts` signature guard prevents replay on unrelated state rerenders
-- `minimal-palette-overrides.css` owns Diamond gemstone visuals and Gold/Silver metallic treatments
-- reduced-motion disables tier motion
+`attraction-view.ts` includes `night/plain` in its render signature, and adds `attraction-nightscape` independently from `attraction-tier-${tier}`.
 
 ## Map integrity
 
@@ -147,52 +129,42 @@ Full audit rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
 
 Representative hardened target: 검암 → `경인아라뱃길 시천가람터` / `시천가람터 인천광역시 서구 시천동 158-11`.
 
-Yongsan station adjustment:
-- `l1:용산`, `gc:용산` → `아이파크몰 용산 + 용리단길`
-- 용리단길 is Silver
-- 신용산 keeps `용리단길 + 아모레퍼시픽미술관`
-
 ## Restaurant recommendation policy
 
 - Google Places live candidates
 - explicit `추천 식당 보기` only
 - hard radius 2 km
 - max 20 candidates → TOP 3
-- Bayesian rating 55%
-- review volume log 25%
-- Google relevance 15%
-- distance 5%
+- Bayesian rating 55%, review volume log 25%, Google relevance 15%, distance 5%
 - Google-derived restaurant results are not persisted as a reusable DB
 
-## Latest verified Web — gemstone Diamond release
+## Latest verified Web — Nightscape release
 
-- source/regression head: `ada83825726afd43ceed202d40be5b0da4a902e9`
-- main CI run `35109359593` — **success**
-- Web Release run `35109359439` — **success**
-- deployment commit: `459545c14cbda1d87fe12aac2833691e1fda4c5f`
-- public bundle: `assets/modular-IguZemH4.js`
-- GitHub Pages run `35109358128` — **success**
+- source/regression head: `b35c2be8e1182343929655e869ff234c649f082a`
+- main CI run `35112696311` — **success**
+- Web Release run `35112696302` — **success**
+- public bundle: `assets/modular-BRia8hmx.js`
+- GitHub Pages run `35112694619` — **success**
 
-The public bundle was directly fetched and checked. It contains:
-- exactly four Diamond IDs: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을
-- Diamond classifier before Gold
-- `attraction-diamond-prism 4.2s`
-- `attraction-diamond-sparkle 3.4s`
-- `attraction-diamond-arrive 1.8s`
-- `16px` cyan expansion ring and larger multi-stage cyan/violet glow
+The deployed bundle was directly fetched and checked for:
+- all 10 Nightscape IDs
+- independent `nightscape` feature attachment
+- `attraction-nightscape` rendering alongside `attraction-tier-*`
+- night-sky gradient `#081227 → #132343 → #241a40`
+- 석촌동 고분군 + 서소문성지역사박물관 in Silver
 
-## Latest verified Android — gemstone Diamond release
+## Latest verified Android — Nightscape release
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- branch/source head: `37755a7f3b02101b334286a6e16ff4212dce6ecd`
-- Android CI run `35109420952` — **success**
+- branch/source head: `398a272fa3ef04ad7970393ff105b6a6e1e6a844`
+- Android CI run `35113150949` — **success**
 - shared tests → native Web build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - fixed Release asset: `random-seoul-latest.apk`
-- size: `11,420,860` bytes
-- SHA-256: `3b7e6d66d17a8600a6fb70428e11085a3e9e7c3a6275e8cb911624861aaad285`
+- size: `11,421,500` bytes
+- SHA-256: `34519dcf9396e655cbee49e8ad547660df3d55040becafd1c0ff4b42ce46e338`
 
 Direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -209,16 +181,17 @@ Android: shared tests → native Web build → Capacitor sync → Gradle `assemb
 - `STATUS.md`: current facts / verification
 - `PROJECT_PLAN.md`: product intent / policy
 - `ARCHITECTURE.md`: technical/data flow
-- `ATTRACTION_CURATION.md`: selection/map/tier policy
-- `ATTRACTION_TIER_AUDIT.md`: prominence audit evidence, decisions and Diamond rarity contract
+- `ATTRACTION_CURATION.md`: selection/map/tier/feature policy
+- `ATTRACTION_TIER_AUDIT.md`: prominence audit evidence and decisions
 
 Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJECT_CONTEXT/README**.
 
 ## Change log — 2026-09-16
 
-- Diamond remains fixed to exactly four attractions: 경복궁, 국립중앙박물관, 롯데월드타워, 북촌한옥마을.
-- Replaced the previous platinum/metal-like Diamond treatment with a true gemstone-style icy cyan / sky / white / violet prism treatment.
-- Added subtle facet sparkles to the resting Diamond card.
-- Increased Diamond first-arrival reveal from `1.65s` to `1.8s` and expanded its visual radius to a `16px` outer ring plus `42–58px` glow.
-- Added several visible pulse/sparkle beats while preserving one-time signature behavior and reduced-motion handling.
-- Verified Web CI/Web Release/public bundle/Pages and Android CI/latest APK for the gemstone Diamond release.
+- Hidden-Gem classification was deliberately **not added**.
+- Confirmed 서소문성지역사박물관 was already Silver.
+- Promoted 서울 석촌동 고분군 from Standard → Silver; Silver count is now 85.
+- Added independent Nightscape feature with 10 conservatively selected attractions.
+- Nightscape uses the card interior rather than border, allowing simultaneous Diamond/Gold/Silver + Nightscape presentation.
+- Added dark navy/indigo/purple starry background and night-specific text/action treatment without a visible badge.
+- Verified Web CI/Web Release/public bundle/Pages and Android CI/latest APK for the Nightscape release.
