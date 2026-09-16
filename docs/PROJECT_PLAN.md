@@ -1,6 +1,6 @@
 # Random Seoul — Project Plan
 
-Last updated: 2026-09-16
+Last updated: 2026-09-17
 
 이 문서는 Random Seoul의 제품 방향과 변경 불가 원칙을 기록합니다. 최신 구현/검증 상태는 `STATUS.md`, 구조는 `ARCHITECTURE.md`를 우선 확인합니다.
 
@@ -63,26 +63,49 @@ Last updated: 2026-09-16
 - **Silver:** 도시·권역 주요 유명 목적지 또는 nationally known niche destination
 - **Standard:** 해당 역에서 둘러볼 가치가 있는 local stop
 
-Diamond는 금속성 platinum이 아니라 **icy cyan / sky / white / pale-violet gemstone prism**으로 표현합니다. `4.2s` prism, `3.4s` facet sparkle, `1.8s` strong first-arrival reveal. Gold/Silver는 metallic border, Standard는 borderless.
+Current counts: Diamond 4 / Gold 25 / Silver 88 / remaining Standard.
+
+Diamond는 금속성 platinum이 아니라 icy cyan / sky / white / pale-violet gemstone prism으로 표현합니다. Gold/Silver는 metallic border, Standard는 borderless.
 
 ### Orthogonal features
 
-특수 속성은 prominence tier와 별도 축으로 둡니다. 따라서 하나의 장소가 `Diamond + Nightscape`, `Gold + Nightscape`, `Silver + Nightscape`가 될 수 있습니다.
+특수 속성은 prominence tier와 별도 축입니다. 동일 장소가 `Diamond + Nightscape`, `Silver + Nightscape`, `Standard + Nightscape`가 될 수 있습니다.
 
 #### Nightscape
 
-- 5번째 tier가 아님
-- 밤에 가는 것 자체가 명확한 방문 이유인 장소만 보수적으로 tag
-- seasonal-only 야간개장/축제는 static tag에서 제외
+Nightscape는 5번째 tier가 아닙니다. 제품 의미는 다음으로 고정합니다:
+
+> **높은 곳에서 도시 불빛·스카이라인을 내려다보는 것이 밤 방문의 주된 이유인 전망 목적지.**
+
+따라서 단순히 조명된 건축물, 수변 산책, 야간 분위기가 좋은 상권은 자동으로 Nightscape가 아닙니다.
+
+Current set — 12:
+- N서울타워
+- 낙산공원
+- 응봉산 팔각정
+- 달맞이봉공원
+- 매봉산 팔각정
+- 용왕산 스카이워크
+- 삼성해맞이공원
+- 용마산 스카이워크
+- 용양봉저정공원
+- 롯데월드타워
+- 남한산성 서문 전망대
+- 수원화성 서장대
+
+Removed from Nightscape only: DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체. Their normal recommendations/tier remain.
+
+Presentation:
 - visible `야경` text badge 없음
-- tier border는 그대로 유지하고 **card interior만 night-sky background**로 전환
-- dark navy / indigo / purple + tiny stars + subtle warm city-light glow
+- tier border/effect stays intact
+- Nightscape changes the **card interior only** to dark navy/indigo/purple night sky + subtle stars/city glow
 
-현재 10개: DDP, 낙산공원, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 롯데월드타워, 송도 센트럴파크, 광교호수공원, 라베니체.
-
-Source separation:
+Data separation:
 - `curated-attraction-tiers.ts` → prominence
-- `curated-attraction-features.ts` → Nightscape 같은 orthogonal feature
+- `curated-attraction-features.ts` → Nightscape classification
+- `curated-attractions-night-viewpoints.ts` → missing elevated viewpoint destinations
+
+The night-viewpoint data layer has the lowest merge priority so it fills spare slots without displacing stronger established recommendations.
 
 ## 5. Mobile result-flow policy
 
@@ -99,8 +122,7 @@ Source separation:
 - result/action 중심, 설명 copy 최소화
 - passive UI는 neutral bg/paper/surface 중심
 - active draw lime + completed station actual line color 유지
-- 일반 card border 최소화
-- prominence tier border와 Nightscape background는 서로 독립적으로 합성
+- prominence tier border와 Nightscape background는 독립적으로 합성
 - `01 노선 / 02 역 / 03 음식` progress strip 숨김
 - stage-aware headline + active card로 진행상태 전달
 - random settle reveal + Android haptic 유지
