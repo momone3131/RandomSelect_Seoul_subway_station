@@ -26,7 +26,10 @@ describe('curated attractions', () => {
 
   it('broadens coverage with commercial streets, markets and sizeable parks', () => {
     expect(getCuratedAttractions('l2', '아현').map((item) => item.name)).toEqual(['아현시장']);
-    expect(getCuratedAttractions('l7', '사가정').map((item) => item.name)).toEqual(['용마폭포공원']);
+    expect(getCuratedAttractions('l7', '사가정').map((item) => item.name)).toEqual([
+      '용마폭포공원',
+      '용마산 스카이워크',
+    ]);
     expect(getCuratedAttractions('l8', '남한산성입구').map((item) => item.name)).toEqual([
       '남한산성',
       '남한산성 서문 전망대',
@@ -38,7 +41,10 @@ describe('curated attractions', () => {
 
   it('includes browse-worthy commercial and lifestyle destinations', () => {
     expect(getCuratedAttractions('l1', '광명').map((item) => item.name)).toEqual(['IKEA 광명', '롯데몰 광명']);
-    expect(getCuratedAttractions('l1', '화서').map((item) => item.name)).toEqual(['스타필드 수원']);
+    expect(getCuratedAttractions('l1', '화서').map((item) => item.name)).toEqual([
+      '스타필드 수원',
+      '수원화성 서장대',
+    ]);
     expect(getCuratedAttractions('l3', '삼송').map((item) => item.name)).toEqual(['스타필드 고양']);
     expect(getCuratedAttractions('l3', '원흥').map((item) => item.name)).toEqual(['IKEA 고양']);
     expect(getCuratedAttractions('ic1', '테크노파크').map((item) => item.name)).toEqual([
@@ -119,6 +125,7 @@ describe('curated attractions', () => {
       'seosomun-shrine-history-museum',
       'eungbongsan-palgakjeong',
       'namhansanseong-west-gate-viewpoint',
+      'suwon-hwaseong-seojangdae',
     ]) {
       expect(attractionTierForId(id)).toBe('silver');
     }
@@ -137,6 +144,9 @@ describe('curated attractions', () => {
       'lotte-dept-dongtan',
       'dalmaji-bong-park',
       'maebongsan-palgakjeong',
+      'yongwangsan-skywalk',
+      'samsung-haemaji-park',
+      'yongmasan-skywalk',
       'yongyangbongjeojeong-park',
     ]) {
       expect(attractionTierForId(id)).toBe('standard');
@@ -144,16 +154,20 @@ describe('curated attractions', () => {
   });
 
   it('classifies nightscape as elevated city-view destinations independent from prominence tier', () => {
-    expect(NIGHTSCAPE_ATTRACTION_IDS).toHaveLength(8);
+    expect(NIGHTSCAPE_ATTRACTION_IDS).toHaveLength(12);
     for (const id of [
       'n-seoul-tower',
       'naksan-park',
       'eungbongsan-palgakjeong',
       'dalmaji-bong-park',
       'maebongsan-palgakjeong',
+      'yongwangsan-skywalk',
+      'samsung-haemaji-park',
+      'yongmasan-skywalk',
       'yongyangbongjeojeong-park',
       'lotte-world-tower',
       'namhansanseong-west-gate-viewpoint',
+      'suwon-hwaseong-seojangdae',
     ]) {
       expect(isNightscapeAttraction(id)).toBe(true);
     }
@@ -201,10 +215,20 @@ describe('curated attractions', () => {
       'N서울타워',
     ]);
     expect(getCuratedAttractions('l3', '옥수').map((item) => item.name)).toEqual(['달맞이봉공원']);
+    expect(getCuratedAttractions('l9', '신목동').map((item) => item.name)).toEqual(['용왕산 스카이워크']);
+    expect(getCuratedAttractions('l7', '청담').map((item) => item.name)).toEqual([
+      '청담 명품거리',
+      '삼성해맞이공원',
+    ]);
     expect(getCuratedAttractions('l8', '남한산성입구').map((item) => item.name)).toEqual([
       '남한산성',
       '남한산성 서문 전망대',
     ]);
+    expect(getCuratedAttractions('l1', '화서')).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'suwon-hwaseong-seojangdae', tier: 'silver', nightscape: true }),
+      ]),
+    );
   });
 
   it('uses an exact nearby anchor for broad or ambiguous attraction targets', () => {
