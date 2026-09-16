@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { ALCOHOL_FOOD_IDS, isAlcoholFoodId } from '../src/data/food-category-features';
+import { FOOD_CATEGORIES } from '../src/data/food-categories';
 import {
   HISTORY_STORAGE_KEY,
   SETTINGS_STORAGE_KEY,
@@ -26,6 +28,23 @@ describe('stable web persistence compatibility', () => {
 
     savePreferences(storage, preferences);
     expect(storage.values.get(SETTINGS_STORAGE_KEY)).toEqual({ selected: ['l2'], selected_foods: ['c_dimsum'], instant: true });
+  });
+
+  it('treats the previous 36-category full selection as all 42 categories after the alcohol expansion', () => {
+    const storage = new MemoryStorage();
+    const previousDefault = FOOD_CATEGORIES.filter((food) => !isAlcoholFoodId(food.id)).map((food) => food.id);
+    expect(previousDefault).toHaveLength(36);
+    storage.values.set(SETTINGS_STORAGE_KEY, { selected_foods: previousDefault });
+
+    const preferences = loadPreferences(storage);
+    expect(preferences.selectedFoodIds).toHaveLength(42);
+    for (const id of ALCOHOL_FOOD_IDS) expect(preferences.selectedFoodIds).toContain(id);
+  });
+
+  it('does not inject alcohol into a deliberately narrowed saved food selection', () => {
+    const storage = new MemoryStorage();
+    storage.values.set(SETTINGS_STORAGE_KEY, { selected_foods: ['c_dimsum', 'w_pizza'] });
+    expect(loadPreferences(storage).selectedFoodIds).toEqual(['c_dimsum', 'w_pizza']);
   });
 
   it('migrates the existing v9 history shape without changing its storage contract', () => {

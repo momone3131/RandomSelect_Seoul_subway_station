@@ -1,3 +1,4 @@
+import { ALCOHOL_FOOD_IDS, isAlcoholFoodId } from '../data/food-category-features';
 import { FOOD_CATEGORIES } from '../data/food-categories';
 import { SUBWAY_LINES } from '../data/subway-lines';
 import { readableInk } from './color';
@@ -11,6 +12,7 @@ export class SettingsModalView {
   private previousFocus: Element | null = null;
   private lockedScrollY = 0;
   private onDraftChange?: (draftIds: readonly string[]) => void;
+  private readonly alcoholPreset: HTMLButtonElement;
   private readonly modalKeydownHandler = (event: KeyboardEvent): void => {
     if (!this.mode) return;
     if (event.key === 'Escape' || event.keyCode === 27) {
@@ -40,6 +42,16 @@ export class SettingsModalView {
     }
   };
 
+  constructor() {
+    const button = make('button', 'preset', '주류 제외') as HTMLButtonElement;
+    button.id = 'preset_alcohol';
+    button.type = 'button';
+    button.hidden = true;
+    button.addEventListener('click', () => this.toggleAlcohol());
+    byId<HTMLButtonElement>('preset_none').insertAdjacentElement('afterend', button);
+    this.alcoholPreset = button;
+  }
+
   get isOpen(): boolean {
     return this.mode !== undefined;
   }
@@ -58,15 +70,16 @@ export class SettingsModalView {
     this.onDraftChange = onDraftChange;
     const isFood = mode === 'food';
 
-    byId<HTMLElement>('settings_title').textContent = isFood ? '무슨 음식을 뽑을까요?' : '어떤 노선을 뽑을까요?';
+    byId<HTMLElement>('settings_title').textContent = isFood ? '뭘 먹거나 마실까요?' : '어떤 노선을 뽑을까요?';
     byId<HTMLElement>('settings_desc').textContent = isFood
-      ? '서로 다른 식사 종류를 36종으로 나눴어요. 각 종목은 같은 확률이에요.'
+      ? `식사·주류 종목을 ${FOOD_CATEGORIES.length}종으로 나눴어요. 각 종목은 같은 확률이에요.`
       : '선택한 노선 안에서만 뽑아요. 각 노선의 확률은 같아요.';
     byId<HTMLElement>('settings_apply_note').textContent = isFood
       ? '적용하면 음식만 초기화돼요. 뽑은 노선·역과 기록은 유지됩니다.'
       : '적용하면 노선·역·음식이 초기화돼요. 기록은 유지됩니다.';
     byId<HTMLButtonElement>('apply_settings').textContent = isFood ? '선택한 음식 적용' : '선택한 노선 적용';
     byId<HTMLButtonElement>('preset_metro').hidden = isFood;
+    this.alcoholPreset.hidden = !isFood;
 
     this.renderChoices();
     this.previousFocus = document.activeElement;
@@ -119,9 +132,30 @@ export class SettingsModalView {
     this.renderChoices();
   }
 
+  toggleAlcohol(): void {
+    if (this.mode !== 'food') return;
+    const hasAlcohol = this.draftIds.some((id) => isAlcoholFoodId(id));
+    if (hasAlcohol) {
+      this.draftIds = this.draftIds.filter((id) => !isAlcoholFoodId(id));
+    } else {
+      const selected = new Set(this.draftIds);
+      for (const id of ALCOHOL_FOOD_IDS) selected.add(id);
+      this.draftIds = FOOD_CATEGORIES.map((food) => food.id).filter((id) => selected.has(id));
+    }
+    this.renderChoices();
+  }
+
+  private syncAlcoholPreset(): void {
+    if (this.mode !== 'food') return;
+    const hasAlcohol = this.draftIds.some((id) => isAlcoholFoodId(id));
+    this.alcoholPreset.textContent = hasAlcohol ? '주류 제외' : '주류 포함';
+    this.alcoholPreset.setAttribute('aria-label', hasAlcohol ? '주류 종목 모두 제외' : '주류 종목 모두 포함');
+  }
+
   private renderCount(): void {
     byId<HTMLElement>('draft_count').textContent = `${this.draftIds.length}개 선택`;
     byId<HTMLButtonElement>('apply_settings').disabled = this.draftIds.length === 0;
+    this.syncAlcoholPreset();
     this.onDraftChange?.(this.draftIds);
   }
 

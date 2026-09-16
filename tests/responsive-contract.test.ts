@@ -11,6 +11,7 @@ const primaryDrawPlacement = readFileSync(new URL('../src/ui/primary-draw-placem
 const drawAnimation = readFileSync(new URL('../src/ui/draw-animation.ts', import.meta.url), 'utf8');
 const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
 const attractionView = readFileSync(new URL('../src/ui/attraction-view.ts', import.meta.url), 'utf8');
+const settingsView = readFileSync(new URL('../src/ui/settings-view.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 describe('Random Seoul responsive visual contract', () => {
@@ -103,6 +104,20 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('.attraction-tier-diamond.attraction-nightscape::before{inset:3px}');
     expect(styles).toContain('.attraction-card.attraction-nightscape>*{position:relative;z-index:2}');
     expect(attractionView).not.toContain("make('span', 'attraction-nightscape");
+  });
+
+  it('adds a one-button alcohol include/exclude preset only to food settings', () => {
+    expect(settingsView).toContain("button.id = 'preset_alcohol'");
+    expect(settingsView).toContain("hasAlcohol ? '주류 제외' : '주류 포함'");
+    expect(settingsView).toContain('ALCOHOL_FOOD_IDS');
+    expect(settingsView).toContain('isAlcoholFoodId');
+    expect(settingsView).toContain('this.alcoholPreset.hidden = !isFood');
+    expect(settingsView).toContain('toggleAlcohol(): void');
+  });
+
+  it('shows the live selected food count instead of the old static 36-category copy', () => {
+    expect(drawView).toContain("byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`");
+    expect(settingsView).toContain('식사·주류 종목을 ${FOOD_CATEGORIES.length}종으로 나눴어요');
   });
 
   it('defers restaurant lookup until the user asks for it', () => {

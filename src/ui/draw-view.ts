@@ -2,7 +2,6 @@ import type { AppState } from '../state/app-state';
 import type { FoodCategory, SubwayLine, SubwayStation } from '../domain/types';
 import { readableInk } from './color';
 import { append, byId, make, replaceContent } from './dom';
-import { renderAttractions, resetAttractionView } from './attraction-view';
 import { placePrimaryDrawButton, type PrimaryDrawStage } from './primary-draw-placement';
 
 export interface DrawViewStatus {
@@ -198,6 +197,8 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   copy.disabled = locked || !state.currentStation;
   instant.disabled = status.busy;
   instant.checked = state.preferences.instantDraw;
+  byId<HTMLElement>('scope_count').textContent = `${state.preferences.selectedLineIds.length}개 노선`;
+  byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`;
 
   drawButton.className = `draw-btn${status.busy ? ' busy' : ''}`;
   const drawShell = byId<HTMLElement>('draw_shell');
@@ -273,6 +274,4 @@ export function renderDrawView(state: Readonly<AppState>, status: DrawViewStatus
   renderFood(state.currentFood, state.currentStation);
   renderControls(state, status);
   renderStationList(state.currentLine, state.currentStation);
-  if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions ?? []);
-  else resetAttractionView();
 }
