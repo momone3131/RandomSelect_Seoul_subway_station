@@ -1,6 +1,8 @@
-import type { AttractionRecommendation } from '../domain/types';
+import type { AttractionRecommendation, AttractionTier } from '../domain/types';
 import { googleMapsAttractionUrl } from '../services/maps/web-map-links';
 import { append, byId, make, replaceContent } from './dom';
+
+let lastRenderedSignature = '';
 
 function ensureSection(): HTMLElement {
   const found = document.getElementById('attraction_section');
@@ -34,8 +36,17 @@ function ensureSection(): HTMLElement {
   return section;
 }
 
+function tierOf(attraction: AttractionRecommendation): AttractionTier {
+  return attraction.tier ?? 'standard';
+}
+
+function signatureFor(stationName: string, attractions: readonly AttractionRecommendation[]): string {
+  return `${stationName}|${attractions.map((item) => `${item.id}:${tierOf(item)}`).join('|')}`;
+}
+
 export function resetAttractionView(): void {
   const section = ensureSection();
+  lastRenderedSignature = '';
   section.hidden = true;
   byId<HTMLElement>('attraction_cards').hidden = true;
   byId<HTMLElement>('attraction_count').hidden = true;
@@ -44,19 +55,27 @@ export function resetAttractionView(): void {
 
 export function renderAttractions(stationName: string, attractions: readonly AttractionRecommendation[]): void {
   const section = ensureSection();
-  replaceContent(byId<HTMLElement>('attraction_cards'));
 
   if (!attractions.length) {
     resetAttractionView();
     return;
   }
 
+  const signature = signatureFor(stationName, attractions);
+  if (signature === lastRenderedSignature && !section.hidden) return;
+  const shouldReveal = signature !== lastRenderedSignature;
+  lastRenderedSignature = signature;
+
   section.hidden = false;
   byId<HTMLElement>('attraction_context').textContent = `${stationName}역 주변`;
   const fragment = document.createDocumentFragment();
 
   attractions.forEach((attraction) => {
-    const card = make('article', 'restaurant-card attraction-card');
+    const tier = tierOf(attraction);
+    const revealClass = shouldReveal && tier !== 'standard' ? ' attraction-tier-reveal' : '';
+    const card = make('article', `restaurant-card attraction-card attraction-tier-${tier}${revealClass}`);
+    card.dataset.attractionTier = tier;
+
     const name = make('h3', 'restaurant-name', attraction.name);
     const category = make('p', 'restaurant-desc', attraction.category || '볼거리');
 
