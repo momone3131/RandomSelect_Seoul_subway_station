@@ -78,6 +78,7 @@ export interface AttractionRecommendation {
   mapQuery?: string;
   note?: string;
   tier?: AttractionTier;
+  nightscape?: boolean;
 }
 
 export interface DrawHistoryItem {
