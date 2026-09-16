@@ -29,6 +29,7 @@ src/
 │  ├─ curated-attractions-extra.ts
 │  ├─ curated-attractions-local.ts
 │  ├─ curated-attraction-tiers.ts
+│  ├─ curated-attraction-features.ts
 │  └─ station-coordinates.ts
 ├─ domain/
 │  ├─ types.ts
@@ -62,7 +63,7 @@ Provider returns candidates; shared core owns final restaurant ranking.
 
 - draw functions do not wait for restaurant network lookup
 - station draw calls `getCuratedAttractions()` and puts static 0–2 attractions in state immediately
-- merged attraction gets its visual tier at merge time
+- merged attractions receive both prominence tier and orthogonal features before entering state
 - food draw finalizes food/history only; `recommendations` stays empty
 - UI shows attractions before restaurant CTA
 
@@ -89,11 +90,7 @@ Course change invalidates previous restaurant request UI state.
 5. distance signal
 6. TOP 3
 
-Weights:
-- rating 55%
-- review volume 25%
-- relevance 15%
-- distance 5%
+Weights: rating 55% / review volume 25% / relevance 15% / distance 5%.
 
 Provider restaurant result/rating/review values are not persisted as a reusable long-term DB.
 
@@ -105,44 +102,91 @@ Attractions are first-party static data, max 0–2. There is no Google attractio
 
 `getCuratedAttractions()` merges in this exact order:
 
-1. `curated-attractions-base.ts` — established strong seed
-2. `curated-attractions-adjustments.ts` — sparse station-specific priority override
-3. `curated-attractions-extra.ts` — browse-worthy expansion
-4. `curated-attractions-local.ts` — broader local streets/markets/sizeable parks/campuses/culture/sports
+1. `curated-attractions-base.ts`
+2. `curated-attractions-adjustments.ts`
+3. `curated-attractions-extra.ts`
+4. `curated-attractions-local.ts`
 5. ID dedupe
 6. `slice(0, 2)`
-7. tier attachment via `curated-attraction-tiers.ts`
+7. prominence tier attachment via `curated-attraction-tiers.ts`
+8. orthogonal feature attachment via `curated-attraction-features.ts`
 
-Priority prevents a weaker local stop from displacing an established stronger recommendation. `adjustments` is intentionally sparse; it is for cases such as Yongsan where the desired top-two combination crosses layers.
+Priority prevents a weaker local stop from displacing an established stronger recommendation. `adjustments` is intentionally sparse; Yongsan is the current representative use.
 
-Current Yongsan adjustment:
-- `l1:용산`, `gc:용산` → 아이파크몰 용산 + 용리단길
-- 신용산 remains 용리단길 + 아모레퍼시픽미술관
+### Attraction domain model
 
-### Attraction type and tiers
-
-`AttractionRecommendation` includes optional:
+`AttractionRecommendation` includes:
 
 ```ts
 tier?: 'diamond' | 'gold' | 'silver' | 'standard'
+nightscape?: boolean
 ```
 
-Public merged results always attach a tier.
+Prominence and feature are intentionally separate dimensions.
 
-- diamond: ultra-rare jackpot destination; fixed four
-- gold: nationwide / destination-grade recognition
-- silver: strong city/region destination or nationally known niche place
-- standard: worthwhile local stop
+#### Prominence tier
 
-Tier assignment is ID-based and centralized in `curated-attraction-tiers.ts` so the same place keeps the same visual prominence across stations.
+- Diamond: ultra-rare jackpot; exactly four
+- Gold: nationwide / destination-grade recognition
+- Silver: strong city/region destination or nationally known niche place
+- Standard: worthwhile local stop
 
-Current classifier:
-- Diamond 4
-- Gold 24
-- Silver 84
-- remaining surfaced attractions Standard
+Current classifier: Diamond 4 / Gold 24 / Silver 85 / remaining Standard.
 
-Diamond is intentionally fixed to 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을. It is a rarity/fun layer rather than an absolute quality score. Audit rationale is documented in `docs/ATTRACTION_TIER_AUDIT.md`.
+`curated-attraction-tiers.ts` is the source of truth. Same attraction ID has the same tier across stations.
+
+#### Orthogonal feature: Nightscape
+
+`curated-attraction-features.ts` owns independent Nightscape tagging. It is **not a fifth tier**.
+
+Current 10 IDs:
+- `ddp`
+- `naksan-park`
+- `nodeul-island`
+- `banpo-hangang-park`
+- `sebit-islands`
+- `seokchon-lake`
+- `lotte-world-tower`
+- `songdo-central-park`
+- `gwanggyo-lake-park`
+- `laveniche`
+
+Because Nightscape is independent, examples include:
+- 롯데월드타워 = Diamond + Nightscape
+- 반포한강공원 = Gold + Nightscape
+- 낙산공원 = Silver + Nightscape
+
+Seasonal-only night openings/festivals are not used for a static Nightscape flag.
+
+### Attraction presentation
+
+`attraction-view.ts` places attraction section immediately after `.panels`.
+
+- max 2 compact cards
+- 1 → one-column
+- 0 → hidden section
+- no tier label and no Nightscape text badge
+- tier class: `attraction-tier-${tier}`
+- feature class: `attraction-nightscape`
+- dataset keeps both tier and Nightscape state
+
+The render signature contains station + attraction ID + tier + `night/plain`. Ordinary unrelated state changes therefore do not rebuild the attraction DOM or replay first-arrival tier effects.
+
+### Visual ownership
+
+`minimal-palette-overrides.css`:
+- Diamond: gemstone prism border/facet sparkle + `1.8s` first-arrival jackpot reveal
+- Gold: metallic gold border + sheen + gold reveal
+- Silver: metallic silver border + sheen + silver reveal
+- Standard: neutral borderless
+- Nightscape: dark navy/indigo/purple **interior pseudo-layer** with star points and a subtle warm city-light glow
+
+Nightscape never takes ownership of the border. Tier-specific insets (`3px` Diamond, `2px` Gold/Silver) keep the prominence border visible around the night interior.
+
+### Latest tier correction
+
+- `seosomun-shrine-history-museum`: already Silver; unchanged
+- `seokchon-dong-tombs`: Standard → Silver
 
 ### Quality gate
 
@@ -151,27 +195,6 @@ Diamond is intentionally fixed to 경복궁 / 국립중앙박물관 / 롯데월�
 - distinctive streets/markets/culture/sizeable parks/waterfronts/campuses/major commercial destinations allowed
 - tiny playgrounds and generic weak neighborhood facilities excluded
 - weak station may remain `[]`
-
-### Attraction presentation
-
-`attraction-view.ts` places attraction section immediately after `.panels`.
-
-- max 2 compact cards
-- 1 → one-column
-- 0 → section hidden
-- tier text is never rendered
-- class only: `attraction-tier-diamond | attraction-tier-gold | attraction-tier-silver | attraction-tier-standard`
-
-A module-level signature uses station + attraction IDs + tiers. Same-result rerenders do not rebuild attraction DOM, so the tier reveal is genuinely first-arrival rather than replaying on unrelated state changes.
-
-### Tier visuals
-
-`minimal-palette-overrides.css` owns final tier treatment:
-- diamond: 3px platinum/prism metallic gradient border + 3.8s sheen + deliberately noticeable 1.65s two-pulse/multi-stage first-arrival reveal
-- gold: metallic gradient border + slow sheen + strong gold first-arrival pulse
-- silver: metallic silver border + slow sheen + silver first-arrival pulse
-- standard: neutral borderless card
-- reduced-motion disables tier animation
 
 ### Map-target strategy
 
@@ -182,7 +205,7 @@ Attraction lat/lng is not stored; each result uses self-contained `mapQuery`.
 - broad waterfront/path destinations use concrete access anchor where appropriate
 - ambiguous target can be omitted rather than linking to wrong pin
 
-Tests guard data validity, max2, station keys, map targets, Diamond exclusivity, audited tier boundaries and visual contracts.
+Tests guard data validity, max2, station keys, map targets, tier boundaries, Nightscape classification and visual overlap contracts.
 
 ## 7. Station center strategy
 
@@ -200,7 +223,7 @@ Station center and attraction mapQuery are separate data paths.
 - `currentLine`
 - `currentStation`
 - `currentFood`
-- `attractions`: static 0–2 tiered results
+- `attractions`: static 0–2 enriched results
 - `recommendations`: live restaurant TOP 3 after user request
 - `history`
 
@@ -216,15 +239,7 @@ Restaurant request lifecycle and attraction reveal signature are transient UI-on
 
 ## 10. Platform services
 
-Adapters/plugins own:
-- native place search
-- haptics
-- share
-- map launch/deep link
-- back handling
-- persistent storage
-
-Current GPS/current-location permission: none.
+Adapters/plugins own native place search, haptics, share, map launch/deep link, back handling and persistent storage. Current GPS/current-location permission: none.
 
 ## 11. API key strategy
 
@@ -238,22 +253,10 @@ Do not hardcode production keys into shared TypeScript.
 
 ### Web
 
-`modular.html` → Vite hashed assets.
-
-`web-release.yml`:
-1. tests
-2. Vite build
-3. headless browser smoke
-4. verified root promotion
-5. deployment commit rebase/push to latest main
-6. GitHub Pages
+`web-release.yml`: tests → Vite build → headless browser smoke → verified root promotion → Pages.
 
 ### Android
 
-Vite native build → Capacitor sync → Gradle `assembleDebug`.
+Vite native build → Capacitor sync → Gradle `assembleDebug` → artifact → fixed `android-dev-latest` Release.
 
-Successful Android branch build updates:
-1. Actions artifact `random-seoul-debug-apk`
-2. fixed Release `android-dev-latest` / `random-seoul-latest.apk`
-
-Web and Android share the same static attraction layers and four-tier classifier; only live restaurant candidate lookup is platform-specific.
+Web and Android share the same attraction layers, prominence classifier and Nightscape feature classifier; only live restaurant candidate lookup is platform-specific.
