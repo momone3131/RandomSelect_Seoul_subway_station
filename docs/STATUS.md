@@ -40,9 +40,9 @@ Last updated: 2026-09-16
 
 ## Attraction coverage
 
-Status: **STATIC FIRST-PARTY / MAX 0–2 / BROAD LOCAL COVERAGE / THREE VISUAL PROMINENCE TIERS**
+Status: **STATIC FIRST-PARTY / MAX 0–2 / BROAD LOCAL COVERAGE / FOUR VISUAL PROMINENCE TIERS**
 
-Allowed candidates now include:
+Allowed candidates include:
 - major landmarks / heritage / museums
 - distinctive commercial, food, cafe and rodeo streets
 - traditional / specialty markets
@@ -67,74 +67,71 @@ Key files:
 
 `curated-attractions-local.ts` adds 60+ station keys beyond the older seed layers.
 
-## Attraction prominence tier audit — 2026-09-16
+## Attraction prominence tiers
 
-A full tier audit was completed against the current attraction inventory, using current official tourism material as external evidence and editorial consistency across the dataset.
-
-Tier meaning:
-- **gold:** nationwide / destination-grade recognition
-- **silver:** strong city/region destination or nationally known niche place
-- **standard:** worthwhile local stop
-
-The tier name is never shown as text.
+The tier name is **never shown as text**.
 
 Current classifier:
-- Gold IDs: **28**
-- Silver IDs: **84**
+- **Diamond: 4**
+- **Gold: 24**
+- **Silver: 84**
 - all other surfaced attraction IDs: Standard
 
-Representative Gold after audit:
-- 경복궁 / 창덕궁 / 북촌 / 종묘
-- 국립중앙박물관 / 전쟁기념관
+### Diamond — ultra-rare jackpot tier
+
+Exactly four attractions:
+- 경복궁
+- 국립중앙박물관
+- 롯데월드타워
+- 북촌한옥마을
+
+Diamond exists primarily as a rare/fun jackpot experience above Gold. It is intentionally kept extremely small and should not be expanded casually.
+
+Visual contract:
+- 3 px platinum/prism metallic border
+- pale platinum + restrained cyan/lilac/warm reflective highlights
+- continuous `3.8s` sheen
+- first-arrival `1.65s` multi-stage reveal with a strong first pulse and a second smaller pulse
+- reveal only when a genuinely new station/attraction signature appears
+- reduced-motion disables animation
+
+### Gold
+
+Nationwide / destination-grade recognition. Representative current Gold:
+- 창덕궁 / 종묘
 - 광화문광장 / 청계천
 - 광장시장 / 남대문시장
-- DDP / 명동 / 홍대
+- DDP / 명동거리 / 홍대
 - 성수 연무장길 / 서울숲
 - 반포한강공원
-- 롯데월드타워 / 석촌호수 / 올림픽공원
+- 석촌호수 / 올림픽공원
 - 코엑스 / 서울대공원 / 에버랜드
 - 두물머리 / 남한산성 / 임진각 평화누리
 - 송도 센트럴파크 / 인천 차이나타운 / 개항장거리
 
-Notable Silver promotions/confirmations:
-- 서대문형무소역사관 / 대학로 / 낙산공원 / 북서울꿈의숲
-- 동묘벼룩시장 / 동대문종합시장 / 경동시장 / 마장축산물시장
-- 용리단길 / 가로수길 / 압구정로데오 / 청담 명품거리
-- 신당동 떡볶이타운 / 신림동 순대타운
-- 아차산 / 도봉산 / 수락산 / 관악산 / 청계산
-- 고척스카이돔 / 잠실종합운동장 / 국기원
-- 모란민속5일장 / 안산 다문화음식거리 / 대림동 차이나타운
-- 한국만화박물관 / 백남준아트센터
-- 정릉 / 동구릉 / 태릉과 강릉 / 선정릉
-- 인천대공원 / 자유공원 / 신포국제시장 / 소래포구
-- 강촌유원지 / 청평유원지 / 춘천 명동 닭갈비골목 / 소양강스카이워크
-- 보정동 카페거리 / 라베니체 / 소요산
+Visual: metallic gold border + continuing sheen + strong first-arrival gold pulse.
 
-Intentional Silver → Standard demotions:
-- 서울로7017
-- 양재시민의숲
-- 용마폭포공원
-- 양화한강공원
-- 일자산 허브천문공원
-- 인천중앙공원
-- 삼패한강공원
-- 은계호수공원
-- 화계사
-- 동백호수공원
-- 롯데백화점 동탄점
+### Silver
 
-Demotion does **not** remove a recommendation; it only removes metallic Silver emphasis.
+Strong city/region destination or nationally known niche place. Examples include 가로수길, 용리단길, 대학로, 낙산공원, 서울식물원, 보라매공원, 국립과천과학관, 일산호수공원, 모란민속5일장, 고척스카이돔, 잠실종합운동장, 동구릉, 인천대공원, 강촌유원지, 라베니체 등.
 
-Full rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
+Visual: metallic silver border + continuing sheen + first-arrival silver pulse.
 
-## Attraction visual contract
+### Standard
 
-- gold: metallic gold reflective border + continuing sheen + strong first-arrival gold pulse
-- silver: metallic silver reflective border + continuing sheen + silver first-arrival pulse
-- standard: neutral borderless card
-- reveal runs only for a new station/attraction signature
-- ordinary rerender does not replay reveal
-- reduced-motion disables tier animation
+Worthwhile local stop without metallic prominence. Demotion does not remove a recommendation; it only removes the special border/effect.
+
+Full audit rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
+
+## Attraction visual implementation
+
+- type: `AttractionTier = 'diamond' | 'gold' | 'silver' | 'standard'`
+- classifier: `src/data/curated-attraction-tiers.ts`
+- render class: `attraction-tier-${tier}`
+- no visible tier badge/text
+- `attraction-view.ts` signature guard prevents replay on unrelated state rerenders
+- `minimal-palette-overrides.css` owns diamond/gold/silver metallic treatments
+- reduced-motion disables tier motion
 
 ## Map integrity
 
@@ -164,29 +161,33 @@ Yongsan station adjustment:
 - distance 5%
 - Google-derived restaurant results are not persisted as a reusable DB
 
-## Latest verified Web
+## Latest verified Web — Diamond release
 
-Full-audit source release:
-- tier source head: `ef6eb1dcfd8b6d7823c5607a7cb2532c53db8a8d`
-- main CI run `35102781290` — **success**
-- Web Release run `35102781339` — **success**
-- deployment commit: `006eafb1070a36a1a0041c1d91125d2ba7697c2f`
-- public bundle: `assets/modular-Coke_hQH.js`
-- GitHub Pages run `35102843979` — **success**
+- source/regression head: `45331b014b275da6f0d5506de36b1255f7ecbdb3`
+- main CI run `35107346536` — **success**
+- Web Release run `35107346782` — **success**
+- public bundle: `assets/modular-CkBsRXsr.js`
+- GitHub Pages run `35107343850` — **success**
 
-The public bundle was directly checked and contains the audited Gold/Silver ID sets including current second-pass additions such as 북서울꿈의숲, 마장축산물시장, 신림동 순대타운, 고척스카이돔, 잠실종합운동장, 모란민속5일장 and 춘천 명동 닭갈비골목.
+The public bundle was directly fetched and checked. It contains:
+- exactly four Diamond IDs: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을
+- Diamond classifier before Gold
+- `attraction-diamond-sheen 3.8s`
+- `attraction-diamond-arrive 1.65s`
+- multi-stage Diamond reveal keyframes
 
-## Latest verified Android
+## Latest verified Android — Diamond release
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- audited tier source head: `100f5e485221fd4dbc3915746cfa72fceed98526`
-- Android CI run `35102822357` — **success**
+- branch/source head: `8fa480321054c0ef6494b472c08c6e405acc6947`
+- Android CI run `35107400302` — **success**
+- shared tests → native Web build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - fixed Release asset: `random-seoul-latest.apk`
-- size: `11,419,580` bytes
-- SHA-256: `f62636ec46df889921a107752012feccf27da8568deb6fe61080728763f3581f`
+- size: `11,420,072` bytes
+- SHA-256: `80b12e1cfff02855cf5aeb0d72a864d905f2eeadeba009fa94c5bf1cfeb7bd07`
 
 Direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -204,6 +205,16 @@ Android: shared tests → native Web build → Capacitor sync → Gradle `assemb
 - `PROJECT_PLAN.md`: product intent / policy
 - `ARCHITECTURE.md`: technical/data flow
 - `ATTRACTION_CURATION.md`: selection/map/tier policy
-- `ATTRACTION_TIER_AUDIT.md`: 2026-09 prominence audit evidence and decisions
+- `ATTRACTION_TIER_AUDIT.md`: prominence audit evidence, decisions and Diamond rarity contract
 
 Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJECT_CONTEXT/README**.
+
+## Change log — 2026-09-16
+
+- Added ultra-rare Diamond tier above Gold.
+- Diamond fixed to exactly four attractions: 경복궁, 국립중앙박물관, 롯데월드타워, 북촌한옥마을.
+- Moved those four IDs out of Gold; current counts are Diamond 4 / Gold 24 / Silver 84 / remaining Standard.
+- Added 3px platinum/prismatic reflective border and 3.8s sheen.
+- Added deliberately noticeable 1.65s multi-stage first-arrival reveal with two visible pulse moments.
+- Kept tier labels hidden and preserved signature/reduced-motion behavior.
+- Verified Web CI/Web Release/public bundle/Pages and Android CI/latest APK for the Diamond release.
