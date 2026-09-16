@@ -1,4 +1,5 @@
 import type { AttractionRecommendation } from '../domain/types';
+import { isNightscapeAttraction } from './curated-attraction-features';
 import { attractionTierForId } from './curated-attraction-tiers';
 import { getAdjustedCuratedAttractions } from './curated-attractions-adjustments';
 import { getCuratedAttractions as getBaseCuratedAttractions } from './curated-attractions-base';
@@ -20,8 +21,12 @@ export function getCuratedAttractions(lineId: string, stationName: string): Attr
       return true;
     })
     .slice(0, 2)
-    .map((item) => ({
-      ...item,
-      tier: item.tier ?? attractionTierForId(item.id),
-    }));
+    .map((item) => {
+      const nightscape = item.nightscape ?? isNightscapeAttraction(item.id);
+      return {
+        ...item,
+        tier: item.tier ?? attractionTierForId(item.id),
+        ...(nightscape ? { nightscape: true } : {}),
+      };
+    });
 }
