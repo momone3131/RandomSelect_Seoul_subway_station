@@ -44,7 +44,7 @@ describe('curated attractions', () => {
 
   it('assigns visual tiers while keeping the tier label out of attraction names', () => {
     expect(getCuratedAttractions('l3', '경복궁')[0]).toEqual(
-      expect.objectContaining({ name: '경복궁', tier: 'gold' }),
+      expect.objectContaining({ name: '경복궁', tier: 'diamond' }),
     );
     expect(getCuratedAttractions('l2', '성수')[0]).toEqual(
       expect.objectContaining({ name: '성수 연무장길', tier: 'gold' }),
@@ -62,11 +62,24 @@ describe('curated attractions', () => {
     for (const line of SUBWAY_LINES) {
       for (const station of line.stations) {
         for (const attraction of getCuratedAttractions(line.id, station.name)) {
-          expect(['gold', 'silver', 'standard']).toContain(attraction.tier);
-          expect(attraction.name).not.toMatch(/^(금|은|골드|실버)\s/i);
+          expect(['diamond', 'gold', 'silver', 'standard']).toContain(attraction.tier);
+          expect(attraction.name).not.toMatch(/^(다이아|금|은|골드|실버)\s/i);
         }
       }
     }
+  });
+
+  it('keeps the diamond jackpot tier exclusive to the chosen four', () => {
+    for (const id of [
+      'gyeongbokgung-palace',
+      'national-museum-of-korea',
+      'lotte-world-tower',
+      'bukchon-hanok-village',
+    ]) {
+      expect(attractionTierForId(id)).toBe('diamond');
+    }
+    expect(attractionTierForId('everland')).toBe('gold');
+    expect(attractionTierForId('changdeokgung-palace')).toBe('gold');
   });
 
   it('locks the 2026 full-audit prominence boundary', () => {
