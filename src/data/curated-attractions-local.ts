@@ -33,7 +33,7 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['l2:충정로', 'l5:충정로'], attractions: [['seosomun-shrine-history-museum', '서소문성지역사박물관', '역사·문화', '서소문성지역사박물관 서울 중구 칠패로 5']] },
   { stations: ['l2:양천구청'], attractions: [['yangcheon-park', '양천공원', '공원', '양천공원 서울 양천구 목동동로 111']] },
 
-  { stations: ['l3:연신내'], attractions: [['yeonseo-market', '연서시장', '전통시장', '연서시장 서울 은평구 통일로']], ['yeonsinnae-rodeo', '연신내 로데오거리', '거리·상권', '연신내 로데오거리 서울 은평구 갈현동']] },
+  { stations: ['l3:연신내'], attractions: [['yeonseo-market', '연서시장', '전통시장', '연서시장 서울 은평구 통일로'], ['yeonsinnae-rodeo', '연신내 로데오거리', '거리·상권', '연신내 로데오거리 서울 은평구 갈현동']] },
   { stations: ['l3:무악재'], attractions: [['ansan-jarak-gil', '안산자락길', '도심산책', '안산자락길 무악재 서울 서대문구']] },
   { stations: ['l3:잠원'], attractions: [['jamwon-hangang-park', '잠원한강공원', '한강공원']] },
   { stations: ['l3:매봉'], attractions: [['yangjaecheon-stream', '양재천', '수변·산책']] },
