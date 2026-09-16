@@ -11,9 +11,9 @@ export function getCuratedAttractions(lineId: string, stationName: string): Attr
   const merged = [
     ...getBaseCuratedAttractions(lineId, stationName),
     ...getAdjustedCuratedAttractions(lineId, stationName),
-    ...getNightViewpointAttractions(lineId, stationName),
     ...getExtraCuratedAttractions(lineId, stationName),
     ...getLocalCuratedAttractions(lineId, stationName),
+    ...getNightViewpointAttractions(lineId, stationName),
   ];
   const seen = new Set<string>();
   return merged
