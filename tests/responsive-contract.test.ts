@@ -72,13 +72,17 @@ describe('Random Seoul responsive visual contract', () => {
     expect(attractionView).not.toContain("make('span', 'attraction-tier");
   });
 
-  it('gives gold and silver cards metallic borders and one-time arrival effects', () => {
+  it('gives diamond, gold and silver cards metallic borders and one-time arrival effects', () => {
+    expect(styles).toContain('.attraction-card.attraction-tier-diamond');
     expect(styles).toContain('.attraction-card.attraction-tier-gold');
     expect(styles).toContain('.attraction-card.attraction-tier-silver');
+    expect(styles).toContain('attraction-diamond-sheen');
     expect(styles).toContain('attraction-gold-sheen');
     expect(styles).toContain('attraction-silver-sheen');
+    expect(styles).toContain('attraction-diamond-arrive 1.65s');
     expect(styles).toContain('attraction-gold-arrive');
     expect(styles).toContain('attraction-silver-arrive');
+    expect(styles).toContain('border:3px solid transparent!important');
     expect(styles).toContain('@media(prefers-reduced-motion:reduce)');
     expect(attractionView).toContain('lastRenderedSignature');
     expect(attractionView).toContain('if (signature === lastRenderedSignature && !section.hidden) return;');
