@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { isNightscapeAttraction, NIGHTSCAPE_ATTRACTION_IDS } from '../src/data/curated-attraction-features';
 import { attractionTierForId } from '../src/data/curated-attraction-tiers';
 import { getCuratedAttractions } from '../src/data/curated-attractions';
 import { EXTRA_CURATED_STATION_KEYS } from '../src/data/curated-attractions-extra';
@@ -109,6 +110,8 @@ describe('curated attractions', () => {
       'laveniche',
       'gwacheon-national-science-museum',
       'gocheok-sky-dome',
+      'seokchon-dong-tombs',
+      'seosomun-shrine-history-museum',
     ]) {
       expect(attractionTierForId(id)).toBe('silver');
     }
@@ -128,6 +131,38 @@ describe('curated attractions', () => {
     ]) {
       expect(attractionTierForId(id)).toBe('standard');
     }
+  });
+
+  it('classifies nightscape independently from prominence tier', () => {
+    expect(NIGHTSCAPE_ATTRACTION_IDS).toHaveLength(10);
+    for (const id of [
+      'ddp',
+      'naksan-park',
+      'nodeul-island',
+      'banpo-hangang-park',
+      'sebit-islands',
+      'seokchon-lake',
+      'lotte-world-tower',
+      'songdo-central-park',
+      'gwanggyo-lake-park',
+      'laveniche',
+    ]) {
+      expect(isNightscapeAttraction(id)).toBe(true);
+    }
+    expect(isNightscapeAttraction('seoul-forest')).toBe(false);
+    expect(isNightscapeAttraction('garosu-gil')).toBe(false);
+
+    expect(getCuratedAttractions('l2', '잠실')).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'lotte-world-tower', tier: 'diamond', nightscape: true }),
+        expect.objectContaining({ id: 'seokchon-lake', tier: 'gold', nightscape: true }),
+      ]),
+    );
+    expect(getCuratedAttractions('l4', '혜화')).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'naksan-park', tier: 'silver', nightscape: true }),
+      ]),
+    );
   });
 
   it('uses an exact nearby anchor for broad or ambiguous attraction targets', () => {
