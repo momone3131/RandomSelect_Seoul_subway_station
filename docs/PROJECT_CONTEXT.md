@@ -44,11 +44,7 @@ Random Seoul은 별도 계획 없이 서울/수도권에서 어디로 가고 무
 - active draw target: lime
 - completed station: selected line-color subway-sign style
 - visual `01 노선 / 02 역 / 03 음식` strip hidden
-- headline:
-  - `어디로 가볼까?`
-  - `어느 역에서 내릴까?`
-  - `식사도 해야지?`
-  - `이 코스로 가자!`
+- headline: `어디로 가볼까? → 어느 역에서 내릴까? → 식사도 해야지? → 이 코스로 가자!`
 - in-card refresh: 27px / stroke 2.7 / 36px hit area
 - food pending: `뭐 먹을까?`
 - actions: `복사 / 네이버지도 / 구글지도` one row
@@ -58,19 +54,20 @@ Random Seoul은 별도 계획 없이 서울/수도권에서 어디로 가고 무
 
 Attractions are first-party static curation, max 0–2, no live Google attraction Text Search.
 
-Current merge priority:
+Merge priority:
 
-**base → station adjustments → extra → local → ID dedupe → max2 → tier attachment**
+**base → station adjustments → extra → local → ID dedupe → max2 → tier + orthogonal feature attachment**
 
 Files:
 - `curated-attractions-base.ts`: established strong seed
 - `curated-attractions-adjustments.ts`: sparse station-specific priority overrides; currently used for Yongsan
 - `curated-attractions-extra.ts`: browse-worthy expansion
 - `curated-attractions-local.ts`: broader local streets/markets/sizeable parks/campuses/culture/sports; 60+ extra station keys
-- `curated-attraction-tiers.ts`: visual prominence classifier
+- `curated-attraction-tiers.ts`: Diamond/Gold/Silver/Standard prominence classifier
+- `curated-attraction-features.ts`: orthogonal features such as Nightscape
 - `curated-attractions.ts`: public merge entry
 
-Coverage intentionally includes distinctive commercial/food/cafe streets, markets, sizeable parks/waterfronts, campuses, culture/sports/exhibition anchors and large browse-worthy retail destinations. Tiny playgrounds and generic weak neighborhood facilities remain excluded. Zero results is still valid.
+Tiny playgrounds and generic weak neighborhood facilities remain excluded. Zero results is valid.
 
 ### Yongsan adjustment
 
@@ -78,49 +75,72 @@ Coverage intentionally includes distinctive commercial/food/cafe streets, market
 - 용리단길 map target: `용리단길 서울 용산구 한강로2가`
 - 신용산 keeps `용리단길 + 아모레퍼시픽미술관`
 
-## 5. Attraction visual tiers
+## 5. Attraction prominence tiers
 
 Internal only: `diamond | gold | silver | standard`. Tier names are never printed.
 
 Current classifier:
 - **Diamond 4**
 - **Gold 24**
-- **Silver 84**
+- **Silver 85**
 - all other surfaced IDs Standard
 
 ### Diamond
 
-Ultra-rare jackpot tier, fixed to exactly four:
+Ultra-rare jackpot tier fixed to exactly four:
 - 경복궁
 - 국립중앙박물관
 - 롯데월드타워
 - 북촌한옥마을
 
-It is a fun/rarity mechanic above Gold, not an absolute quality score. Do not casually add more Diamond IDs.
-
-Visual — **gemstone, not platinum metal**:
+Visual is gemstone, not metal:
 - 3px icy cyan / sky-blue / white / pale-violet prism border
-- moving faceted prism (`4.2s`) plus tiny facet sparkles (`3.4s`)
-- first-arrival reveal is `1.8s`, with several visible pulse/sparkle beats
-- peak scale `1.075`, cyan outer ring up to `16px`, glow roughly `42–58px`
-- same signature guard as other tiers; ordinary rerender does not replay
-- reduced-motion disables motion
+- `4.2s` moving prism + `3.4s` facet sparkle
+- `1.8s` strong first-arrival multi-stage reveal
+- peak scale `1.075`, `16px` cyan ring, roughly `42–58px` glow
+- signature guard prevents replay; reduced-motion disables motion
 
 ### Gold / Silver / Standard
 
-- Gold: nationally iconic / destination-grade
-- Silver: strong city/region destination or nationally known niche place
-- Standard: worthwhile local stop
+- Gold: nationally iconic / destination-grade; metallic gold
+- Silver: strong city/region destination or nationally known niche place; metallic silver
+- Standard: worthwhile local stop; borderless neutral
 
-Gold examples after Diamond extraction: 창덕궁, 종묘, 광화문광장, 청계천, 광장시장, DDP, 홍대, 성수 연무장길, 서울숲, 반포한강공원, 석촌호수, 올림픽공원, 코엑스, 서울대공원, 에버랜드, 두물머리, 남한산성, 임진각 평화누리, 송도 센트럴파크, 인천 차이나타운/개항장거리.
-
-Silver examples: 가로수길, 용리단길, 대학로, 북서울꿈의숲, 서대문형무소역사관, 동묘, 신당동 떡볶이타운, 신림동 순대타운, 고척스카이돔, 잠실종합운동장, 모란민속5일장, 정릉·동구릉, 인천대공원, 한국만화박물관, 강촌유원지, 라베니체 등.
-
-Intentional Standard demotions include 서울로7017, 양재시민의숲, 용마폭포공원, 양화한강공원, 일자산 허브천문공원, 인천중앙공원, 삼패한강공원, 은계호수공원, 화계사, 동백호수공원, 롯데백화점 동탄점. Demotion does not remove the recommendation.
+Latest tier correction:
+- 서소문성지역사박물관 was already Silver.
+- 서울 석촌동 고분군 promoted Standard → Silver.
 
 Full rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
 
-## 6. Map target integrity
+## 6. Nightscape — orthogonal attraction feature
+
+Nightscape is **not a fifth tier**. It can overlap any prominence tier.
+
+Source: `src/data/curated-attraction-features.ts`.
+
+Current conservative set (10):
+- DDP
+- 낙산공원
+- 노들섬
+- 반포한강공원
+- 세빛섬
+- 석촌호수
+- 롯데월드타워
+- 송도 센트럴파크
+- 광교호수공원
+- 라베니체 마치에비뉴
+
+Rules:
+- 밤에 가는 것 자체가 분명한 방문 이유인 곳만 tag
+- seasonal-only 야간개장/축제는 static tag에서 제외
+- feature is rendered as **interior background**, never as the tier border
+- dark navy → indigo/purple sky, small star points, subtle warm city-light glow
+- no visible `야경` badge/text
+- tier border remains simultaneously visible, so Diamond + Nightscape, Gold + Nightscape, Silver + Nightscape all work
+
+`AttractionRecommendation` has optional `nightscape?: boolean`; `getCuratedAttractions()` attaches it from the feature classifier. Render signature includes night/plain state.
+
+## 7. Map target integrity
 
 - attraction lat/lng 별도 저장 없음
 - self-contained `mapQuery`
@@ -131,7 +151,7 @@ Full rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
 
 Representative: 검암 → `경인아라뱃길 시천가람터` / `시천가람터 인천광역시 서구 시천동 158-11`.
 
-## 7. Restaurant policy
+## 8. Restaurant policy
 
 - live Google Places candidates
 - explicit `추천 식당 보기` only
@@ -140,36 +160,29 @@ Representative: 검암 → `경인아라뱃길 시천가람터` / `시천가람�
 - Bayesian rating 55%, review log 25%, relevance 15%, distance 5%
 - Google rating/review results not persisted as own reusable DB
 
-## 8. Station centers
-
-- `station-coordinates.ts` static first
-- missing only → Google fallback
-- fallback 30-day cache
-
 ## 9. Latest verified snapshot
 
-### Web — gemstone Diamond release
-- source/regression head `ada83825726afd43ceed202d40be5b0da4a902e9`
-- CI `35109359593` — success
-- Web Release `35109359439` — success
-- deployment commit `459545c14cbda1d87fe12aac2833691e1fda4c5f`
-- public bundle `assets/modular-IguZemH4.js`
-- Pages `35109358128` — success
-- public bundle directly checked for the four Diamond IDs, prism/sparkle treatment and `1.8s` reveal
+### Web — Nightscape release
+- source/regression head `b35c2be8e1182343929655e869ff234c649f082a`
+- CI `35112696311` — success
+- Web Release `35112696302` — success
+- public bundle `assets/modular-BRia8hmx.js`
+- Pages `35112694619` — success
+- public bundle directly checked for 10 Nightscape IDs, overlap rendering, night-sky CSS and Silver promotion
 
-### Android — gemstone Diamond release
-- source head `37755a7f3b02101b334286a6e16ff4212dce6ecd`
-- Android CI `35109420952` — success
+### Android — Nightscape release
+- source head `398a272fa3ef04ad7970393ff105b6a6e1e6a844`
+- Android CI `35113150949` — success
 - APK `random-seoul-latest.apk`
-- size `11,420,860` bytes
-- SHA-256 `3b7e6d66d17a8600a6fb70428e11085a3e9e7c3a6275e8cb911624861aaad285`
+- size `11,421,500` bytes
+- SHA-256 `34519dcf9396e655cbee49e8ad547660df3d55040becafd1c0ff4b42ce46e338`
 
 Direct APK:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
 
 ## 10. Build/deploy
 
-Web Release: tests → build → browser smoke → verified root promotion → deployment commit → Pages.
+Web Release: tests → build → browser smoke → verified root promotion → Pages.
 
 Android: shared tests → native Web build → Capacitor sync → Gradle debug APK → artifact → fixed latest Release.
 
@@ -179,7 +192,7 @@ Android: shared tests → native Web build → Capacitor sync → Gradle debug A
 - `STATUS.md`: current facts / verification
 - `PROJECT_PLAN.md`: product intent
 - `ARCHITECTURE.md`: data flow/modules
-- `ATTRACTION_CURATION.md`: selection/map/tier rules
-- `ATTRACTION_TIER_AUDIT.md`: latest prominence audit + Diamond rarity contract
+- `ATTRACTION_CURATION.md`: selection/map/tier/feature rules
+- `ATTRACTION_TIER_AUDIT.md`: prominence audit
 
 Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJECT_CONTEXT/README**.
