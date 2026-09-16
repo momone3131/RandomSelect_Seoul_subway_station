@@ -41,29 +41,41 @@ Last updated: 2026-09-16
 
 공식 관광자료는 존재성·대표성·운영 상태를 확인하는 우선 참고자료입니다. 공식 관광지 등재만으로 자동 승급하지 않습니다.
 
-## Three visual tiers
+## Four visual tiers
 
-모든 노출 명소는 내부적으로 `gold / silver / standard` 중 하나를 갖습니다. **등급명은 사용자 화면에 글자로 표시하지 않고 카드 테두리와 등장 효과로만 표현합니다.**
+모든 노출 명소는 내부적으로 `diamond / gold / silver / standard` 중 하나를 갖습니다. **등급명은 사용자 화면에 글자로 표시하지 않고 카드 테두리와 등장 효과로만 표현합니다.**
+
+### Diamond — 극소수 잭팟 목적지
+
+Gold 위의 최상위 희귀 등급입니다. Random Seoul에서 뽑혔을 때 사용자가 즉시 “특별한 결과가 떴다”고 느낄 수 있도록 **정확히 4곳만** 유지합니다.
+
+현재 Diamond:
+- 경복궁
+- 국립중앙박물관
+- 롯데월드타워
+- 북촌한옥마을
+
+이 목록은 재미를 위한 희귀도 설계이므로 쉽게 늘리지 않습니다. 새 후보를 넣으려면 기존 Diamond와 교체할 정도의 상징성·인지도·독립 목적지성이 있어야 합니다.
+
+UI:
+- 금색보다 한 단계 위의 **백금(platinum) + 절제된 프리즘 반사 테두리**
+- 3px metallic border + 지속적인 reflective sheen
+- 새 명소 조합의 최초 등장 시 **1.65초 다단계 pulse/reveal**
+- reveal 중 두 번의 확실한 빛 확산으로 사용자가 놓치지 않게 함
+- `prefers-reduced-motion`에서는 움직임 비활성화
 
 ### Gold — 전국구 / 목적지급
 
-전국적으로 인지도가 높거나 서울·수도권 여행 자체의 대표 목적지가 될 수 있는 곳입니다. Gold는 보수적으로 운영합니다.
-
-강한 기준점:
-- 최근 문화체육관광부·한국관광공사 `한국관광 100선`
-- UNESCO/국가급 문화유산
-- 전국적으로 알려진 대표 랜드마크·관광지
-- 장소 자체만으로 장거리 방문 목적이 성립하는 곳
+전국적으로 인지도가 높거나 서울·수도권 여행 자체의 대표 목적지가 될 수 있는 곳입니다. Diamond 4곳을 제외한 강한 전국구 목적지가 여기에 속합니다.
 
 현재 대표 예:
-- 경복궁 / 창덕궁 / 북촌한옥마을 / 종묘
-- 국립중앙박물관 / 전쟁기념관
+- 창덕궁 / 종묘
 - 광화문광장 / 청계천
 - 광장시장 / 남대문시장
 - DDP / 명동거리 / 홍대
 - 성수 연무장길 / 서울숲
 - 반포한강공원
-- 롯데월드타워 / 석촌호수 / 올림픽공원
+- 석촌호수 / 올림픽공원
 - 코엑스 / 서울대공원 / 에버랜드
 - 두물머리 / 남한산성 / 임진각 평화누리
 - 송도 센트럴파크
@@ -105,7 +117,7 @@ UI:
 
 ### Standard — 둘러볼 만한 local stop
 
-해당 역에서 실제로 시간을 보낼 이유는 충분하지만 광역 유명세/독립 목적지성은 Gold·Silver보다 낮은 곳입니다.
+해당 역에서 실제로 시간을 보낼 이유는 충분하지만 광역 유명세/독립 목적지성은 Diamond·Gold·Silver보다 낮은 곳입니다.
 
 예:
 - 아현시장·연서시장 같은 지역 시장
@@ -151,27 +163,27 @@ Standard는 추천에서 제외되는 등급이 아닙니다. **일반 카드로
 
 Tier assignment source of truth: `src/data/curated-attraction-tiers.ts`.
 
+- `DIAMOND_IDS` → diamond
 - `GOLD_IDS` → gold
 - `SILVER_IDS` → silver
 - 그 외 노출 명소 → standard
 
-같은 attraction ID는 어느 역에서 노출되든 같은 tier를 사용합니다. Tier는 품질 별점이 아니라 **인지도/목적지성에 따른 UI prominence**입니다.
+같은 attraction ID는 어느 역에서 노출되든 같은 tier를 사용합니다. Tier는 품질 별점이 아니라 **인지도/목적지성 + Random Seoul의 재미를 위한 UI prominence**입니다.
 
 2026-09 전체 재감사 결과와 외부 기준은 `docs/ATTRACTION_TIER_AUDIT.md`에 기록합니다.
 
 ## Visual effect contract
 
 `src/ui/attraction-view.ts`:
-- `attraction-tier-gold | attraction-tier-silver | attraction-tier-standard`
+- `attraction-tier-diamond | attraction-tier-gold | attraction-tier-silver | attraction-tier-standard`
 - tier text badge 없음
 - station + attraction IDs + tier signature 사용
 - 동일 signature 반복 렌더 시 등장 pulse 반복 금지
-- 새로운 gold/silver 결과에만 `attraction-tier-reveal`
+- 새로운 diamond/gold/silver 결과에만 `attraction-tier-reveal`
 
 `src/ui/minimal-palette-overrides.css`:
-- gold/silver metallic gradient border
-- slow reflective sheen
-- first-arrival color-matched pulse
+- diamond: 3px platinum/prism metallic gradient border + 3.8s sheen + 1.65s multi-pulse first-arrival reveal
+- gold/silver: metallic gradient border + slow reflective sheen + first-arrival color-matched pulse
 - standard borderless
 - `prefers-reduced-motion: reduce`에서는 tier motion 비활성화
 
@@ -196,9 +208,9 @@ Tier assignment source of truth: `src/data/curated-attraction-tiers.ts`.
 - `curated-attractions.ts`: merge/dedupe/max2/tier attachment public entry
 
 Tests:
-- `tests/curated-attractions.test.ts`: 대표 결과, key validity, tier audit boundary, max2, map target 규칙, weak zero-result
+- `tests/curated-attractions.test.ts`: 대표 결과, key validity, Diamond 4개 고정, tier audit boundary, max2, map target 규칙, weak zero-result
 - `tests/map-links.test.ts`: curated target direct use / station suffix 금지
-- `tests/responsive-contract.test.ts`: no visible tier labels, metallic visuals, first-arrival guard, reduced motion
+- `tests/responsive-contract.test.ts`: no visible tier labels, diamond/gold/silver metallic visuals, first-arrival guard, reduced motion
 
 ## Maintenance checklist
 
