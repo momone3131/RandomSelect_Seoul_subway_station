@@ -2,14 +2,19 @@ import type { AttractionTier } from '../domain/types';
 
 // Visual/editorial prominence only. The UI never prints these labels.
 // 2026-09 full audit baseline:
+// - diamond: ultra-rare, nationally iconic jackpot destinations
 // - gold: nationwide / destination-grade recognition
 // - silver: strong city/region destination or nationally known niche place
 // - standard: worthwhile local stop
-const GOLD_IDS = new Set<string>([
-  'national-museum-of-korea',
+const DIAMOND_IDS = new Set<string>([
   'gyeongbokgung-palace',
-  'changdeokgung-palace',
+  'national-museum-of-korea',
+  'lotte-world-tower',
   'bukchon-hanok-village',
+]);
+
+const GOLD_IDS = new Set<string>([
+  'changdeokgung-palace',
   'gwanghwamun-square',
   'cheonggyecheon-stream',
   'jongmyo-shrine',
@@ -22,7 +27,6 @@ const GOLD_IDS = new Set<string>([
   'seoul-forest',
   'banpo-hangang-park',
   'seokchon-lake',
-  'lotte-world-tower',
   'olympic-park',
   'seoul-grand-park',
   'everland',
@@ -124,6 +128,7 @@ const SILVER_IDS = new Set<string>([
 ]);
 
 export function attractionTierForId(id: string): AttractionTier {
+  if (DIAMOND_IDS.has(id)) return 'diamond';
   if (GOLD_IDS.has(id)) return 'gold';
   if (SILVER_IDS.has(id)) return 'silver';
   return 'standard';
