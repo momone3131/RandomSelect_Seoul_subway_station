@@ -117,7 +117,7 @@ describe('Random Seoul responsive visual contract', () => {
 
   it('shows the live selected food count instead of the old static 36-category copy', () => {
     expect(drawView).toContain("byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`");
-    expect(settingsView).toContain('`${FOOD_CATEGORIES.length}종으로 나눴어요. 각 종목은 같은 확률이에요.`');
+    expect(settingsView).toContain('식사·주류 종목을 ${FOOD_CATEGORIES.length}종으로 나눴어요');
   });
 
   it('defers restaurant lookup until the user asks for it', () => {
