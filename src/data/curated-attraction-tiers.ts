@@ -91,6 +91,7 @@ const SILVER_IDS = new Set<string>([
   'seokchon-dong-tombs',
   'eungbongsan-palgakjeong',
   'namhansanseong-west-gate-viewpoint',
+  'suwon-hwaseong-seojangdae',
   'starfield-suwon',
   'starfield-goyang',
   'starfield-hanam',
