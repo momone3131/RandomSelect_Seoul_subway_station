@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { getCuratedAttractions } from '../src/data/curated-attractions';
 import { EXTRA_CURATED_STATION_KEYS } from '../src/data/curated-attractions-extra';
+import { LOCAL_CURATED_STATION_KEYS } from '../src/data/curated-attractions-local';
 import { SUBWAY_LINES } from '../src/data/subway-lines';
 
 describe('curated attractions', () => {
-  it('returns representative Tier A attractions for strong destinations', () => {
+  it('returns representative strong attractions without changing established ordering', () => {
     expect(getCuratedAttractions('l4', '이촌').map((item) => item.name)).toEqual([
       '국립중앙박물관',
       '용산가족공원',
@@ -20,6 +21,15 @@ describe('curated attractions', () => {
     expect(getCuratedAttractions('l7', '광명사거리').map((item) => item.name)).toEqual(['광명전통시장']);
   });
 
+  it('broadens coverage with commercial streets, markets and sizeable parks', () => {
+    expect(getCuratedAttractions('l2', '아현').map((item) => item.name)).toEqual(['아현시장']);
+    expect(getCuratedAttractions('l7', '사가정').map((item) => item.name)).toEqual(['용마폭포공원']);
+    expect(getCuratedAttractions('l8', '남한산성입구').map((item) => item.name)).toEqual(['남한산성']);
+    expect(getCuratedAttractions('ic1', '인천시청').map((item) => item.name)).toEqual(['인천중앙공원']);
+    expect(getCuratedAttractions('sl', '보라매공원').map((item) => item.name)).toEqual(['보라매공원']);
+    expect(LOCAL_CURATED_STATION_KEYS.length).toBeGreaterThan(60);
+  });
+
   it('includes browse-worthy commercial and lifestyle destinations', () => {
     expect(getCuratedAttractions('l1', '광명').map((item) => item.name)).toEqual(['IKEA 광명', '롯데몰 광명']);
     expect(getCuratedAttractions('l1', '화서').map((item) => item.name)).toEqual(['스타필드 수원']);
@@ -29,6 +39,27 @@ describe('curated attractions', () => {
       '현대프리미엄아울렛 송도점',
       '트리플스트리트',
     ]);
+  });
+
+  it('assigns visual tiers while keeping the tier label out of attraction names', () => {
+    expect(getCuratedAttractions('l3', '경복궁')[0]).toEqual(
+      expect.objectContaining({ name: '경복궁', tier: 'gold' }),
+    );
+    expect(getCuratedAttractions('l9', '중앙보훈병원')[0]).toEqual(
+      expect.objectContaining({ name: '일자산 허브천문공원', tier: 'silver' }),
+    );
+    expect(getCuratedAttractions('l2', '아현')[0]).toEqual(
+      expect.objectContaining({ name: '아현시장', tier: 'standard' }),
+    );
+
+    for (const line of SUBWAY_LINES) {
+      for (const station of line.stations) {
+        for (const attraction of getCuratedAttractions(line.id, station.name)) {
+          expect(['gold', 'silver', 'standard']).toContain(attraction.tier);
+          expect(attraction.name).not.toMatch(/^(금|은|골드|실버)\s/i);
+        }
+      }
+    }
   });
 
   it('uses an exact nearby anchor for broad or ambiguous attraction targets', () => {
@@ -59,6 +90,7 @@ describe('curated attractions', () => {
       SUBWAY_LINES.flatMap((line) => line.stations.map((station) => `${line.id}:${station.name}`)),
     );
     expect(EXTRA_CURATED_STATION_KEYS.filter((key) => !stationKeys.has(key))).toEqual([]);
+    expect(LOCAL_CURATED_STATION_KEYS.filter((key) => !stationKeys.has(key))).toEqual([]);
   });
 
   it('never stores a station-only target for an attraction', () => {
@@ -72,13 +104,18 @@ describe('curated attractions', () => {
     }
   });
 
-  it('does not force a recommendation for an uncurated station', () => {
-    expect(getCuratedAttractions('l2', '아현')).toEqual([]);
+  it('still allows genuinely weak locations to remain uncurated', () => {
+    expect(getCuratedAttractions('l1', '직산')).toEqual([]);
   });
 
   it('never exposes more than two curated attractions', () => {
     expect(getCuratedAttractions('l2', '잠실')).toHaveLength(2);
     expect(getCuratedAttractions('l6', '월드컵경기장')).toHaveLength(2);
     expect(getCuratedAttractions('l1', '광명')).toHaveLength(2);
+    for (const line of SUBWAY_LINES) {
+      for (const station of line.stations) {
+        expect(getCuratedAttractions(line.id, station.name).length).toBeLessThanOrEqual(2);
+      }
+    }
   });
 });
