@@ -65,6 +65,25 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('#attraction_section .restaurant-meta{display:none}');
   });
 
+  it('renders attraction tiers without visible tier labels', () => {
+    expect(attractionView).toContain('attraction-tier-${tier}');
+    expect(attractionView).toContain("tier !== 'standard' ? ' attraction-tier-reveal' : ''");
+    expect(attractionView).toContain('card.dataset.attractionTier = tier');
+    expect(attractionView).not.toContain("make('span', 'attraction-tier");
+  });
+
+  it('gives gold and silver cards metallic borders and one-time arrival effects', () => {
+    expect(styles).toContain('.attraction-card.attraction-tier-gold');
+    expect(styles).toContain('.attraction-card.attraction-tier-silver');
+    expect(styles).toContain('attraction-gold-sheen');
+    expect(styles).toContain('attraction-silver-sheen');
+    expect(styles).toContain('attraction-gold-arrive');
+    expect(styles).toContain('attraction-silver-arrive');
+    expect(styles).toContain('@media(prefers-reduced-motion:reduce)');
+    expect(attractionView).toContain('lastRenderedSignature');
+    expect(attractionView).toContain('if (signature === lastRenderedSignature && !section.hidden) return;');
+  });
+
   it('defers restaurant lookup until the user asks for it', () => {
     expect(main).toContain("button.textContent = '추천 식당 보기'");
     expect(main).toContain("restaurantRequest.button.addEventListener('click'");
