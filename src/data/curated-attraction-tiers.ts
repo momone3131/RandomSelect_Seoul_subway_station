@@ -59,6 +59,8 @@ const SILVER_IDS = new Set<string>([
   'seoul-arts-center',
   'letsrun-park-seoul',
   'seonjeongneung',
+  'garosu-gil',
+  'yongridan-gil',
   'yangjae-citizens-forest',
   'cheonggyesan-mountain',
   'taereung-gangneung',
