@@ -7,9 +7,13 @@ export const NIGHTSCAPE_ATTRACTION_IDS = [
   'eungbongsan-palgakjeong',
   'dalmaji-bong-park',
   'maebongsan-palgakjeong',
+  'yongwangsan-skywalk',
+  'samsung-haemaji-park',
+  'yongmasan-skywalk',
   'yongyangbongjeojeong-park',
   'lotte-world-tower',
   'namhansanseong-west-gate-viewpoint',
+  'suwon-hwaseong-seojangdae',
 ] as const;
 
 const NIGHTSCAPE_IDS = new Set<string>(NIGHTSCAPE_ATTRACTION_IDS);
