@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { attractionTierForId } from '../src/data/curated-attraction-tiers';
 import { getCuratedAttractions } from '../src/data/curated-attractions';
 import { EXTRA_CURATED_STATION_KEYS } from '../src/data/curated-attractions-extra';
 import { LOCAL_CURATED_STATION_KEYS } from '../src/data/curated-attractions-local';
@@ -45,8 +46,14 @@ describe('curated attractions', () => {
     expect(getCuratedAttractions('l3', '경복궁')[0]).toEqual(
       expect.objectContaining({ name: '경복궁', tier: 'gold' }),
     );
+    expect(getCuratedAttractions('l2', '성수')[0]).toEqual(
+      expect.objectContaining({ name: '성수 연무장길', tier: 'gold' }),
+    );
+    expect(getCuratedAttractions('l3', '신사')[0]).toEqual(
+      expect.objectContaining({ name: '가로수길', tier: 'silver' }),
+    );
     expect(getCuratedAttractions('l9', '중앙보훈병원')[0]).toEqual(
-      expect.objectContaining({ name: '일자산 허브천문공원', tier: 'silver' }),
+      expect.objectContaining({ name: '일자산 허브천문공원', tier: 'standard' }),
     );
     expect(getCuratedAttractions('l2', '아현')[0]).toEqual(
       expect.objectContaining({ name: '아현시장', tier: 'standard' }),
@@ -59,6 +66,54 @@ describe('curated attractions', () => {
           expect(attraction.name).not.toMatch(/^(금|은|골드|실버)\s/i);
         }
       }
+    }
+  });
+
+  it('locks the 2026 full-audit prominence boundary', () => {
+    for (const id of [
+      'seoul-forest',
+      'seokchon-lake',
+      'songdo-central-park',
+      'incheon-chinatown',
+      'incheon-open-port-street',
+      'imjingak-pyeonghwa-nuri',
+      'cheonggyecheon-stream',
+    ]) {
+      expect(attractionTierForId(id)).toBe('gold');
+    }
+
+    for (const id of [
+      'seodaemun-prison-history-hall',
+      'daehakro',
+      'dongmyo-flea-market',
+      'sindang-tteokbokki-town',
+      'bongeunsa-temple',
+      'ilsan-lake-park',
+      'donggureung-royal-tombs',
+      'incheon-grand-park',
+      'gangchon-recreation-area',
+      'bojeong-cafe-street',
+      'laveniche',
+      'gwacheon-national-science-museum',
+      'gocheok-sky-dome',
+    ]) {
+      expect(attractionTierForId(id)).toBe('silver');
+    }
+
+    for (const id of [
+      'seoullo-7017',
+      'yangjae-citizens-forest',
+      'yongma-waterfall-park',
+      'yanghwa-hangang-park',
+      'iljasan-herb-astronomy-park',
+      'incheon-central-park',
+      'sampaehangang-park',
+      'eungye-lake-park',
+      'hwagyesa-temple',
+      'dongbaek-lake-park',
+      'lotte-dept-dongtan',
+    ]) {
+      expect(attractionTierForId(id)).toBe('standard');
     }
   });
 
