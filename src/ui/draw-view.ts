@@ -197,6 +197,8 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   copy.disabled = locked || !state.currentStation;
   instant.disabled = status.busy;
   instant.checked = state.preferences.instantDraw;
+  byId<HTMLElement>('scope_count').textContent = `${state.preferences.selectedLineIds.length}개 노선`;
+  byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`;
 
   drawButton.className = `draw-btn${status.busy ? ' busy' : ''}`;
   const drawShell = byId<HTMLElement>('draw_shell');
