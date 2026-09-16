@@ -78,6 +78,7 @@ body{background:var(--bg)}
   inset:-10px;
   border-radius:inherit;
   pointer-events:none;
+  z-index:3;
   opacity:.42;
   background:
     radial-gradient(circle at 9% 17%,rgba(255,255,255,.98) 0 1.7px,transparent 2.5px),
@@ -102,6 +103,47 @@ body{background:var(--bg)}
     linear-gradient(110deg,#727a80 0%,#b8c0c5 18%,#f6f9fa 36%,#8d969c 51%,#dce2e5 70%,#ffffff 84%,#747d83 100%);
   box-shadow:0 2px 7px rgba(83,94,101,.14);
   animation:attraction-silver-sheen 5.4s linear infinite;
+}
+
+/* Nightscape is orthogonal to tier: the tier keeps its border, while the card interior becomes a night sky. */
+#attraction_section .attraction-card.attraction-nightscape{
+  position:relative;
+  isolation:isolate;
+  color:#f4f8ff;
+}
+#attraction_section .attraction-card.attraction-nightscape::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle at 13% 18%,rgba(255,255,255,.92) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 84% 24%,rgba(156,211,255,.78) 0 1.1px,transparent 2px),
+    radial-gradient(circle at 63% 11%,rgba(221,208,255,.72) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 31% 37%,rgba(206,230,255,.52) 0 .9px,transparent 1.7px),
+    radial-gradient(ellipse at 56% 112%,rgba(255,178,108,.18) 0%,rgba(112,127,203,.13) 34%,transparent 64%),
+    linear-gradient(148deg,#081227 0%,#132343 53%,#241a40 100%);
+  box-shadow:inset 0 -18px 32px rgba(98,120,195,.10),inset 0 1px 0 rgba(255,255,255,.04);
+}
+#attraction_section .attraction-card.attraction-tier-gold.attraction-nightscape::before,
+#attraction_section .attraction-card.attraction-tier-silver.attraction-nightscape::before{inset:2px}
+#attraction_section .attraction-card.attraction-tier-diamond.attraction-nightscape::before{inset:3px}
+#attraction_section .attraction-card.attraction-nightscape>*{position:relative;z-index:2}
+#attraction_section .attraction-card.attraction-nightscape .restaurant-name{
+  color:#f8fbff;
+  text-shadow:0 1px 10px rgba(92,139,213,.24);
+}
+#attraction_section .attraction-card.attraction-nightscape .restaurant-desc{color:#b9c8df}
+#attraction_section .attraction-card.attraction-nightscape .attraction-map-link{
+  background:rgba(245,249,255,.10)!important;
+  border-color:rgba(183,209,242,.20)!important;
+  color:#f5f8ff;
+}
+#attraction_section .attraction-card.attraction-nightscape .map-mark{
+  background:rgba(170,205,255,.16);
+  color:#f8fbff;
 }
 
 #attraction_section .attraction-card.attraction-tier-diamond.attraction-tier-reveal{
