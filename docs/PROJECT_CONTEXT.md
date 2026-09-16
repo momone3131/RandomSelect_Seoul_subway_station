@@ -80,29 +80,42 @@ Coverage intentionally includes distinctive commercial/food/cafe streets, market
 
 ## 5. Attraction visual tiers
 
-Internal only: `gold | silver | standard`. Tier names are never printed.
+Internal only: `diamond | gold | silver | standard`. Tier names are never printed.
+
+Current classifier:
+- **Diamond 4**
+- **Gold 24**
+- **Silver 84**
+- all other surfaced IDs Standard
+
+### Diamond
+
+Ultra-rare jackpot tier, fixed to exactly four:
+- 경복궁
+- 국립중앙박물관
+- 롯데월드타워
+- 북촌한옥마을
+
+It is a fun/rarity mechanic above Gold, not an absolute quality score. Do not casually add more Diamond IDs.
+
+Visual:
+- 3px platinum/prism metallic border
+- 3.8s continuous reflective sheen
+- deliberately noticeable 1.65s first-arrival multi-stage reveal with two pulse moments
+- same signature guard as other tiers; ordinary rerender does not replay
+- reduced-motion disables motion
+
+### Gold / Silver / Standard
 
 - Gold: nationally iconic / destination-grade
 - Silver: strong city/region destination or nationally known niche place
 - Standard: worthwhile local stop
 
-Current audited classifier (2026-09-16):
-- Gold IDs: **28**
-- Silver IDs: **84**
-- all other surfaced IDs: Standard
+Gold examples after Diamond extraction: 창덕궁, 종묘, 광화문광장, 청계천, 광장시장, DDP, 홍대, 성수 연무장길, 서울숲, 반포한강공원, 석촌호수, 올림픽공원, 코엑스, 서울대공원, 에버랜드, 두물머리, 남한산성, 임진각 평화누리, 송도 센트럴파크, 인천 차이나타운/개항장거리.
 
-Gold representative set now includes 경복궁, 청계천, 국립중앙박물관, DDP, 홍대, 성수 연무장길, 서울숲, 반포한강공원, 석촌호수, 롯데월드타워, 올림픽공원, 코엑스, 서울대공원, 에버랜드, 두물머리, 남한산성, 임진각 평화누리, 송도 센트럴파크, 인천 차이나타운/개항장거리.
+Silver examples: 가로수길, 용리단길, 대학로, 북서울꿈의숲, 서대문형무소역사관, 동묘, 신당동 떡볶이타운, 신림동 순대타운, 고척스카이돔, 잠실종합운동장, 모란민속5일장, 정릉·동구릉, 인천대공원, 한국만화박물관, 강촌유원지, 라베니체 등.
 
-Silver representative set includes 가로수길, 용리단길, 대학로, 북서울꿈의숲, 서대문형무소역사관, 동묘, 신당동 떡볶이타운, 신림동 순대타운, 마장축산물시장, 고척스카이돔, 잠실종합운동장, 모란민속5일장, 정릉·동구릉, 인천대공원, 안산 다문화음식거리, 한국만화박물관, 강촌유원지, 춘천 명동 닭갈비골목, 보정동 카페거리, 라베니체 등.
-
-Intentional Standard demotions include 서울로7017, 양재시민의숲, 용마폭포공원, 양화한강공원, 일자산 허브천문공원, 인천중앙공원, 삼패한강공원, 은계호수공원, 화계사, 동백호수공원, 롯데백화점 동탄점. Demotion does not remove the recommendation; only metallic emphasis disappears.
-
-Visuals:
-- gold metallic border + sheen + first-arrival gold pulse
-- silver metallic border + sheen + first-arrival silver pulse
-- standard neutral borderless
-- signature guard prevents replay on ordinary rerender
-- reduced-motion disables motion
+Intentional Standard demotions include 서울로7017, 양재시민의숲, 용마폭포공원, 양화한강공원, 일자산 허브천문공원, 인천중앙공원, 삼패한강공원, 은계호수공원, 화계사, 동백호수공원, 롯데백화점 동탄점. Demotion does not remove the recommendation.
 
 Full rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
 
@@ -134,20 +147,20 @@ Representative: 검암 → `경인아라뱃길 시천가람터` / `시천가람�
 
 ## 9. Latest verified snapshot
 
-### Web
-- audited tier source head: `ef6eb1dcfd8b6d7823c5607a7cb2532c53db8a8d`
-- CI `35102781290` — success
-- Web Release `35102781339` — success
-- deployment commit `006eafb1070a36a1a0041c1d91125d2ba7697c2f`
-- public bundle `assets/modular-Coke_hQH.js`
-- Pages `35102843979` — success
+### Web — Diamond release
+- source/regression head `45331b014b275da6f0d5506de36b1255f7ecbdb3`
+- CI `35107346536` — success
+- Web Release `35107346782` — success
+- public bundle `assets/modular-CkBsRXsr.js`
+- Pages `35107343850` — success
+- public bundle directly checked for the four Diamond IDs and the 1.65s Diamond reveal
 
-### Android
-- audited tier source head: `100f5e485221fd4dbc3915746cfa72fceed98526`
-- Android CI `35102822357` — success
+### Android — Diamond release
+- source head `8fa480321054c0ef6494b472c08c6e405acc6947`
+- Android CI `35107400302` — success
 - APK `random-seoul-latest.apk`
-- size `11,419,580` bytes
-- SHA-256 `f62636ec46df889921a107752012feccf27da8568deb6fe61080728763f3581f`
+- size `11,420,072` bytes
+- SHA-256 `80b12e1cfff02855cf5aeb0d72a864d905f2eeadeba009fa94c5bf1cfeb7bd07`
 
 Direct APK:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -165,6 +178,6 @@ Android: shared tests → native Web build → Capacitor sync → Gradle debug A
 - `PROJECT_PLAN.md`: product intent
 - `ARCHITECTURE.md`: data flow/modules
 - `ATTRACTION_CURATION.md`: selection/map/tier rules
-- `ATTRACTION_TIER_AUDIT.md`: latest full prominence audit
+- `ATTRACTION_TIER_AUDIT.md`: latest prominence audit + Diamond rarity contract
 
 Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJECT_CONTEXT/README**.
