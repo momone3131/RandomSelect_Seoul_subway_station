@@ -87,6 +87,7 @@ const SILVER_IDS = new Set<string>([
   'kukkiwon',
   'jamsil-sports-complex',
   'seosomun-shrine-history-museum',
+  'seokchon-dong-tombs',
   'starfield-suwon',
   'starfield-goyang',
   'starfield-hanam',
