@@ -57,11 +57,13 @@ Gold 위의 최상위 희귀 등급입니다. Random Seoul에서 뽑혔을 때 �
 
 이 목록은 재미를 위한 희귀도 설계이므로 쉽게 늘리지 않습니다. 새 후보를 넣으려면 기존 Diamond와 교체할 정도의 상징성·인지도·독립 목적지성이 있어야 합니다.
 
-UI:
-- 금색보다 한 단계 위의 **백금(platinum) + 절제된 프리즘 반사 테두리**
-- 3px metallic border + 지속적인 reflective sheen
-- 새 명소 조합의 최초 등장 시 **1.65초 다단계 pulse/reveal**
-- reveal 중 두 번의 확실한 빛 확산으로 사용자가 놓치지 않게 함
+UI — **금속이 아니라 보석 다이아몬드 느낌**:
+- 3px icy cyan / sky-blue / white / pale-violet prism border
+- 색 면이 움직이는 faceted prism animation (`4.2s`)
+- 카드 가장자리의 작은 white/cyan/violet facet sparkle (`3.4s`)
+- 새 명소 조합의 최초 등장 시 **1.8초 강한 multi-stage pulse/reveal**
+- 최대 scale `1.075`, `16px` cyan outer ring, 약 `42–58px` cyan/violet glow
+- 한 번의 짧은 flash가 아니라 여러 pulse/sparkle 순간을 두어 사용자가 알아채기 쉽게 함
 - `prefers-reduced-motion`에서는 움직임 비활성화
 
 ### Gold — 전국구 / 목적지급
@@ -182,7 +184,7 @@ Tier assignment source of truth: `src/data/curated-attraction-tiers.ts`.
 - 새로운 diamond/gold/silver 결과에만 `attraction-tier-reveal`
 
 `src/ui/minimal-palette-overrides.css`:
-- diamond: 3px platinum/prism metallic gradient border + 3.8s sheen + 1.65s multi-pulse first-arrival reveal
+- diamond: gemstone prism border + facet sparkles + `4.2s` prism motion + `3.4s` sparkle motion + `1.8s` large multi-pulse first-arrival reveal
 - gold/silver: metallic gradient border + slow reflective sheen + first-arrival color-matched pulse
 - standard borderless
 - `prefers-reduced-motion: reduce`에서는 tier motion 비활성화
@@ -210,7 +212,7 @@ Tier assignment source of truth: `src/data/curated-attraction-tiers.ts`.
 Tests:
 - `tests/curated-attractions.test.ts`: 대표 결과, key validity, Diamond 4개 고정, tier audit boundary, max2, map target 규칙, weak zero-result
 - `tests/map-links.test.ts`: curated target direct use / station suffix 금지
-- `tests/responsive-contract.test.ts`: no visible tier labels, diamond/gold/silver metallic visuals, first-arrival guard, reduced motion
+- `tests/responsive-contract.test.ts`: no visible tier labels, Diamond gemstone prism/sparkle, Gold/Silver metallic visuals, first-arrival guard, reduced motion
 
 ## Maintenance checklist
 
