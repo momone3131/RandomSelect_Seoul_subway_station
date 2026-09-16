@@ -124,18 +124,25 @@ Current Yongsan adjustment:
 `AttractionRecommendation` includes optional:
 
 ```ts
-tier?: 'gold' | 'silver' | 'standard'
+tier?: 'diamond' | 'gold' | 'silver' | 'standard'
 ```
 
 Public merged results always attach a tier.
 
+- diamond: ultra-rare jackpot destination; fixed four
 - gold: nationwide / destination-grade recognition
 - silver: strong city/region destination or nationally known niche place
 - standard: worthwhile local stop
 
 Tier assignment is ID-based and centralized in `curated-attraction-tiers.ts` so the same place keeps the same visual prominence across stations.
 
-The 2026-09 full audit currently has **28 Gold IDs and 84 Silver IDs**; all other surfaced attraction IDs are Standard. Audit rationale is documented in `docs/ATTRACTION_TIER_AUDIT.md`.
+Current classifier:
+- Diamond 4
+- Gold 24
+- Silver 84
+- remaining surfaced attractions Standard
+
+Diamond is intentionally fixed to 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을. It is a rarity/fun layer rather than an absolute quality score. Audit rationale is documented in `docs/ATTRACTION_TIER_AUDIT.md`.
 
 ### Quality gate
 
@@ -153,13 +160,14 @@ The 2026-09 full audit currently has **28 Gold IDs and 84 Silver IDs**; all othe
 - 1 → one-column
 - 0 → section hidden
 - tier text is never rendered
-- class only: `attraction-tier-gold | attraction-tier-silver | attraction-tier-standard`
+- class only: `attraction-tier-diamond | attraction-tier-gold | attraction-tier-silver | attraction-tier-standard`
 
 A module-level signature uses station + attraction IDs + tiers. Same-result rerenders do not rebuild attraction DOM, so the tier reveal is genuinely first-arrival rather than replaying on unrelated state changes.
 
 ### Tier visuals
 
 `minimal-palette-overrides.css` owns final tier treatment:
+- diamond: 3px platinum/prism metallic gradient border + 3.8s sheen + deliberately noticeable 1.65s two-pulse/multi-stage first-arrival reveal
 - gold: metallic gradient border + slow sheen + strong gold first-arrival pulse
 - silver: metallic silver border + slow sheen + silver first-arrival pulse
 - standard: neutral borderless card
@@ -174,7 +182,7 @@ Attraction lat/lng is not stored; each result uses self-contained `mapQuery`.
 - broad waterfront/path destinations use concrete access anchor where appropriate
 - ambiguous target can be omitted rather than linking to wrong pin
 
-Tests guard data validity, max2, station keys, map targets, tier audit boundaries and visual contracts.
+Tests guard data validity, max2, station keys, map targets, Diamond exclusivity, audited tier boundaries and visual contracts.
 
 ## 7. Station center strategy
 
@@ -248,4 +256,4 @@ Successful Android branch build updates:
 1. Actions artifact `random-seoul-debug-apk`
 2. fixed Release `android-dev-latest` / `random-seoul-latest.apk`
 
-Web and Android share the same static attraction layers and audited tiers; only live restaurant candidate lookup is platform-specific.
+Web and Android share the same static attraction layers and four-tier classifier; only live restaurant candidate lookup is platform-specific.
