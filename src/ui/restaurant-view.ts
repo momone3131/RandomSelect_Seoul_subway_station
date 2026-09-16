@@ -6,11 +6,16 @@ export interface RestaurantViewContext {
   stationName: string;
   foodName: string;
   query: string;
+  isAlcohol?: boolean;
 }
 
 function distanceText(meters: number): string {
   if (meters < 1000) return `${Math.round(meters)}m`;
   return `${(Math.round(meters / 100) / 10).toFixed(1)}km`;
+}
+
+function venueNoun(context: RestaurantViewContext): '술집' | '식당' {
+  return context.isAlcohol ? '술집' : '식당';
 }
 
 function renderAttributions(restaurants: readonly RestaurantRecommendation[]): void {
@@ -45,6 +50,7 @@ function renderAttributions(restaurants: readonly RestaurantRecommendation[]): v
 }
 
 function setContext(context: RestaurantViewContext): void {
+  byId<HTMLElement>('restaurant_title').textContent = context.isAlcohol ? '추천 술집' : '추천 식당';
   byId<HTMLElement>('restaurant_context').textContent = `${context.stationName}역 근처 · ${context.foodName}`;
   byId<HTMLAnchorElement>('restaurant_search_link').href = googleMapsSearchUrl(context.query);
   byId<HTMLAnchorElement>('restaurant_naver_link').href = naverMapSearchUrl(context.query);
@@ -104,11 +110,12 @@ export function renderRestaurants(
   replaceContent(byId<HTMLElement>('restaurant_cards'));
 
   if (!restaurants.length) {
+    const noun = venueNoun(context);
     byId<HTMLElement>('restaurant_cards').hidden = true;
     byId<HTMLElement>('restaurant_empty').hidden = false;
     byId<HTMLElement>('restaurant_count').hidden = true;
-    byId<HTMLElement>('restaurant_empty_title').textContent = '주변에서 추천 식당을 찾지 못했어요.';
-    byId<HTMLElement>('restaurant_empty_context').textContent = `${context.stationName}역 주변의 ${context.foodName} 식당을 지도에서 둘러볼 수 있어요.`;
+    byId<HTMLElement>('restaurant_empty_title').textContent = `주변에서 추천 ${noun}을 찾지 못했어요.`;
+    byId<HTMLElement>('restaurant_empty_context').textContent = `${context.stationName}역 주변의 ${context.foodName}을 지도에서 둘러볼 수 있어요.`;
     byId<HTMLElement>('google_attribution').hidden = true;
     return;
   }
