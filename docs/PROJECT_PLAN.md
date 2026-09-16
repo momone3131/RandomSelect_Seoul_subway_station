@@ -73,19 +73,31 @@ Weights:
 
 #### Attraction tiers
 
-노출 명소는 내부적으로 `gold / silver / standard` 3단계 visual prominence를 갖습니다.
+노출 명소는 내부적으로 `diamond / gold / silver / standard` 4단계 visual prominence를 갖습니다. Tier 이름은 UI에 텍스트로 표시하지 않습니다.
 
-- gold: 전국구 / destination-level
-- silver: 도시·권역 단위 주요 유명 목적지
-- standard: 해당 역에서 둘러볼 가치가 있는 local stop
+- **diamond:** 재미를 위한 초희귀 jackpot tier. 정확히 4곳만 유지
+  - 경복궁
+  - 국립중앙박물관
+  - 롯데월드타워
+  - 북촌한옥마을
+- **gold:** 전국구 / destination-level
+- **silver:** 도시·권역 단위 주요 유명 목적지
+- **standard:** 해당 역에서 둘러볼 가치가 있는 local stop
 
-Tier 이름은 UI에 텍스트로 표시하지 않습니다.
+Diamond rarity contract:
+- 쉽게 늘리지 않음
+- 추가하려면 기존 4곳 중 하나를 교체할 정도의 이유가 필요
+- 3px platinum/prism metallic border
+- 3.8s reflective sheen
+- 사용자가 놓치지 않도록 1.65s multi-stage first-arrival reveal
+- reduced-motion에서는 animation off
 
+Other tiers:
 - gold → metallic gold border + reflection + first-arrival gold effect
 - silver → metallic silver border + reflection + first-arrival silver effect
 - standard → neutral borderless card
 
-상세 선정/등급/mapQuery 기준은 `docs/ATTRACTION_CURATION.md`를 따릅니다.
+상세 선정/등급/mapQuery 기준은 `docs/ATTRACTION_CURATION.md`, 전체 audit은 `docs/ATTRACTION_TIER_AUDIT.md`를 따릅니다.
 
 ## 4. Mobile result-flow policy
 
@@ -106,7 +118,8 @@ Tier 이름은 UI에 텍스트로 표시하지 않습니다.
 - passive UI color count를 최소화: neutral bg / paper / structural surface 중심
 - active random target의 lime과 선택된 역의 actual line color는 functional accent로 유지
 - 일반 card border는 최소화
-- attraction gold/silver만 의미 있는 예외로 metallic border 사용
+- attraction diamond/gold/silver는 의미 있는 예외로 metallic border 사용
+- Diamond는 매우 드물기 때문에 Gold보다 눈에 띄되 전체 minimal UI를 깨는 과도한 무지개/게임 UI는 피함
 - `01 노선 / 02 역 / 03 음식` 같은 중복 progress strip은 표시하지 않음
 - stage-aware headline + active card + result state가 진행 상황 전달
 - random result settled reveal + Android haptic 유지
@@ -150,7 +163,7 @@ Web은 폐기용 prototype이 아닙니다.
 - platform roles
 - Places call timing/provider
 - restaurant ranking/distance
-- attraction curation/tier policy
+- attraction curation/tier/rarity policy
 - app identifier/brand
 - deployment structure
 - core UI/interaction policy
