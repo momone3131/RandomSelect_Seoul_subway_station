@@ -87,13 +87,16 @@ Exactly four attractions:
 
 Diamond exists primarily as a rare/fun jackpot experience above Gold. It is intentionally kept extremely small and should not be expanded casually.
 
-Visual contract:
-- 3 px platinum/prism metallic border
-- pale platinum + restrained cyan/lilac/warm reflective highlights
-- continuous `3.8s` sheen
-- first-arrival `1.65s` multi-stage reveal with a strong first pulse and a second smaller pulse
+Visual contract — **gemstone, not metal**:
+- 3 px icy cyan / sky blue / white / pale-violet prism border
+- faceted color movement via `attraction-diamond-prism` rather than a platinum metallic sheen
+- tiny white/cyan/violet facet sparkles around the card
+- resting prism cycle: `4.2s`; sparkle cycle: `3.4s`
+- first-arrival reveal: **1.8s**, deliberately stronger than Gold/Silver
+- peak expansion: scale `1.075`, cyan outer ring up to `16px`, glow out to roughly `42–58px`
+- multiple pulse moments + sparkle burst so the user can clearly notice a jackpot result
 - reveal only when a genuinely new station/attraction signature appears
-- reduced-motion disables animation
+- reduced-motion disables all tier animation
 
 ### Gold
 
@@ -130,7 +133,7 @@ Full audit rationale: `docs/ATTRACTION_TIER_AUDIT.md`.
 - render class: `attraction-tier-${tier}`
 - no visible tier badge/text
 - `attraction-view.ts` signature guard prevents replay on unrelated state rerenders
-- `minimal-palette-overrides.css` owns diamond/gold/silver metallic treatments
+- `minimal-palette-overrides.css` owns Diamond gemstone visuals and Gold/Silver metallic treatments
 - reduced-motion disables tier motion
 
 ## Map integrity
@@ -161,33 +164,35 @@ Yongsan station adjustment:
 - distance 5%
 - Google-derived restaurant results are not persisted as a reusable DB
 
-## Latest verified Web — Diamond release
+## Latest verified Web — gemstone Diamond release
 
-- source/regression head: `45331b014b275da6f0d5506de36b1255f7ecbdb3`
-- main CI run `35107346536` — **success**
-- Web Release run `35107346782` — **success**
-- public bundle: `assets/modular-CkBsRXsr.js`
-- GitHub Pages run `35107343850` — **success**
+- source/regression head: `ada83825726afd43ceed202d40be5b0da4a902e9`
+- main CI run `35109359593` — **success**
+- Web Release run `35109359439` — **success**
+- deployment commit: `459545c14cbda1d87fe12aac2833691e1fda4c5f`
+- public bundle: `assets/modular-IguZemH4.js`
+- GitHub Pages run `35109358128` — **success**
 
 The public bundle was directly fetched and checked. It contains:
 - exactly four Diamond IDs: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을
 - Diamond classifier before Gold
-- `attraction-diamond-sheen 3.8s`
-- `attraction-diamond-arrive 1.65s`
-- multi-stage Diamond reveal keyframes
+- `attraction-diamond-prism 4.2s`
+- `attraction-diamond-sparkle 3.4s`
+- `attraction-diamond-arrive 1.8s`
+- `16px` cyan expansion ring and larger multi-stage cyan/violet glow
 
-## Latest verified Android — Diamond release
+## Latest verified Android — gemstone Diamond release
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- branch/source head: `8fa480321054c0ef6494b472c08c6e405acc6947`
-- Android CI run `35107400302` — **success**
+- branch/source head: `37755a7f3b02101b334286a6e16ff4212dce6ecd`
+- Android CI run `35109420952` — **success**
 - shared tests → native Web build → Capacitor sync → Gradle APK → artifact → fixed latest Release all passed
 - fixed Release asset: `random-seoul-latest.apk`
-- size: `11,420,072` bytes
-- SHA-256: `80b12e1cfff02855cf5aeb0d72a864d905f2eeadeba009fa94c5bf1cfeb7bd07`
+- size: `11,420,860` bytes
+- SHA-256: `3b7e6d66d17a8600a6fb70428e11085a3e9e7c3a6275e8cb911624861aaad285`
 
 Direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -211,10 +216,9 @@ Conflict priority: **actual code/Git > STATUS > ARCHITECTURE/PROJECT_PLAN > PROJ
 
 ## Change log — 2026-09-16
 
-- Added ultra-rare Diamond tier above Gold.
-- Diamond fixed to exactly four attractions: 경복궁, 국립중앙박물관, 롯데월드타워, 북촌한옥마을.
-- Moved those four IDs out of Gold; current counts are Diamond 4 / Gold 24 / Silver 84 / remaining Standard.
-- Added 3px platinum/prismatic reflective border and 3.8s sheen.
-- Added deliberately noticeable 1.65s multi-stage first-arrival reveal with two visible pulse moments.
-- Kept tier labels hidden and preserved signature/reduced-motion behavior.
-- Verified Web CI/Web Release/public bundle/Pages and Android CI/latest APK for the Diamond release.
+- Diamond remains fixed to exactly four attractions: 경복궁, 국립중앙박물관, 롯데월드타워, 북촌한옥마을.
+- Replaced the previous platinum/metal-like Diamond treatment with a true gemstone-style icy cyan / sky / white / violet prism treatment.
+- Added subtle facet sparkles to the resting Diamond card.
+- Increased Diamond first-arrival reveal from `1.65s` to `1.8s` and expanded its visual radius to a `16px` outer ring plus `42–58px` glow.
+- Added several visible pulse/sparkle beats while preserving one-time signature behavior and reduced-motion handling.
+- Verified Web CI/Web Release/public bundle/Pages and Android CI/latest APK for the gemstone Diamond release.
