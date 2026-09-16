@@ -41,7 +41,9 @@ function tierOf(attraction: AttractionRecommendation): AttractionTier {
 }
 
 function signatureFor(stationName: string, attractions: readonly AttractionRecommendation[]): string {
-  return `${stationName}|${attractions.map((item) => `${item.id}:${tierOf(item)}`).join('|')}`;
+  return `${stationName}|${attractions
+    .map((item) => `${item.id}:${tierOf(item)}:${item.nightscape ? 'night' : 'plain'}`)
+    .join('|')}`;
 }
 
 export function resetAttractionView(): void {
@@ -73,8 +75,13 @@ export function renderAttractions(stationName: string, attractions: readonly Att
   attractions.forEach((attraction) => {
     const tier = tierOf(attraction);
     const revealClass = shouldReveal && tier !== 'standard' ? ' attraction-tier-reveal' : '';
-    const card = make('article', `restaurant-card attraction-card attraction-tier-${tier}${revealClass}`);
+    const nightscapeClass = attraction.nightscape ? ' attraction-nightscape' : '';
+    const card = make(
+      'article',
+      `restaurant-card attraction-card attraction-tier-${tier}${nightscapeClass}${revealClass}`,
+    );
     card.dataset.attractionTier = tier;
+    if (attraction.nightscape) card.dataset.attractionNightscape = 'true';
 
     const name = make('h3', 'restaurant-name', attraction.name);
     const category = make('p', 'restaurant-desc', attraction.category || '볼거리');
