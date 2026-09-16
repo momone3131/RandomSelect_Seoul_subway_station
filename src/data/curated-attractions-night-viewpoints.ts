@@ -37,6 +37,24 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
     ],
   },
   {
+    stations: ['l9:신목동'],
+    attractions: [
+      ['yongwangsan-skywalk', '용왕산 스카이워크', '전망·야경', '용왕산 스카이워크 서울 양천구 목동 199-51'],
+    ],
+  },
+  {
+    stations: ['l7:청담'],
+    attractions: [
+      ['samsung-haemaji-park', '삼성해맞이공원', '전망·야경', '삼성해맞이공원 서울 강남구 삼성동 82'],
+    ],
+  },
+  {
+    stations: ['l7:사가정'],
+    attractions: [
+      ['yongmasan-skywalk', '용마산 스카이워크', '전망·야경', '용마산 스카이워크 서울 광진구 중곡제4동 용마산'],
+    ],
+  },
+  {
     stations: ['l9:노들'],
     attractions: [
       ['yongyangbongjeojeong-park', '용양봉저정공원', '전망·야경', '용양봉저정공원 서울 동작구 본동 산3-9'],
@@ -46,6 +64,12 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
     stations: ['l8:산성', 'l8:남한산성입구'],
     attractions: [
       ['namhansanseong-west-gate-viewpoint', '남한산성 서문 전망대', '성곽·전망', '남한산성 서문 경기도 광주시 남한산성면'],
+    ],
+  },
+  {
+    stations: ['l1:화서'],
+    attractions: [
+      ['suwon-hwaseong-seojangdae', '수원화성 서장대', '성곽·전망', '수원화성 서장대 경기도 수원시 팔달구 남창동'],
     ],
   },
 ];
