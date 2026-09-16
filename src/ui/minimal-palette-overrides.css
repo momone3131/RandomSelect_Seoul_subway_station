@@ -46,3 +46,72 @@ body{background:var(--bg)}
 /* Food prompt uses the neutral system until the active lime card takes focus. */
 .food-panel.waiting .food-question{color:var(--muted);opacity:.48}
 .food-panel.ready .food-question{color:var(--dark);opacity:1}
+
+/* Attraction tiers are visual only: no text badge is rendered. */
+#attraction_section .attraction-card.attraction-tier-gold,
+#attraction_section .attraction-card.attraction-tier-silver{
+  position:relative;
+  border:2px solid transparent!important;
+  background-origin:border-box;
+  background-clip:padding-box,border-box;
+  background-size:100% 100%,240% 100%;
+  background-position:0 0,0 0;
+}
+
+#attraction_section .attraction-card.attraction-tier-gold{
+  background-image:
+    linear-gradient(var(--paper),var(--paper)),
+    linear-gradient(110deg,#8f6500 0%,#d6a620 18%,#fff3ad 35%,#b67a00 50%,#f7d867 68%,#fff8cf 82%,#9e7000 100%);
+  box-shadow:0 2px 7px rgba(159,111,0,.16);
+  animation:attraction-gold-sheen 4.8s linear infinite;
+}
+
+#attraction_section .attraction-card.attraction-tier-silver{
+  background-image:
+    linear-gradient(var(--paper),var(--paper)),
+    linear-gradient(110deg,#727a80 0%,#b8c0c5 18%,#f6f9fa 36%,#8d969c 51%,#dce2e5 70%,#ffffff 84%,#747d83 100%);
+  box-shadow:0 2px 7px rgba(83,94,101,.14);
+  animation:attraction-silver-sheen 5.4s linear infinite;
+}
+
+#attraction_section .attraction-card.attraction-tier-gold.attraction-tier-reveal{
+  animation:
+    attraction-gold-sheen 4.8s linear infinite,
+    attraction-gold-arrive .86s cubic-bezier(.12,.84,.2,1) 1;
+}
+
+#attraction_section .attraction-card.attraction-tier-silver.attraction-tier-reveal{
+  animation:
+    attraction-silver-sheen 5.4s linear infinite,
+    attraction-silver-arrive .72s cubic-bezier(.16,.82,.25,1) 1;
+}
+
+@keyframes attraction-gold-sheen{
+  from{background-position:0 0,0% 0}
+  to{background-position:0 0,220% 0}
+}
+@keyframes attraction-silver-sheen{
+  from{background-position:0 0,0% 0}
+  to{background-position:0 0,220% 0}
+}
+@keyframes attraction-gold-arrive{
+  0%{transform:scale(.96);filter:brightness(.96);box-shadow:0 0 0 0 rgba(230,180,35,0)}
+  28%{transform:scale(1.045);filter:brightness(1.18);box-shadow:0 0 0 10px rgba(236,190,46,.34),0 12px 24px rgba(128,88,0,.24)}
+  58%{transform:scale(1.018);filter:brightness(1.08);box-shadow:0 0 0 5px rgba(255,226,118,.28),0 7px 16px rgba(128,88,0,.18)}
+  100%{transform:scale(1);filter:brightness(1);box-shadow:0 2px 7px rgba(159,111,0,.16)}
+}
+@keyframes attraction-silver-arrive{
+  0%{transform:scale(.97);filter:brightness(.97);box-shadow:0 0 0 0 rgba(180,192,200,0)}
+  30%{transform:scale(1.032);filter:brightness(1.13);box-shadow:0 0 0 8px rgba(199,211,217,.36),0 9px 20px rgba(82,95,103,.20)}
+  62%{transform:scale(1.012);filter:brightness(1.06);box-shadow:0 0 0 4px rgba(232,238,241,.32),0 5px 13px rgba(82,95,103,.15)}
+  100%{transform:scale(1);filter:brightness(1);box-shadow:0 2px 7px rgba(83,94,101,.14)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #attraction_section .attraction-card.attraction-tier-gold,
+  #attraction_section .attraction-card.attraction-tier-silver,
+  #attraction_section .attraction-card.attraction-tier-gold.attraction-tier-reveal,
+  #attraction_section .attraction-card.attraction-tier-silver.attraction-tier-reveal{
+    animation:none;
+  }
+}
