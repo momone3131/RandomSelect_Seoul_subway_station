@@ -196,9 +196,10 @@ The footprint map is a shared TypeScript feature layered on top of durable `Visi
 
 - `station-equivalence.ts` exposes canonical physical-station keys/display names
 - `domain/visit-footprint.ts` groups records by physical station and orders visit history
-- `ui/footprint-map-view.ts` renders the overlay, OpenStreetMap raster tiles, pins, zoom controls and visit detail
-- equivalent-line static station coordinates are averaged when available
-- missing static coordinates reuse `StationLocationService`; on Android that resolver continues through the native Places bridge and existing 30-day cache
-- map tiles are presentation-only; no separate visit/location database is created
+- `ui/footprint-map-view.ts` renders the overlay, line rails, station nodes and visit detail
+- `SUBWAY_LINES` topology/order is the only geometry source; geographic station coordinates are not used
+- all stations render as small nodes while visited physical stations render as larger filled nodes
+- node selection updates CSS/ARIA state plus detail only; the schematic DOM is not rebuilt on tap
+- no map tile provider or Places lookup is used by the footprint UI
 - no GPS/current-location permission is used
 - native Android back handling closes footprint/visit/settings overlays before normal navigation or exit
