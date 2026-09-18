@@ -125,29 +125,34 @@ Current 12:
 
 DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체는 일반 추천/기존 tier는 유지하지만 Nightscape에서는 제외합니다.
 
-## Latest verified Web — alcohol-enabled release
+## Latest verified Web — Phase 4 visit statistics
 
-Functional source head: `82960fbfcd9131709d7302ee3b3e5a991f8662d3`
+- Phase 4 PR #16 CI `35367289293` — **success**
+- source merge `e15b8b6108d6c3664174a53f3a3e918a44a5276f`
+- main CI `35367506018` — **success**
+- Web Release `35367506047` — **success**
+- deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`
+- public bundle: `assets/modular-Ct4Elvwv.js`
+- browser smoke includes the Phase 4 statistics marker
+- regression coverage explicitly verifies a 1호선 신도림 visit counts on both 1호선 and 2호선 progress
+- confirmed attraction statistics include Diamond / Gold / Silver / Standard unique-place and revisit-inclusive counts
 
-- CI `35156095117` — **success**
-- Web Release `35156095108` — **success**
-- deployment commit `306b5e787b6bc7fd42c3905f65bfa5e7efea8040`
-- deployment Pages `35156142207` — **success**
-- public bundle: `assets/modular-DjJ7bZur.js`
-
-The public bundle was directly fetched and checked for the strict 12-ID Nightscape set, 42 food categories, 6 alcohol IDs, dynamic `주류 포함/제외`, alcohol candidate filtering, and alcohol-aware recommendation copy.
-
-## Latest verified Android — alcohol-enabled release
+## Latest verified Android — Phase 4 visit statistics
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- source head: `219a392b203cebd67960c53f4a263f491da7bd2e`
-- Android CI `35156192849` — **success**
+- source head: `a5a9b78bf83c1929f32de521b53d4a28771d5539`
+- Android CI `35367476033` — **success**
+- shared tests — success
+- native Web build / Capacitor sync — success
+- Gradle debug APK assembly — success
+- Android hardware back closes visit statistics before footprint / visit / settings overlays
+- fixed latest-development APK republished successfully
 - APK `random-seoul-latest.apk`
-- size: `11,423,212` bytes
-- SHA-256: `8ff7f1f16ccbd97218e7331dfd9360cf1bbb4dded05640def5158d06cc990891`
+- size: `11,525,425` bytes
+- asset updated: 2026-09-19 KST
 
 Direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
@@ -230,7 +235,7 @@ Verification:
 
 ## Visit statistics — Phase 4
 
-Status: **IMPLEMENTED IN PR #16 / FINAL VERIFICATION IN PROGRESS**
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - Phase 3 unvisited-first / visited-exclusion draw modes are intentionally skipped; random selection remains unchanged by visit history
 - main 발자취 hub adds `방문 통계` beside `발자취 노선도 보기`
@@ -243,6 +248,12 @@ Status: **IMPLEMENTED IN PR #16 / FINAL VERIFICATION IN PROGRESS**
 - current prominence breakdown: Diamond / Gold / Silver / Standard unique visited places + revisit-inclusive counts
 - no new visit/statistics persistence schema; all metrics derive from `VisitRecord` and update after edits/deletes
 - independent viewport-safe modal, sibling main button, Escape/backdrop/focus restoration support
+
+Verification:
+- explicit 신도림 cross-line regression test — passed on Web and Android CI
+- attraction tier aggregation regression test — passed on Web and Android CI
+- independent statistics modal browser smoke — passed
+- Web deploy + Android fixed latest-development APK — published
 
 Roadmap after Phase 4: no Phase 3 random filtering planned; future additions should preserve complete-random behavior unless product direction changes.
 
