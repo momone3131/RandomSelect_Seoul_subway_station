@@ -43,6 +43,16 @@ describe('durable visit statistics', () => {
     expect(stats.lines.find((line) => line.lineId === 'l7')?.visitedStations).toBe(1);
   });
 
+  it('credits a Sindorim visit to both Line 1 and Line 2 progress', () => {
+    const station = SUBWAY_LINES.find((line) => line.id === 'l1')!.stations.find((item) => item.name === '신도림')!;
+    const stats = buildVisitStatistics([visit({
+      lineId: 'l1', stationName: '신도림', stationOrdinal: station.ordinal,
+    })]);
+    expect(stats.visitedStations).toBe(1);
+    expect(stats.lines.find((line) => line.lineId === 'l1')?.visitedStations).toBe(1);
+    expect(stats.lines.find((line) => line.lineId === 'l2')?.visitedStations).toBe(1);
+  });
+
   it.each(['신촌', '양평'])('keeps non-interchange stations named %s separate', (name) => {
     const records = SUBWAY_LINES.filter((line) => line.stations.some((station) => station.name === name))
       .map((line) => visit({ id: line.id, lineId: line.id, stationName: name }));
@@ -58,6 +68,20 @@ describe('durable visit statistics', () => {
       visit({ id: 'three', foodId: 'food-confirmed', attractions: [option, { id: 'attraction-b', name: '명소 B' }] }),
     ]);
     expect(stats).toMatchObject({ foodCategories: 1, foodVisits: 2, attractions: 2, attractionVisits: 3 });
+  });
+
+  it('groups confirmed attractions by current prominence tier and keeps revisit counts', () => {
+    const stats = buildVisitStatistics([
+      visit({ attractions: [{ id: 'gyeongbokgung-palace', name: '경복궁' }, { id: 'changdeokgung-palace', name: '창덕궁' }] }),
+      visit({ id: 'two', attractions: [{ id: 'gyeongbokgung-palace', name: '경복궁' }, { id: 'deoksugung-palace', name: '덕수궁' }] }),
+      visit({ id: 'three', attractions: [{ id: 'local-standard-test', name: '로컬 명소' }] }),
+    ]);
+    expect(stats.attractionTiers).toEqual([
+      { tier: 'diamond', attractions: 1, visits: 2 },
+      { tier: 'gold', attractions: 1, visits: 1 },
+      { tier: 'silver', attractions: 1, visits: 1 },
+      { tier: 'standard', attractions: 1, visits: 1 },
+    ]);
   });
 
   it('uses actual entered visit dates, not creation time, and includes undated visits', () => {
