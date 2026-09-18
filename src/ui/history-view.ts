@@ -1,6 +1,6 @@
 import { FOOD_BY_ID } from '../data/food-categories';
 import { SUBWAY_LINE_BY_ID } from '../data/subway-lines';
-import type { DrawHistoryItem, SubwayLine } from '../domain/types';
+import type { DrawHistoryItem, SubwayLine, VisitRecord } from '../domain/types';
 import { readableInk } from './color';
 import { append, byId, make, replaceContent } from './dom';
 
@@ -12,7 +12,11 @@ function lineBadge(line: SubwayLine): HTMLElement {
   return badge;
 }
 
-export function renderHistory(history: readonly DrawHistoryItem[]): void {
+export function renderHistory(
+  history: readonly DrawHistoryItem[],
+  visits: readonly VisitRecord[],
+  onVisit: (item: DrawHistoryItem, existing?: VisitRecord) => void,
+): void {
   byId<HTMLElement>('history_count').textContent = String(history.length);
   byId<HTMLButtonElement>('clear_history').hidden = history.length === 0;
 
@@ -38,7 +42,15 @@ export function renderHistory(history: readonly DrawHistoryItem[]): void {
       food ? `${food.emoji} ${food.name}` : '음식 미선택',
     );
     append(text, name, meta, meal);
-    append(card, lineBadge(line), text);
+    const existingVisit = visits.find((visit) => visit.sourceHistoryId === item.id);
+    const visitButton = make(
+      'button',
+      `history-visit-btn${existingVisit ? ' saved' : ''}`,
+      existingVisit ? '방문 기록 수정' : '다녀왔어요',
+    ) as HTMLButtonElement;
+    visitButton.type = 'button';
+    visitButton.addEventListener('click', () => onVisit(item, existingVisit));
+    append(card, lineBadge(line), text, visitButton);
     fragment.appendChild(card);
   }
 
