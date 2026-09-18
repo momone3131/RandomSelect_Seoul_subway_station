@@ -1,6 +1,7 @@
+import { attractionTierForId } from '../data/curated-attraction-tiers';
 import { SUBWAY_LINES } from '../data/subway-lines';
 import { getPhysicalStationKey } from '../data/station-equivalence';
-import type { VisitRecord } from './types';
+import type { AttractionTier, VisitRecord } from './types';
 
 export interface LineVisitStatistics {
   lineId: string;
@@ -9,6 +10,12 @@ export interface LineVisitStatistics {
   visitedStations: number;
   totalStations: number;
   percentage: number;
+}
+
+export interface AttractionTierVisitStatistics {
+  tier: AttractionTier;
+  attractions: number;
+  visits: number;
 }
 
 export interface VisitStatistics {
@@ -22,6 +29,7 @@ export interface VisitStatistics {
   foodVisits: number;
   attractions: number;
   attractionVisits: number;
+  attractionTiers: AttractionTierVisitStatistics[];
   lines: LineVisitStatistics[];
 }
 
@@ -35,6 +43,7 @@ const allStationKeys = new Set(lineStations.flatMap(({ keys }) => [...keys]));
 const knownReferences = new Set(SUBWAY_LINES.flatMap((line) =>
   line.stations.map((station) => `${line.id}:${station.name}`),
 ));
+const ATTRACTION_TIER_ORDER: readonly AttractionTier[] = ['diamond', 'gold', 'silver', 'standard'];
 
 function percentage(visited: number, total: number): number {
   return total ? (visited / total) * 100 : 0;
@@ -45,6 +54,12 @@ export function buildVisitStatistics(visits: readonly VisitRecord[]): VisitStati
   const stationKeys = new Set<string>();
   const foodIds = new Set<string>();
   const attractionIds = new Set<string>();
+  const attractionIdsByTier = new Map<AttractionTier, Set<string>>(
+    ATTRACTION_TIER_ORDER.map((tier) => [tier, new Set<string>()]),
+  );
+  const attractionVisitsByTier = new Map<AttractionTier, number>(
+    ATTRACTION_TIER_ORDER.map((tier) => [tier, 0]),
+  );
   let latestVisitedAt: string | undefined;
   let undatedVisits = 0;
   let foodVisits = 0;
@@ -67,7 +82,12 @@ export function buildVisitStatistics(visits: readonly VisitRecord[]): VisitStati
     }
     const confirmedAttractions = new Set(visit.attractions.map((attraction) => attraction.id));
     attractionVisits += confirmedAttractions.size;
-    for (const id of confirmedAttractions) attractionIds.add(id);
+    for (const id of confirmedAttractions) {
+      attractionIds.add(id);
+      const tier = attractionTierForId(id);
+      attractionIdsByTier.get(tier)?.add(id);
+      attractionVisitsByTier.set(tier, (attractionVisitsByTier.get(tier) ?? 0) + 1);
+    }
   }
 
   const lines = lineStations.map(({ line, keys }): LineVisitStatistics => {
@@ -93,6 +113,11 @@ export function buildVisitStatistics(visits: readonly VisitRecord[]): VisitStati
     foodVisits,
     attractions: attractionIds.size,
     attractionVisits,
+    attractionTiers: ATTRACTION_TIER_ORDER.map((tier) => ({
+      tier,
+      attractions: attractionIdsByTier.get(tier)?.size ?? 0,
+      visits: attractionVisitsByTier.get(tier) ?? 0,
+    })),
     lines,
   };
 }
