@@ -158,6 +158,9 @@ Phase 2 stays on top of the existing durable `VisitRecord` collection.
 - visited markers are rendered in a non-scaled viewport overlay and re-positioned from anchor×map-transform, keeping their screen size visible at fit-all and zoomed views
 - marker/strip selection updates CSS/ARIA state + detail only; it does not rebuild or reposition the map
 - no physical station is auto-selected on open; detail stays hidden until explicit selection
+- modal is a capped flex column: header is non-scrolling, body is the only vertical scroll surface
+- explicit selection toggles `detail-open`; the map viewport contracts and refits once so detail does not push the close control off-screen
+- detail header composes line badge(s), station name and visit count on one compact row; long per-station visit history scrolls inside a bounded history region
 - no current-location/GPS input, station resolver, Google map lookup or OSM tile request is used by the footprint screen
 - Android native back handling closes footprint/visit/settings overlays before app navigation/exit
 
