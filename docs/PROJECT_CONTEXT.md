@@ -98,10 +98,12 @@ Nightscape changes the card interior to dark navy/indigo/purple night sky; promi
 
 ## 6. Durable visit loop
 
-Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase 3 is intentionally skipped.
+Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase 3 is intentionally skipped. The main visit UX is promoted near the completed draw result.
 
 Phase 1:
 - visits are persisted separately from recent draw history
+- first registration is available from both recent-history `다녀왔어요` and completed-course `이 코스로 가기`
+- completed-course action appears immediately left of `새 코스`; after save it becomes disabled `발자취에 등록됨`
 - station is always saved
 - drawn food is user-confirmed optional
 - shown attractions are user-confirmed optional multi-select
@@ -110,6 +112,7 @@ Phase 1:
 - clearing recent draw history leaves visits untouched
 
 Phase 2:
+- main 발자취 hub is promoted directly below `복사 · 네이버지도 · 구글지도` and above live restaurant/술집 results
 - `다녀온 곳 → 발자취 노선도`
 - bundled public-domain **수도권 전체 노선도 한 장** 위에 방문 physical station marker overlay
 - 24 lines / 800 line×station reference anchors, 800/800 automated audit
@@ -145,27 +148,29 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Phase 4 Web
-- PR #16 CI `35367289293` — success
-- merge `e15b8b6108d6c3664174a53f3a3e918a44a5276f`
-- main CI `35367506018` — success
-- Web Release `35367506047` — success
-- deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`
-- bundle `assets/modular-Ct4Elvwv.js`
+### Promoted visit UX — Web
+- PR #17 CI `35368693765` — success
+- PR #18 CI `35368949986` — success
+- final source merge `7bdfcc2f65e35be10bf006005545884b5c298e6a`
+- main CI `35369033009` / Web Release `35369033238` — success
+- deployment commit `e633c7b3bb63ffb5d24ba2e23a94fdb4bc556460`
+- bundle `assets/modular--Htlab0P.js`
+- `바로 뽑기` removed from main UI; normal reveal animation is the product behavior
+- completed course exposes `이 코스로 가기 | 새 코스`
+- 발자취 hub is directly after `map_actions`, above live recommendation results
 
-### Phase 4 Android
+### Promoted visit UX — Android
 - branch `feature/random-seoul-android`, PR #3
-- source head `a5a9b78bf83c1929f32de521b53d4a28771d5539`
-- Android CI `35367476033` — success
-- shared tests → native build → Capacitor sync → APK assembly → fixed latest release all passed
-- `random-seoul-latest.apk` size `11,525,425` bytes
+- source head `de2e21cb463adc088fa60164bb6d5c1fad44ed82`
+- Android CI `35369057004` — success
+- fixed `android-dev-latest` APK republished, size `11,526,053` bytes
 
 ### Visit/statistics invariants
-- physical interchange equality / 신촌·양평 non-interchange separation / 이수 alias: preserved
+- current-course registration reuses the exact existing visit picker/VisitRecord contract
+- one source history item cannot be registered twice through the new action
+- physical interchange equality / 신촌·양평 separation / 이수 alias preserved
 - 1호선 신도림 visit credits both 1호선 and 2호선 progress
-- revisits do not inflate station coverage
-- confirmed attraction tier counts use current Diamond / Gold / Silver / Standard classification
-- no visit/statistics schema migration and no GPS/location permission
+- no new persistence schema and no GPS/location permission
 
 ## 8. Source-of-truth docs
 
