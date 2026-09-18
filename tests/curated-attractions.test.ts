@@ -344,6 +344,72 @@ describe('curated attractions', () => {
     ]);
   });
 
+  it('adds second-pass researched destinations around still-empty stations', () => {
+    expect(getCuratedAttractions('l2', '서초')).toEqual([
+      expect.objectContaining({ id: 'national-library-of-korea', tier: 'silver' }),
+    ]);
+    expect(getCuratedAttractions('l3', '화정').map((item) => item.name)).toEqual(['화정 문화의거리']);
+    expect(getCuratedAttractions('l5', '명일').map((item) => item.name)).toEqual(['명일전통시장']);
+    expect(getCuratedAttractions('l8', '암사역사공원').map((item) => item.name)).toEqual(['암사역사공원']);
+    expect(getCuratedAttractions('ic2', '석바위시장').map((item) => item.name)).toEqual(['석바위시장']);
+    expect(getCuratedAttractions('gc', '가좌')[0]).toEqual(
+      expect.objectContaining({ id: 'gyeongui-line-forest-park', tier: 'silver' }),
+    );
+    expect(getCuratedAttractions('gc', '한국항공대').map((item) => item.name)).toEqual([
+      '한국항공대학교 항공우주박물관',
+    ]);
+    expect(getCuratedAttractions('sb', '기흥')[0]).toEqual(
+      expect.objectContaining({ id: 'nam-june-paik-art-center', tier: 'silver' }),
+    );
+    expect(getCuratedAttractions('sb', '인천논현').map((item) => item.name)).toEqual(['늘솔길공원']);
+    expect(getCuratedAttractions('ui', '솔샘').map((item) => item.name)).toEqual([
+      '북한산둘레길 흰구름길',
+    ]);
+    expect(getCuratedAttractions('gj', '의정부시청').map((item) => item.name)).toEqual([
+      '의정부예술의전당',
+    ]);
+    expect(getCuratedAttractions('ev', '삼가').map((item) => item.name)).toEqual(['용인미르스타디움']);
+    expect(getCuratedAttractions('gm', '구래').map((item) => item.name)).toEqual([
+      '김포독립운동기념관',
+    ]);
+    expect(getCuratedAttractions('l1', '역곡').map((item) => item.name)).toEqual(['역곡상상시장']);
+    expect(getCuratedAttractions('l1', '송내').map((item) => item.name)).toEqual(['복사골문화센터']);
+  });
+
+  it('locks final multi-pass zero-coverage audit additions', () => {
+    expect(getCuratedAttractions('l1', '창동').map((item) => item.name)).toEqual([
+      '서울시립 사진미술관',
+      '서울로봇인공지능과학관',
+    ]);
+    expect(getCuratedAttractions('l4', '길음').map((item) => item.name)).toEqual([
+      '서울성북미디어문화마루',
+    ]);
+    expect(getCuratedAttractions('l3', '녹번').map((item) => item.name)).toEqual([
+      '은평문화예술회관',
+    ]);
+    expect(getCuratedAttractions('l3', '약수').map((item) => item.name)).toEqual([
+      '다산성곽도서관',
+    ]);
+    expect(getCuratedAttractions('l6', '마포구청').map((item) => item.name)).toEqual([
+      '마포농수산물시장',
+    ]);
+    expect(getCuratedAttractions('l7', '신중동').map((item) => item.name)).toEqual([
+      '롯데백화점 중동점',
+    ]);
+    expect(getCuratedAttractions('l5', '강동').map((item) => item.name)).toEqual([
+      '강풀만화거리',
+    ]);
+    expect(getCuratedAttractions('l4', '상계').map((item) => item.name)).toEqual([
+      '상계중앙시장',
+    ]);
+    expect(getCuratedAttractions('l3', '백석').map((item) => item.name)).toEqual([
+      '벨라시타',
+    ]);
+    expect(getCuratedAttractions('l7', '산곡').map((item) => item.name)).toEqual([
+      '원적산공원',
+    ]);
+  });
+
   it('reuses strong nearby destinations instead of creating duplicate attraction identities', () => {
     expect(getCuratedAttractions('l2', '을지로4가')[0]).toEqual(
       expect.objectContaining({ id: 'gwangjang-market', tier: 'gold' }),
@@ -360,6 +426,7 @@ describe('curated attractions', () => {
   });
 
   it('keeps researched but unsuitable or too-distant station names uncurated', () => {
+    expect(getCuratedAttractions('l2', '신답')).toEqual([]);
     expect(getCuratedAttractions('ic1', '검단호수공원')).toEqual([]);
     expect(getCuratedAttractions('gg', '세종대왕릉')).toEqual([]);
     expect(getCuratedAttractions('gg', '신둔도예촌')).toEqual([]);
