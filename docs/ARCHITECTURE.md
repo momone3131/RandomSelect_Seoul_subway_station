@@ -105,7 +105,7 @@ The night-viewpoint layer is last so it only fills available capacity.
 ### Prominence
 - Diamond 4
 - Gold 25
-- Silver 88
+- Silver 100
 - remaining Standard
 
 ### Nightscape
@@ -116,6 +116,11 @@ Current 12 IDs:
 
 ## 6. UI composition
 
+- completed course keeps the original single `새 코스` primary action
+- hero headline gets a compact visit-state action only when a source draw record exists:
+  - `등록` → existing visit picker
+  - saved `발자취` → footprint map
+- no separate main footprint module/card; `visit-view.ts` inserts quiet `발자취 노선도` + `방문 통계` controls directly after the station-list control
 - attraction tier owns outer border/effect
 - Nightscape owns card interior/background
 - no tier/nightscape text badge
@@ -140,7 +145,7 @@ Draw history and visit history are different data domains.
 - `DrawHistoryItem.attractionOptions` snapshots the 0–2 attractions shown at station draw time
 - `VisitRecord` stores station identity, optional visit date, drawn food candidate, shown-attraction candidates and the user-confirmed visited subset
 - Google Places restaurant results are intentionally excluded from visit records
-- `visit-view.ts` owns the visit picker plus compact main-screen footprint entry; durable visit list/edit/delete presentation lives inside `footprint-map-view.ts`
+- `visit-view.ts` owns the visit picker plus the two quiet main-screen footprint/statistics utility buttons; durable visit list/edit/delete presentation lives inside `footprint-map-view.ts`
 
 This shared TypeScript contract is the source for the footprint map and visit statistics. Unvisited-aware random was intentionally skipped; visit history does not alter draw probability.
 
@@ -163,7 +168,7 @@ Phase 2 stays on top of the existing durable `VisitRecord` collection.
 - detail space is reserved from initial open, so selecting a station never changes modal or map viewport height and never requires a detail-triggered refit
 - detail header composes line badge(s), station name and visit count on one compact row; the idle detail region shows only `역을 누르면 상세·수정`, and selected history scrolls inside the same reserved region
 - no current-location/GPS input, station resolver, Google map lookup or OSM tile request is used by the footprint screen
-- Android native back handling closes footprint/visit/settings overlays before app navigation/exit
+- Android native back handling closes statistics/footprint/visit/settings overlays before app navigation/exit
 
 Automated reference audit requires 800/800 mappings, interchange anchor equality, non-interchange separation, one documented synthetic terminal exception, and bounded adjacent-station geometry.
 
@@ -181,7 +186,7 @@ Phase 4 is a read-only projection over `VisitRecord`.
 - confirmed food/alcohol counts use `VisitRecord.foodId` only
 - confirmed attraction counts use `VisitRecord.attractions` only
 - prominence breakdown calls `attractionTierForId()` at render-time aggregation, producing Diamond/Gold/Silver/Standard unique-place counts plus revisit-inclusive counts
-- the main visit hub exposes a sibling statistics button; the statistics modal is independent from the footprint modal
+- the quiet main utility row exposes a sibling statistics button below the station-list control; the statistics modal is independent from the footprint modal
 - no `VisitRecord` schema migration or statistics persistence key is introduced
 
 Phase 3 unvisited-aware/exclusion drawing is intentionally not implemented. Repeated stations remain a user redraw decision.
