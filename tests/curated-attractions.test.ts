@@ -320,6 +320,51 @@ describe('curated attractions', () => {
     expect(getEquivalentStationReferences('l7', '이수')).toEqual(isuGroup);
   });
 
+  it('adds researched destinations to previously empty station coverage', () => {
+    expect(getCuratedAttractions('l1', '남영')).toEqual([
+      expect.objectContaining({ id: 'democracy-movement-memorial-hall', tier: 'silver' }),
+    ]);
+    expect(getCuratedAttractions('l1', '오산대')).toEqual([
+      expect.objectContaining({ id: 'mulhyanggi-arboretum', tier: 'silver' }),
+    ]);
+    expect(getCuratedAttractions('l1', '백운').map((item) => item.name)).toEqual(['부평아트센터']);
+    expect(getCuratedAttractions('l9', '양천향교').map((item) => item.name)).toEqual([
+      '양천향교',
+      '겸재정선미술관',
+    ]);
+    expect(getCuratedAttractions('ic1', '원인재').map((item) => item.name)).toEqual(['원인재']);
+    expect(getCuratedAttractions('cc', '금곡')).toEqual([
+      expect.objectContaining({ id: 'hongyureung-royal-tombs', tier: 'silver' }),
+    ]);
+    expect(getCuratedAttractions('cc', '대성리').map((item) => item.name)).toEqual([
+      '대성리 국민관광지',
+    ]);
+    expect(getCuratedAttractions('gj', '발곡').map((item) => item.name)).toEqual([
+      '의정부음악도서관',
+    ]);
+  });
+
+  it('reuses strong nearby destinations instead of creating duplicate attraction identities', () => {
+    expect(getCuratedAttractions('l2', '을지로4가')[0]).toEqual(
+      expect.objectContaining({ id: 'gwangjang-market', tier: 'gold' }),
+    );
+    expect(getCuratedAttractions('l5', '군자')[0]).toEqual(
+      expect.objectContaining({ id: 'seoul-childrens-grand-park', tier: 'silver' }),
+    );
+    expect(getCuratedAttractions('l5', '영등포시장')[0]).toEqual(
+      expect.objectContaining({ id: 'times-square-yeongdeungpo' }),
+    );
+    expect(getCuratedAttractions('l2', '신대방')[0]).toEqual(
+      expect.objectContaining({ id: 'boramae-park', tier: 'silver' }),
+    );
+  });
+
+  it('keeps researched but unsuitable or too-distant station names uncurated', () => {
+    expect(getCuratedAttractions('ic1', '검단호수공원')).toEqual([]);
+    expect(getCuratedAttractions('gg', '세종대왕릉')).toEqual([]);
+    expect(getCuratedAttractions('gg', '신둔도예촌')).toEqual([]);
+  });
+
   it('still allows genuinely weak locations to remain uncurated', () => {
     expect(getCuratedAttractions('l1', '직산')).toEqual([]);
   });
