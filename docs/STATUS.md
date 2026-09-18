@@ -204,12 +204,13 @@ Roadmap: `docs/VISIT_HISTORY_PLAN.md`
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - durable `VisitRecord` remains the only visit source of truth
-- physical interchange line variants collapse into one pin; same-name non-interchanges remain separate
+- footprint UI is a terrain-free subway schematic built from shared `SUBWAY_LINES` topology/order
+- every station is a small node; visited physical stations are larger/filled
+- physical interchange line variants share one visit state; same-name non-interchanges remain separate
 - `총신대입구(이수)` ↔ `이수` is one physical station
-- pin detail shows visit count and per-visit date / line / confirmed food / confirmed attractions
-- static station coordinates are preferred; missing stations reuse the existing native Places station resolver + cache
-- OpenStreetMap raster tiles render the map background with attribution
-- no GPS/current-location permission added
+- node detail shows visit count and per-visit date / line / confirmed food / confirmed attractions
+- selecting a visited node does not rebuild the schematic DOM, eliminating the mobile tap/reposition issue
+- footprint UI uses no station-coordinate resolver, map tile provider, GPS or current-location permission
 - Android hardware back closes footprint and visit overlays before app navigation/exit
 
 Verification:
