@@ -71,6 +71,18 @@ Current prominence:
 
 Diamond fixed: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
 
+### Zero-coverage re-audit (2026-09-18)
+
+Missing stations were re-researched using map/transit proximity plus municipal tourism/cultural sources, including markets, parks, waterfronts, museums, specialized streets and trailheads rather than tourism lists alone.
+
+Current coverage after audit:
+- 800 line/station outcomes: 319 zero / 377 one / 104 two
+- 60.1% of draw outcomes have at least one curated attraction
+- 288 physical station groups remain genuinely uncurated
+- 375 unique surfaced attractions: Diamond 4 / Gold 25 / Silver 96 / Standard 250
+
+Planned/unbuilt or too-distant candidates remain intentionally excluded.
+
 ## 5. Nightscape feature
 
 Nightscape is independent from prominence, not a fifth tier.
