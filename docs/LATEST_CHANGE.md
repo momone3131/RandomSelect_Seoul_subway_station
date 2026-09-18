@@ -16,11 +16,11 @@ Baseline after physical-interchange consistency fix:
 - 330 unique surfaced attractions
 
 After the multi-pass re-audit:
-- **262 zero / 432 one / 106 two**
+- **262 zero / 431 one / 107 two**
 - **67.3% attraction coverage**
 - **237 physical station groups remain uncurated**
-- **419 unique surfaced attractions**
-- prominence: Diamond 4 / Gold 25 / Silver 100 / Standard 290
+- **420 unique surfaced attractions**
+- prominence: Diamond 4 / Gold 25 / Silver 100 / Standard 291
 
 Representative additions include 민주화운동기념관, 서울시립 사진미술관, 서울로봇인공지능과학관, 물향기수목원, 홍유릉, 대성리 국민관광지, 원인재, 양천향교, 겸재정선미술관, 서울성북미디어문화마루, 마포농수산물시장, 김포 장릉, 성남아트센터 and multiple local markets/cultural streets.
 
@@ -43,3 +43,12 @@ Examples intentionally rejected/kept empty after research include 검단호수�
 - `src/data/curated-attraction-tiers.ts`
 - `tests/curated-attractions.test.ts`
 - documentation synchronized with final coverage counts
+
+
+## Follow-up — Hwajeong
+
+화정역 curation was expanded from one to two places after checking the official Goyang tourism data:
+- 화정 문화의거리
+- 고양어린이박물관 (경기도 고양시 덕양구 화중로 26)
+
+The museum is about 0.57 km from the culture street and is kept as a Standard attraction.
