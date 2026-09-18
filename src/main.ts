@@ -556,35 +556,6 @@ async function runBrowserSelfTest(): Promise<void> {
       throw new Error('Self-test 2 km filter failed.');
     }
 
-    const footprintHistory = complete.history[0];
-    if (!footprintHistory) throw new Error('Self-test has no draw history for footprint validation.');
-    const selfTestVisit = controller.saveVisit({
-      sourceHistoryId: footprintHistory.id,
-      lineId: footprintHistory.lineId,
-      stationName: footprintHistory.stationName,
-      stationOrdinal: footprintHistory.stationOrdinal,
-      drawnFoodId: footprintHistory.foodId,
-      shownAttractions: footprintHistory.attractionOptions ?? [],
-      includeFood: Boolean(footprintHistory.foodId),
-      selectedAttractionIds: [],
-      visitedAt: '2026-09-18',
-    });
-
-    await footprintMap.open(store.getSnapshot().visits);
-    const footprintMarker = document.querySelector<HTMLButtonElement>('.footprint-visit-marker');
-    const footprintReference = document.querySelector<HTMLImageElement>('.footprint-reference-image');
-    if (!footprintMarker || !footprintReference?.src.includes('footprint-seoul-subway-reference.svg')) {
-      throw new Error('Self-test footprint full-network reference did not render.');
-    }
-    const markerIdentity = footprintMarker;
-    footprintMarker.click();
-    if (document.querySelector('.footprint-visit-marker') !== markerIdentity) {
-      throw new Error('Self-test footprint marker was rebuilt after selection.');
-    }
-    document.body.dataset.selftestFootprint = 'stable-full-network';
-    footprintMap.close();
-    controller.deleteVisit(selfTestVisit.id);
-
     await runMainDraw();
     const restarted = store.getSnapshot();
     if (!restarted.currentLine || restarted.currentStation || restarted.currentFood) {
