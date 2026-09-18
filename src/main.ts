@@ -221,7 +221,7 @@ function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): v
 }
 
 function openFootprintMap(): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || footprintMap.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
   const visits = store.getSnapshot().visits;
   if (!visits.length) return;
   void footprintMap.open(visits).catch((error) => {
