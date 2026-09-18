@@ -122,12 +122,14 @@ Orthogonal Nightscape feature:
 
 ## 9. Long-term visit loop
 
+Current status: **Phase 1 + Phase 2 implemented / verified on Web + Android**.
+
 기본 개발 순서:
 
-1. **방문 기록 분리 저장** — 역 필수, 당시 음식 종목 선택 기록, 당시 추천 명소 0~2곳 복수 선택, 선택적 방문일
-2. **발자취 지도** — 방문 역 pin / 방문 세부기록
-3. **안 가본 역 우선·제외 랜덤** — 기본 완전 랜덤은 유지
-4. **간단한 방문 통계** — 고유 방문 역/노선별 진행도 등
+1. **방문 기록 분리 저장** — 완료
+2. **발자취 지도** — 완료; physical station 단위 pin / 방문 세부기록
+3. **안 가본 역 우선·제외 랜덤** — 다음 단계; 기본 완전 랜덤은 유지
+4. **간단한 방문 통계** — 이후; 고유 방문 역/노선별 진행도 등
 
 상세 source of truth: `docs/VISIT_HISTORY_PLAN.md`.
 
