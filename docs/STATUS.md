@@ -193,6 +193,9 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - 노선도 아래 `역명 · 최근 방문일` horizontal strip을 드래그/스크롤해 방문역 탐색
 - 초기에는 상세를 숨기고 marker/strip 선택 시에만 방문일·당시 노선·실제 방문 음식/명소 history 표시
 - selected detail에서 개별 방문기록 수정/삭제 가능; strip은 상세가 열린 상태에서도 계속 스크롤 가능
+- 상세 선택 시 노선 뱃지 + 역명 + 방문 횟수를 한 줄로 압축
+- 상세가 열리면 노선도 viewport를 자동 축소/refit하고 modal header는 고정하여 작은 화면에서도 상단 닫기 버튼이 유지됨
+- 긴 동일역 방문 history는 상세 내부에서 제한 높이로 스크롤
 - marker/strip 선택 시 full map이나 marker DOM을 재렌더하지 않아 기존 모바일 tap/reposition 문제 제거
 - drag / wheel zoom / pinch zoom / fit-all 지원
 - 신규 방문 저장 toast는 `발자취 노선도에서 확인할 수 있어요`로 안내
