@@ -1,6 +1,6 @@
 # Random Seoul — Development Status
 
-Last updated: 2026-09-14
+Last updated: 2026-09-18
 
 이 문서는 현재 진행 위치와 다음 행동을 기록합니다.
 
@@ -29,6 +29,14 @@ Merged PR: `#2 refactor: modularize Random Seoul shared core`
 Main merge commit: `4d7808fd7a21c59991234d86792b141b0d02c150`
 
 Completed: Vite/TypeScript/Vitest scaffold, shared subway/food data, draw engine, state/storage boundaries, Web Places adapter, station resolver/cache, shared restaurant ranking, shared controller, typed UI modules, deterministic browser self-test, responsive mobile parity gates.
+
+## Physical interchange consistency
+
+- 동일한 실제 환승역은 어느 노선에서 추첨돼도 동일한 curated attraction 결과를 공유합니다.
+- 동명이지만 다른 역인 신촌(2호선/경의중앙선), 양평(5호선/경의중앙선)은 자동 병합하지 않습니다.
+- 총신대입구(이수) / 이수는 이름이 다른 동일 환승역으로 명시 연결합니다.
+- 이 수정으로 30개의 기존 빈 line/station 결과가 이미 큐레이션된 동일 환승역 명소를 상속합니다.
+- 800개 line/station 추첨 결과 기준 명소 0/1/2개 분포는 391 / 307 / 102입니다.
 
 ## Curated nearby attractions
 
