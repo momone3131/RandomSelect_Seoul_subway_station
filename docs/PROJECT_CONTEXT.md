@@ -96,7 +96,22 @@ DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파
 
 Nightscape changes the card interior to dark navy/indigo/purple night sky; prominence tier still owns the outer border/effect.
 
-## 6. Latest verified snapshot
+## 6. Durable visit history
+
+Phase 1 is implemented on shared Web code:
+- visits are persisted separately from recent draw history
+- station is always saved
+- drawn food is user-confirmed optional
+- shown attractions are user-confirmed optional multi-select
+- optional visit date
+- edit/delete durable visit list
+- clearing recent draw history leaves visits untouched
+
+Long-term roadmap: durable visits → footprint map → unvisited-aware random → simple visit statistics.
+
+Source: `docs/VISIT_HISTORY_PLAN.md`.
+
+## 7. Latest verified snapshot
 
 ### Web
 - functional source head `82960fbfcd9131709d7302ee3b3e5a991f8662d3`
@@ -116,11 +131,12 @@ Nightscape changes the card interior to dark navy/indigo/purple night sky; promi
 Direct APK:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
 
-## 7. Source-of-truth docs
+## 8. Source-of-truth docs
 
 - `STATUS.md`: latest verified facts
 - `ARCHITECTURE.md`: data flow/modules
 - `PROJECT_PLAN.md`: product intent
+- `VISIT_HISTORY_PLAN.md`: visit persistence / footprint roadmap
 - `ATTRACTION_CURATION.md`: attraction rules
 - `ATTRACTION_TIER_AUDIT.md`: prominence audit
 
