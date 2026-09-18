@@ -144,20 +144,24 @@ Draw history and visit history are different data domains.
 
 This shared TypeScript contract is the source for the footprint map and remains the planned source for unvisited-aware random and visit statistics.
 
-## 9. Visit footprint map
+## 9. Visit footprint full-network map
 
 Phase 2 stays on top of the existing durable `VisitRecord` collection.
 
-- `station-equivalence.ts` exposes canonical physical-station identity for visit grouping
-- `visit-footprint.ts` groups multiple records and line variants into one physical station
-- `footprint-map-view.ts` owns the schematic overlay, visited-node selection and per-station visit history
-- `SUBWAY_LINES` supplies line/station order directly; footprint rendering does not use geographic station coordinates
-- all stations render as small nodes, while visited physical stations render as larger filled nodes
-- selecting a visited node only updates selected CSS/ARIA state plus details; the schematic DOM is not rebuilt on tap
-- footprint rendering has no map-tile or Places dependency and consumes no current-location/GPS input
+- `public/footprint-seoul-subway-reference.svg`: bundled public-domain full-network reference diagram
+- `footprint-map-anchors.ts`: typed `lineId:stationName → SVG anchor` table, exactly 800 entries
+- `generate-footprint-map-anchors.mjs`: deterministic extractor from reference SVG station labels
+- `station-equivalence.ts`: canonical physical-station identity used to collapse interchange line variants
+- `visit-footprint.ts`: groups multiple records and line variants into one physical visit station
+- `footprint-map-view.ts`: full-map pan/zoom surface, visit marker overlay and per-station visit history
+- station markers use the reference SVG's own label geometry; geographic latitude/longitude is not involved
+- visited marker selection updates CSS/ARIA state + detail only; it does not rebuild or reposition the map
+- no current-location/GPS input, station resolver, Google map lookup or OSM tile request is used by the footprint screen
 - Android native back handling closes footprint/visit/settings overlays before app navigation/exit
 
-The footprint schematic does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
+Automated reference audit requires 800/800 mappings, interchange anchor equality, non-interchange separation, one documented synthetic terminal exception, and bounded adjacent-station geometry.
+
+The footprint map does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
 
 ## 10. Build / deployment
 
