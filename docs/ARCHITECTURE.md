@@ -190,16 +190,18 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 `src/data/station-equivalence.ts` canonicalizes real interchange station line variants before curated-attraction layers are merged. Same physical stations therefore share one attraction result across lines. Same-name non-interchanges `신촌` and `양평` remain separate, while `총신대입구(이수)` and `이수` are explicitly linked.
 
 
-## Durable visit footprint map
+## Durable visit footprint full-network map
 
-The footprint map is a shared TypeScript feature layered on top of durable `VisitRecord` data.
+The footprint UI shares exactly the same reference asset and anchor table with Web.
 
-- `station-equivalence.ts` exposes canonical physical-station keys/display names
-- `domain/visit-footprint.ts` groups records by physical station and orders visit history
-- `ui/footprint-map-view.ts` renders the overlay, line rails, station nodes and visit detail
-- `SUBWAY_LINES` topology/order is the only geometry source; geographic station coordinates are not used
-- all stations render as small nodes while visited physical stations render as larger filled nodes
-- node selection updates CSS/ARIA state plus detail only; the schematic DOM is not rebuilt on tap
-- no map tile provider or Places lookup is used by the footprint UI
-- no GPS/current-location permission is used
-- native Android back handling closes footprint/visit/settings overlays before normal navigation or exit
+- `public/footprint-seoul-subway-reference.svg`: bundled public-domain full-network diagram
+- `src/data/footprint-map-anchors.ts`: 800 typed line/station anchors
+- `scripts/generate-footprint-map-anchors.mjs`: deterministic reference-label extractor
+- `domain/visit-footprint.ts`: physical-station grouping
+- `ui/footprint-map-view.ts`: full-map pan/zoom and durable visit overlay
+- Android native build copies the reference through Vite's public asset pipeline; CI checks the built asset exists
+- no Android map SDK, Places lookup, GPS or location permission is used by this footprint screen
+- native Android back handling closes footprint/visit/settings overlays before app navigation/exit
+
+Mapping/audit provenance lives in `docs/FOOTPRINT_MAP_REFERENCE.md`.
+
