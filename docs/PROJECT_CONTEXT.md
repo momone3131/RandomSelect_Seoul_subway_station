@@ -119,6 +119,7 @@ Phase 2:
 - horizontal `역명 · 최근 방문일` strip remains scrollable under the map
 - no detail is shown on open; marker or strip selection opens visit count/date/line/confirmed food/attraction detail
 - selected detail owns per-record edit/delete; main page no longer shows durable visit cards
+- confirmed visited attractions in detail reuse current Diamond/Gold/Silver/Standard rim styling and Nightscape interior; station markers remain visit-only
 - footprint panel has one stable size before/after selection: map height never changes, detail space is reserved from open, idle copy is `역을 누르면 상세·수정`, and header/close stays visible
 - screenshot-driven polish: detail no longer flex-grows into blank space; modal sizes to content with viewport cap and has more comfortable iPhone top spacing
 - pan / wheel zoom / pinch zoom / fit-all
