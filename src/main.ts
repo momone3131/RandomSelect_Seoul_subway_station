@@ -10,6 +10,7 @@ import { googleMapsSearchUrl, naverMapSearchUrl } from './services/maps/web-map-
 import { animateDrawStage, revealDrawStage, type AnimatedDrawStage } from './ui/draw-animation';
 import { renderDrawView } from './ui/draw-view';
 import { renderHistory } from './ui/history-view';
+import { FootprintMapView } from './ui/footprint-map-view';
 import { renderVisits, VisitModalView } from './ui/visit-view';
 import { renderAttractions, resetAttractionView } from './ui/attraction-view';
 import {
@@ -73,6 +74,7 @@ const controller = new RandomSeoulController(
 );
 const settingsView = new SettingsModalView();
 const visitModal = new VisitModalView();
+const footprintMap = new FootprintMapView(stationLocations);
 
 let busy = false;
 let toastTimer: number | undefined;
@@ -200,14 +202,14 @@ function updateStatusCopy(): void {
 }
 
 function openVisitFromHistory(item: Parameters<typeof renderHistory>[0][number]): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
   const existing = store.getSnapshot().visits.find((visit) => visit.sourceHistoryId === item.id);
   visitModal.openFromHistory(item, existing);
   renderState();
 }
 
 function openVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
   visitModal.openVisit(visit);
   renderState();
 }
@@ -218,11 +220,22 @@ function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): v
   notify('방문 기록을 삭제했어요.');
 }
 
+function openFootprintMap(): void {
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || footprintMap.isOpen) return;
+  const visits = store.getSnapshot().visits;
+  if (!visits.length) return;
+  void footprintMap.open(visits).catch((error) => {
+    console.error(error);
+    notify('발자취 지도를 불러오지 못했어요.');
+  });
+  renderState();
+}
+
 function renderState(): void {
   const state = store.getSnapshot();
-  renderDrawView(state, { busy, modalOpen: settingsView.isOpen || visitModal.isOpen });
+  renderDrawView(state, { busy, modalOpen: settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen });
   renderHistory(state.history, state.visits, openVisitFromHistory);
-  renderVisits(state.visits, { onEdit: openVisitRecord, onDelete: deleteVisitRecord });
+  renderVisits(state.visits, { onEdit: openVisitRecord, onDelete: deleteVisitRecord, onOpenMap: openFootprintMap });
   if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions);
   else resetAttractionView();
   updateStatusCopy();
@@ -243,7 +256,7 @@ async function performDraw(
   action: () => Promise<unknown> | unknown,
   animationStage?: AnimatedDrawStage,
 ): Promise<void> {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
   busy = true;
   renderState();
 
@@ -402,12 +415,12 @@ byId<HTMLButtonElement>('google_map_btn').addEventListener('click', () => {
 });
 
 byId<HTMLButtonElement>('settings_btn').addEventListener('click', () => {
-  if (restaurantLookupBusy || visitModal.isOpen) return;
+  if (restaurantLookupBusy || visitModal.isOpen || footprintMap.isOpen) return;
   settingsView.open('line', store.getSnapshot().preferences.selectedLineIds);
   renderState();
 });
 byId<HTMLButtonElement>('food_settings_btn').addEventListener('click', () => {
-  if (restaurantLookupBusy || visitModal.isOpen) return;
+  if (restaurantLookupBusy || visitModal.isOpen || footprintMap.isOpen) return;
   settingsView.open('food', store.getSnapshot().preferences.selectedFoodIds);
   renderState();
 });
@@ -435,6 +448,17 @@ byId<HTMLButtonElement>('apply_settings').addEventListener('click', () => {
 byId<HTMLElement>('settings_overlay').addEventListener('click', (event) => {
   if (event.target === event.currentTarget) {
     settingsView.close();
+    renderState();
+  }
+});
+
+byId<HTMLButtonElement>('close_footprint').addEventListener('click', () => {
+  footprintMap.close();
+  renderState();
+});
+byId<HTMLElement>('footprint_overlay').addEventListener('click', (event) => {
+  if (event.target === event.currentTarget) {
+    footprintMap.close();
     renderState();
   }
 });
@@ -468,6 +492,14 @@ byId<HTMLButtonElement>('clear_history').addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
+  if (footprintMap.isOpen) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      footprintMap.close();
+      renderState();
+    }
+    return;
+  }
   if (visitModal.isOpen) {
     if (event.key === 'Escape') {
       event.preventDefault();
