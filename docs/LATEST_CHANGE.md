@@ -1,36 +1,45 @@
-# Latest Change — Zero-coverage attraction re-audit
+# Latest Change — Multi-pass zero-coverage attraction re-audit
 
 Date: 2026-09-18
 
 ## Product decision
 
-Re-audit stations with zero curated attractions using actual nearby visit value, not only formal tourism lists.
+Re-audit every station with zero curated attractions using actual nearby visit value, not only formal tourism lists.
 
-Research includes municipal tourism/culture sources, map/transit proximity, traditional markets, sizable parks/waterfronts, museums/cultural venues, specialized streets, campuses and trailheads. Tiny neighborhood facilities, planned/unbuilt destinations and locations requiring substantial onward transit remain excluded.
+Research combines municipal/cultural-tourism sources, map/transit proximity, traditional markets, sizeable parks/waterfronts, museums/cultural venues, specialized streets, worthwhile campus facilities and real trail/viewpoint access.
 
-## Result
+## Final result
 
-- 45 new unique curated destinations
-- 8 existing strong destination IDs reused for additional nearby stations
-- 800 line/station outcomes: 391 zero / 307 one / 102 two → **319 zero / 377 one / 104 two**
-- attraction coverage: **47.4% → 60.1%**
-- physical missing station groups: **346 → 288**
-- surfaced unique attractions: **375**
-- prominence: Diamond 4 / Gold 25 / Silver 96 / Standard 250
+Baseline after physical-interchange consistency fix:
+- 800 line/station outcomes: 391 zero / 307 one / 102 two
+- 346 physical station groups with no attraction
+- 330 unique surfaced attractions
 
-Representative additions include 민주화운동기념관, 물향기수목원, 홍유릉, 대성리 국민관광지, 원인재, 김포 장릉, 성남아트센터, 의정부음악도서관 and multiple local markets/cultural streets.
+After the multi-pass re-audit:
+- **262 zero / 432 one / 106 two**
+- **67.3% attraction coverage**
+- **237 physical station groups remain uncurated**
+- **419 unique surfaced attractions**
+- prominence: Diamond 4 / Gold 25 / Silver 100 / Standard 290
+
+Representative additions include 민주화운동기념관, 서울시립 사진미술관, 서울로봇인공지능과학관, 물향기수목원, 홍유릉, 대성리 국민관광지, 원인재, 양천향교, 겸재정선미술관, 서울성북미디어문화마루, 마포농수산물시장, 김포 장릉, 성남아트센터 and multiple local markets/cultural streets.
 
 ## Guardrails
 
 - station names are not evidence by themselves
-- no forced two-place fill
-- exact map targets remain required
-- real physical interchange equivalence remains applied before curation merge
-- same destination must reuse the existing attraction ID instead of creating duplicates
+- no forced 1–2 place fill
+- exact/self-contained map targets are required
+- planned/unbuilt destinations stay excluded
+- substantial onward bus transfer or clearly too-distant destinations stay excluded
+- weak apartment parks/generic resident facilities stay excluded
+- same destination reuses an existing attraction ID
+- physical interchange equivalence is applied before curation merge
+
+Examples intentionally rejected/kept empty after research include 검단호수공원, 세종대왕릉역, 신둔도예촌, and 오남호수공원 from 오남역. The temporary 신답→답십리 고미술상가 mapping was removed because official access evidence points to 답십리역 rather than 신답역.
 
 ## Implementation
 
 - `src/data/curated-attractions-local.ts`
 - `src/data/curated-attraction-tiers.ts`
 - `tests/curated-attractions.test.ts`
-- documentation synchronized with the new coverage counts
+- documentation synchronized with final coverage counts
