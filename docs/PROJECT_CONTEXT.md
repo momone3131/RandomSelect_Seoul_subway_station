@@ -127,17 +127,26 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Web footprint map
-- Phase 2 PR #7 CI `35346526225` — success
-- source merge `2484cc7b323ec27a8049d165d027ae19894249b4`
-- deployment commit `ee493bdc4a6e875696d3c4984d352e644d30af53`
-- deployed bundle `assets/modular-Buo-h1dI.js` directly checked for footprint UI, OSM tiles and physical-station grouping
+### Web full-network footprint
+- PR #9 final CI `35352888242` — success
+- source merge `08cf695bb8e29881777cbb3ac5aeca4b203894e3`
+- deployment commit `a356ccf847a6496b26df9f673b94333263efc1af`
+- deployed bundle `assets/modular-CQ1CWBmD.js`
+- deployed root `footprint-seoul-subway-reference.svg` directly verified
+- old per-line schematic markers are absent from the deployed bundle
 
-### Android footprint map
-- working branch `feature/random-seoul-android`
-- working PR #3
-- Phase 2 code head `a42458fd229322f10914d8f023a0b89286dd484c`
-- fixed `android-dev-latest` advanced after shared tests → native Web build → Capacitor sync → Gradle assembleDebug → release publish
+### Mapping verification
+- app outcomes: 800
+- generated anchors: 800
+- 799 anchors match the exact station label + coordinate in the bundled reference SVG
+- 1 documented synthetic exception: 의정부경전철 차량기지 임시승강장
+- physical interchange equality / 신촌·양평 separation / adjacent geometry sanity: all passed
+- deterministic regeneration zero-diff gate: passed
+
+### Android full-network footprint
+- working branch `feature/random-seoul-android`, PR #3
+- fixed `android-dev-latest` has the full-network footprint view, 800-anchor table, bundled reference SVG and exact SVG-anchor audit test
+- Android build/release workflow publishes only after shared tests → native Web build → Capacitor sync → Gradle assembleDebug
 
 ## 8. Source-of-truth docs
 
