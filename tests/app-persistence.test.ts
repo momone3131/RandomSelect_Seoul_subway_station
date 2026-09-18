@@ -80,7 +80,7 @@ describe('stable web persistence compatibility', () => {
       id: 'r2',
       lineId: 'l3',
       stationName: '화정',
-      stationOrdinal: 6,
+      stationOrdinal: 7,
       foodId: 'c_dimsum',
       attractionOptions: [
         { id: 'hwajeong-culture-street', name: '화정 문화의거리' },
