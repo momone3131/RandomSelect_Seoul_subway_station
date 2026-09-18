@@ -27,3 +27,37 @@ body{background:var(--bg)}
 #restaurant_section{scroll-margin-top:12px}
 @media(max-width:720px){#attraction_section.attraction-section{margin:0 11px 8px;padding:9px 10px}#attraction_section .attraction-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px}.restaurant-request{padding:0 11px 11px}.restaurant-request-btn{min-height:46px}}
 @media(max-width:430px){#attraction_section.attraction-section{margin:0 9px 7px;padding:8px 9px}#attraction_section .attraction-card{padding:9px}#attraction_section .restaurant-name{font-size:13px}#attraction_section .attraction-map-link{min-height:32px;margin-top:6px}.restaurant-request{padding:0 9px 10px}}
+
+
+/* Durable visit history — separate from the 12-item recent draw log. */
+.history-copy{flex:1 1 auto}
+.history-visit-btn{flex:0 0 auto;min-height:34px;padding:6px 9px;border:1px solid #bfc9bd;border-radius:8px;background:#fffdf9;color:#315246;font-size:11px;font-weight:750;white-space:nowrap}
+.history-visit-btn.saved{background:#dfeccf;border-color:#aebf98}
+.history-visit-btn.danger{color:#8b4740;border-color:#ddc7c3;background:#fff8f6}
+.visit-history{margin-top:18px;padding-top:17px;border-top:1px solid #d8d9cf}
+.visit-list .visit-item{align-items:flex-start;flex-wrap:wrap}
+.visit-item .history-copy{min-width:0}
+.visit-details{margin-top:5px;font-size:11px;line-height:1.45;color:#56665f;word-break:keep-all}
+.visit-card-actions{display:flex;gap:6px;margin-left:auto}
+.visit-modal{width:min(560px,100%)}
+.visit-dialog-body{padding:0 24px 20px}
+.visit-station-card{display:grid;gap:3px;padding:13px 14px;border-radius:11px;background:#e8eee3;margin-bottom:14px}
+.visit-station-card span{font-size:10px;font-weight:800;color:#637068;letter-spacing:.04em}
+.visit-station-card strong{font-size:20px;line-height:1.25}
+.visit-station-card small{font-size:11px;color:#748078}
+.visit-date-field{display:grid;gap:6px;margin-bottom:16px;font-size:12px;font-weight:750}
+.visit-date-field input{min-height:42px;padding:8px 10px;border:1px solid #cfd5cc;border-radius:8px;background:#fffdf9;color:var(--ink);font:inherit}
+.visit-choice-group{margin:0 0 15px;padding:0;border:0}
+.visit-choice-group legend{font-size:13px;font-weight:800;margin-bottom:7px}
+.visit-choice-hint{margin:-3px 0 8px;font-size:10px;color:var(--muted)}
+.visit-choice-list{display:grid;gap:7px}
+.visit-check-row{display:flex;align-items:center;gap:9px;min-height:42px;padding:9px 11px;border-radius:9px;background:#e8eee3;font-size:12px;font-weight:650}
+.visit-check-row input{width:17px;height:17px;accent-color:#446b57}
+.visit-none{padding:10px 11px;border-radius:9px;background:#f0eee8;color:#7a827b;font-size:11px}
+@media(max-width:720px){
+ .history-item{align-items:flex-start;flex-wrap:wrap}
+ .history-visit-btn{flex:1 0 100%;width:100%;margin-top:2px}
+ .visit-card-actions{width:100%;margin-left:0}
+ .visit-card-actions .history-visit-btn{flex:1 1 0;width:auto;margin-top:0}
+ .visit-dialog-body{padding:0 17px 16px}
+}
