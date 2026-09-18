@@ -130,6 +130,14 @@ const SILVER_IDS = new Set<string>([
   'nam-june-paik-art-center',
   'soyosan-mountain',
   'laveniche',
+  'jeongok-ri-paleolithic-site',
+  'uireung-royal-tomb',
+  'democracy-movement-memorial-hall',
+  'mulhyanggi-arboretum',
+  'hongyureung-royal-tombs',
+  'cheonmasan-mountain',
+  'seongnam-arts-center',
+  'gimpo-jangneung',
 ]);
 
 export function attractionTierForId(id: string): AttractionTier {
