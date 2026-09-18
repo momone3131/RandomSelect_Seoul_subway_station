@@ -117,7 +117,7 @@ Current 12 IDs:
 ## 6. UI composition
 
 - completed course keeps the original single `새 코스` primary action
-- hero headline gets a compact visit-state action only when a source draw record exists:
+- hero headline gets a compact borderless/transparent visit-state action only when a source draw record exists:
   - `등록` → existing visit picker
   - saved `발자취` → footprint map
 - no separate main footprint module/card; `visit-view.ts` inserts quiet `발자취 노선도` + `방문 통계` controls directly after the station-list control
