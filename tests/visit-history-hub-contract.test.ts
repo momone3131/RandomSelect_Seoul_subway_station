@@ -5,7 +5,6 @@ const historyView = readFileSync(new URL('../src/ui/history-view.ts', import.met
 const visitView = readFileSync(new URL('../src/ui/visit-view.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
-const placement = readFileSync(new URL('../src/ui/primary-draw-placement.ts', import.meta.url), 'utf8');
 const shell = readFileSync(new URL('../src/ui/shell.html', import.meta.url), 'utf8');
 
 describe('durable visit history hub contract', () => {
@@ -15,26 +14,30 @@ describe('durable visit history hub contract', () => {
     expect(historyView).not.toContain("existingVisit ? '방문 기록 수정'");
   });
 
-  it('does not render durable visit cards on the main screen', () => {
-    expect(visitView).toContain("'발자취 노선도 보기'");
-    expect(visitView).toContain('section.hidden = visits.length === 0');
+  it('does not render a separate footprint module or durable visit cards on the main screen', () => {
+    expect(visitView).toContain("'발자취 노선도'");
+    expect(visitView).toContain("'방문 통계'");
+    expect(visitView).not.toContain("'발자취 '");
+    expect(visitView).not.toContain("'visit_count'");
+    expect(visitView).not.toContain("'visit-hub'");
     expect(visitView).not.toContain("const card = make('div', 'history-item visit-item')");
     expect(visitView).not.toContain("'visit_list'");
   });
 
-  it('promotes the footprint hub directly below copy and map actions', () => {
-    expect(visitView).toContain("mapActions.insertAdjacentElement('afterend', section)");
-    expect(visitView).not.toContain("history.insertAdjacentElement('afterend', section)");
-    expect(visitView).not.toContain("drawShell.insertAdjacentElement('afterend', section)");
+  it('places two quiet visit utilities directly below the station-list control', () => {
+    expect(visitView).toContain("stationDetail.insertAdjacentElement('afterend', tools)");
+    expect(visitView).toContain("mapButton.disabled = visits.length === 0");
+    expect(visitView).toContain("statisticsButton.onclick = callbacks.onOpenStatistics");
   });
 
-  it('offers the completed current course beside the new-course action', () => {
-    expect(shell).toContain('id="current_course_visit_btn"');
-    expect(shell).toContain('id="done_actions"');
-    expect(placement).toContain("if (drawButton.parentElement !== doneActions) doneActions.appendChild(drawButton)");
-    expect(drawView).toContain("currentCourseVisit.textContent = currentVisit ? '발자취에 등록됨' : '이 코스로 가기'");
-    expect(main).toContain("byId<HTMLButtonElement>('current_course_visit_btn').addEventListener('click'");
+  it('uses a small hero registration action after course completion', () => {
+    expect(shell).toContain('id="hero_visit_btn"');
+    expect(shell).not.toContain('id="current_course_visit_btn"');
+    expect(shell).not.toContain('id="done_actions"');
+    expect(drawView).toContain("heroVisit.textContent = currentVisit ? '발자취' : '등록'");
+    expect(main).toContain("byId<HTMLButtonElement>('hero_visit_btn').addEventListener('click'");
     expect(main).toContain('openVisitFromHistory(item)');
+    expect(main).toContain('openFootprintMap()');
   });
 
   it('removes the instant-draw checkbox and keeps normal draw animation as the product behavior', () => {
