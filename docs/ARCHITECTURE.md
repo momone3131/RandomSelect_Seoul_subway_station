@@ -1,6 +1,6 @@
 # Random Seoul — Architecture
 
-Last updated: 2026-09-14
+Last updated: 2026-09-18
 
 ## 1. Architecture goals
 
@@ -183,3 +183,8 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 - storage provider
 - framework/platform dependency
 - Web support/deployment strategy
+
+
+## Physical interchange station equivalence
+
+`src/data/station-equivalence.ts` canonicalizes real interchange station line variants before curated-attraction layers are merged. Same physical stations therefore share one attraction result across lines. Same-name non-interchanges `신촌` and `양평` remain separate, while `총신대입구(이수)` and `이수` are explicitly linked.
