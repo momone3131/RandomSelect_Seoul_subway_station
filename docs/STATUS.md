@@ -211,6 +211,10 @@ Verification:
 - source merge `08cf695bb8e29881777cbb3ac5aeca4b203894e3`
 - Web deployment commit `a356ccf847a6496b26df9f673b94333263efc1af`
 - deployed bundle `assets/modular-CQ1CWBmD.js` + root reference SVG directly verified
+- visit-history hub refinement PR #10 CI `35356470654` — **success**
+- source merge `bdf9326584648786e7679389e66c931a09c265d8`
+- Web deployment commit `526f3ab6431cbd2481546a12fce040d78beeb3ba`
+- deployed bundle `assets/modular-_UoS7_f0.js` verified for screen-space visit markers, horizontal visit strip, footprint-only edit/delete, registration-only recent history, and new-save footprint guidance
 
 Next planned phases:
 3. unvisited-first/exclude random modes
