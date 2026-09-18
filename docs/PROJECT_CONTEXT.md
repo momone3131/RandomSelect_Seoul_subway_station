@@ -96,9 +96,11 @@ DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파
 
 Nightscape changes the card interior to dark navy/indigo/purple night sky; prominence tier still owns the outer border/effect.
 
-## 6. Durable visit history
+## 6. Durable visit loop
 
-Phase 1 is implemented on shared Web code:
+Phase 1 + Phase 2 are implemented and verified on Web + Android.
+
+Phase 1:
 - visits are persisted separately from recent draw history
 - station is always saved
 - drawn food is user-confirmed optional
@@ -107,29 +109,33 @@ Phase 1 is implemented on shared Web code:
 - edit/delete durable visit list
 - clearing recent draw history leaves visits untouched
 
-Long-term roadmap: durable visits → footprint map → unvisited-aware random → simple visit statistics.
+Phase 2:
+- `다녀온 곳 → 발자취 지도`
+- `VisitRecord` groups by physical station; multiple line variants/visits become one pin
+- 신촌/양평 same-name non-interchanges remain separate
+- 총신대입구(이수) ↔ 이수 is one pin
+- pin detail shows visit count and date/line/confirmed food/confirmed attraction history
+- static station coordinates first; existing station resolver/cache only for missing coordinates
+- OpenStreetMap raster background; no GPS/current-location permission
+- Android back closes footprint/visit overlays before app navigation/exit
+
+Next: Phase 3 unvisited-aware/excluded random → Phase 4 simple visit statistics.
 
 Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Web
-- functional source head `82960fbfcd9131709d7302ee3b3e5a991f8662d3`
-- CI `35156095117` — success
-- Web Release `35156095108` — success
-- deployment commit `306b5e787b6bc7fd42c3905f65bfa5e7efea8040`
-- Pages `35156142207` — success
-- public bundle `assets/modular-DjJ7bZur.js`
+### Web footprint map
+- Phase 2 PR #7 CI `35346526225` — success
+- source merge `2484cc7b323ec27a8049d165d027ae19894249b4`
+- deployment commit `ee493bdc4a6e875696d3c4984d352e644d30af53`
+- deployed bundle `assets/modular-Buo-h1dI.js` directly checked for footprint UI, OSM tiles and physical-station grouping
 
-### Android
-- source head `219a392b203cebd67960c53f4a263f491da7bd2e`
-- Android CI `35156192849` — success
-- APK `random-seoul-latest.apk`
-- size `11,423,212` bytes
-- SHA-256 `8ff7f1f16ccbd97218e7331dfd9360cf1bbb4dded05640def5158d06cc990891`
-
-Direct APK:
-`https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
+### Android footprint map
+- working branch `feature/random-seoul-android`
+- working PR #3
+- Phase 2 code head `a42458fd229322f10914d8f023a0b89286dd484c`
+- fixed `android-dev-latest` advanced after shared tests → native Web build → Capacitor sync → Gradle assembleDebug → release publish
 
 ## 8. Source-of-truth docs
 
