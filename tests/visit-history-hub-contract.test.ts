@@ -22,9 +22,10 @@ describe('durable visit history hub contract', () => {
     expect(visitView).not.toContain("'visit_list'");
   });
 
-  it('promotes the footprint hub directly below the main draw shell', () => {
-    expect(visitView).toContain("drawShell.insertAdjacentElement('afterend', section)");
+  it('promotes the footprint hub directly below copy and map actions', () => {
+    expect(visitView).toContain("mapActions.insertAdjacentElement('afterend', section)");
     expect(visitView).not.toContain("history.insertAdjacentElement('afterend', section)");
+    expect(visitView).not.toContain("drawShell.insertAdjacentElement('afterend', section)");
   });
 
   it('offers the completed current course beside the new-course action', () => {
