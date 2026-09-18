@@ -181,6 +181,12 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('grid-template-columns:repeat(3,minmax(0,1fr))');
   });
 
+  it('keeps completed-course commitment and new-course actions side by side', () => {
+    expect(styles).toContain('.done-actions{');
+    expect(styles).toContain('grid-template-columns:minmax(0,1fr) minmax(0,1fr)');
+    expect(styles).toContain('.current-course-visit-btn.saved:disabled');
+  });
+
   it('changes the hero prompt with the draw stage', () => {
     expect(drawView).toContain("'어디로 가볼까?'");
     expect(drawView).toContain("'어느 역에서 내릴까?'");
