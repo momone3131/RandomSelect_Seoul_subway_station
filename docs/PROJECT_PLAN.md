@@ -120,7 +120,26 @@ Orthogonal Nightscape feature:
 - Android UX/release: 계속 진행
 - iOS: Android 안정화 이후 shared core 재사용
 
-## 9. Documentation change control
+## 9. Long-term visit loop
+
+기본 개발 순서:
+
+1. **방문 기록 분리 저장** — 역 필수, 당시 음식 종목 선택 기록, 당시 추천 명소 0~2곳 복수 선택, 선택적 방문일
+2. **발자취 지도** — 방문 역 pin / 방문 세부기록
+3. **안 가본 역 우선·제외 랜덤** — 기본 완전 랜덤은 유지
+4. **간단한 방문 통계** — 고유 방문 역/노선별 진행도 등
+
+상세 source of truth: `docs/VISIT_HISTORY_PLAN.md`.
+
+Phase 1 규칙:
+- 최근 추첨 기록 삭제는 실제 방문 기록을 삭제하지 않음
+- 음식/명소는 뽑혔다는 이유만으로 자동 방문 처리하지 않음
+- 음식 후보는 당시 추첨 종목 하나만; Google 추천 식당은 저장 후보가 아님
+- 명소 후보는 당시 화면에 노출된 명소만; 복수 선택 가능
+- 역 방문만 단독 저장 가능
+- 방문일은 선택사항
+
+## 10. Documentation change control
 
 다음 변경은 docs에 동기화합니다:
 - product flow/platform roles
