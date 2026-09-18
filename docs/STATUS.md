@@ -193,6 +193,9 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - 노선도 아래 `역명 · 최근 방문일` horizontal strip을 드래그/스크롤해 방문역 탐색
 - 초기 상세 영역에는 `역을 누르면 상세·수정`만 표시하고 marker/strip 선택 시 방문일·당시 노선·실제 방문 음식/명소 history로 교체
 - selected detail에서 개별 방문기록 수정/삭제 가능; strip은 상세가 열린 상태에서도 계속 스크롤 가능
+- 실제 방문 체크된 명소만 상세에 compact attraction chip으로 표시; 현재 prominence tier 테두리와 Nightscape visual을 재사용
+- 음식은 별도 compact chip, 방문 명소가 없으면 기존 `역 방문만 기록` 유지
+- 지도 marker는 역 방문 의미만 유지하여 명소 tier/feature와 시각 의미를 섞지 않음
 - 상세 선택 시 노선 뱃지 + 역명 + 방문 횟수를 한 줄로 압축
 - 상세 선택 전/후 전체 modal 높이와 노선도 viewport 높이는 동일하게 유지; 상세 공간을 처음부터 확보하여 레이아웃 점프 없음
 - modal header/닫기 버튼은 고정되고 상세 영역 자체가 남는 공간에서 스크롤하므로 긴 방문 history도 전체 panel 크기를 바꾸지 않음
