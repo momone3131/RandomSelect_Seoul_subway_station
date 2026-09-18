@@ -215,6 +215,8 @@ Verification:
 - source merge `bdf9326584648786e7679389e66c931a09c265d8`
 - Web deployment commit `526f3ab6431cbd2481546a12fce040d78beeb3ba`
 - deployed bundle `assets/modular-_UoS7_f0.js` verified for screen-space visit markers, horizontal visit strip, footprint-only edit/delete, registration-only recent history, and new-save footprint guidance
+- Android `android-dev-latest` advanced to the same visit-hub source: footprint view / main flow / styles / UX contract tests all match the Android branch
+- native Vite now includes shared root public assets, so the bundled full-network SVG is present in the APK Web assets
 
 Next planned phases:
 3. unvisited-first/exclude random modes
