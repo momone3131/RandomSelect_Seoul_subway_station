@@ -44,6 +44,7 @@ describe('visit footprint full-network map contract', () => {
     expect(footprintView).toContain("make('button', 'history-visit-btn danger', '삭제')");
     expect(footprintView).toContain('this.callbacks?.onEdit(visit)');
     expect(footprintView).toContain('this.callbacks?.onDelete(visit)');
+    expect(styles).toContain('.footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0');
   });
 
   it('supports pan, pinch/wheel zoom and an explicit fit-all control', () => {
