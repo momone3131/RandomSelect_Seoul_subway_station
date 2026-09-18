@@ -152,14 +152,14 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 
 ## Zero-coverage attraction re-audit — 2026-09-18
 
-Shared curated-attraction data was re-audited using actual map/transit proximity plus municipal tourism/cultural sources rather than tourism lists alone.
+Shared curated-attraction data was re-audited in multiple passes using actual map/transit proximity plus municipal tourism/cultural sources rather than tourism lists alone.
 
-- 45 new unique destinations added
-- 8 existing strong destination IDs reused for additional nearby stations
-- 800 line/station outcomes: 319 zero / 377 one / 104 two
-- attraction coverage: 60.1%
-- physical missing station groups: 288
-- surfaced unique attractions: 375 = Diamond 4 / Gold 25 / Silver 96 / Standard 250
+- baseline after interchange fix: 391 zero / 307 one / 102 two
+- final 800 line/station outcomes: **262 zero / 432 one / 106 two**
+- attraction coverage: **67.3%**
+- physical missing station groups: **237**
+- unique surfaced attractions: **419 = Diamond 4 / Gold 25 / Silver 100 / Standard 290**
 - planned/unbuilt, generic neighborhood-only, or bus-dependent/far candidates remain intentionally uncurated
+- over-aggressive candidates are removed when access evidence does not match the drawn station
 
 Android uses the same shared curation/tier/test contract as Web.
