@@ -19,7 +19,9 @@ Record rules:
 - 명소는 복수 선택 가능
 - 추천 식당 Google Places 결과는 방문 기록 후보에 포함하지 않음
 - 방문일은 선택사항이며 신규 기록 화면에서는 오늘 날짜를 기본값으로 제공하고 사용자가 지울 수 있음
-- 저장 뒤 수정/삭제 가능
+- 최초 등록은 최근 추첨 카드의 `다녀왔어요`에서만 수행
+- 등록 완료 뒤 최근 추첨 카드에서는 `발자취에 등록됨` 상태만 표시하고 수정 진입은 제공하지 않음
+- 이후 조회/수정/삭제는 `발자취 노선도` 안의 durable visit history에서 수행
 
 Persistence:
 - recent draw history: `next_stop_history_v1`, max 12
@@ -36,9 +38,12 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - 앱에 번들된 public-domain 수도권 전철 SVG를 기준 geometry로 사용
 - 앱 수록 24개 노선 / **800개 line×station outcome 전체를 reference anchor에 매핑**
-- 방문한 physical station만 reference map 위에 고정 overlay marker로 강조
+- 방문한 physical station만 reference map 위에 **화면 고정 크기 marker**로 강조하여 전체보기/확대 상태 모두에서 식별 가능
 - 같은 physical station의 여러 노선/여러 방문은 하나의 marker + 방문 횟수 + 날짜별 history로 표현
-- marker 선택 시 방문 날짜, 당시 노선, 실제 방문으로 체크한 음식 종목/명소를 확인
+- 노선도 아래에는 `역명 · 최근 방문일` compact horizontal strip을 항상 표시하고 옆으로 밀어 방문 역을 탐색
+- 처음 열었을 때는 상세기록을 펼치지 않으며 marker 또는 strip item을 선택한 경우에만 상세 표시
+- 선택 상세에서 날짜/노선/실제 방문 음식·명소를 확인하고 개별 방문기록 수정/삭제 가능
+- 상세가 열린 상태에서도 horizontal strip은 계속 스크롤 가능
 - marker 선택은 map DOM을 재생성하지 않고 selection/detail만 갱신하여 모바일 tap 시 위치가 움직이지 않음
 - pan / wheel zoom / pinch zoom / 전체보기 지원
 - physical interchange equivalence를 그대로 재사용
@@ -50,7 +55,7 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 Anchor source/generation/audit 상세: `docs/FOOTPRINT_MAP_REFERENCE.md`.
 
-Phase 2는 `VisitRecord` persistence schema를 변경하지 않으며 별도 방문 DB를 만들지 않습니다.
+Main 화면에는 durable visit card 목록을 노출하지 않고 방문 기록 수 + `발자취 노선도 보기` 진입만 제공합니다. Phase 2는 `VisitRecord` persistence schema를 변경하지 않으며 별도 방문 DB를 만들지 않습니다.
 
 ## Phase 3 — Unvisited-aware random
 
