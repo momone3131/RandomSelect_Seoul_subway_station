@@ -41,6 +41,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify footprint anchor generation
+        run: |
+          npm run generate:footprint-anchors
+          git diff --exit-code -- src/data/footprint-map-anchors.ts
+
       - name: Test
         run: npm test
 
@@ -91,6 +96,7 @@ jobs:
           grep -q 'data-selftest="passed"' /tmp/random-seoul-release-dom.html
           grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-release-dom.html
           grep -q 'RANDOM SEOUL' /tmp/random-seoul-release-dom.html
+          test -f dist/footprint-seoul-subway-reference.svg
           test -f dist/icon-192.png
           test -f dist/icon-512.png
           test -f dist/site.webmanifest
@@ -101,6 +107,7 @@ jobs:
           mkdir -p assets
           rm -f assets/modular-*.js assets/modulepreload-polyfill-*.js
           cp dist/modular.html index.html
+          cp dist/footprint-seoul-subway-reference.svg footprint-seoul-subway-reference.svg
           cp dist/assets/modular-*.js assets/
           cp dist/assets/modulepreload-polyfill-*.js assets/
           cp dist/icon-192.png icon-192.png
@@ -112,7 +119,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html assets/ icon-192.png icon-512.png site.webmanifest
+          git add index.html assets/ footprint-seoul-subway-reference.svg icon-192.png icon-512.png site.webmanifest
           if git diff --cached --quiet; then
             echo 'Web deployment files are already current.'
             exit 0

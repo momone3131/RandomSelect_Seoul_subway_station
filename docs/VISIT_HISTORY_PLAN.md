@@ -32,22 +32,25 @@ Persistence:
 
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-`다녀온 곳` 영역의 `발자취 노선도`에서 durable visit records를 지하철 노선 위에 표시합니다.
+`다녀온 곳`의 `발자취 노선도`는 **수도권 전체 노선도 한 장** 위에 durable visit records를 표시합니다.
 
-- 전체 노선/역을 지형 없는 schematic rail로 표시하고 미방문 역은 작은 점으로 유지
-- 방문한 physical station은 더 큰 filled node로 표시
-- 같은 physical station의 여러 방문 기록은 **node 하나 + 방문 횟수 + 날짜별 history**로 표현
-- 방문 node 선택 시 방문 날짜, 당시 노선, 사용자가 실제 방문으로 선택한 음식 종목/명소를 확인
-- physical interchange equivalence를 그대로 재사용하여 노선별 환승역 중복 pin 방지
-- known same-name non-interchange인 신촌/양평은 별도 pin 유지
-- `총신대입구(이수)` ↔ `이수`는 하나의 physical station으로 통합
-- station geography/좌표는 사용하지 않고 `SUBWAY_LINES` topology/order만 사용
-- node 선택 시 노선도 DOM을 재생성하지 않고 selected state + detail만 갱신하여 모바일 터치 위치가 움직이지 않음
-- footprint 화면 자체는 외부 지도/타일/provider 네트워크 요청이 없음
-- current-location/GPS permission을 요구하지 않음
+- 앱에 번들된 public-domain 수도권 전철 SVG를 기준 geometry로 사용
+- 앱 수록 24개 노선 / **800개 line×station outcome 전체를 reference anchor에 매핑**
+- 방문한 physical station만 reference map 위에 고정 overlay marker로 강조
+- 같은 physical station의 여러 노선/여러 방문은 하나의 marker + 방문 횟수 + 날짜별 history로 표현
+- marker 선택 시 방문 날짜, 당시 노선, 실제 방문으로 체크한 음식 종목/명소를 확인
+- marker 선택은 map DOM을 재생성하지 않고 selection/detail만 갱신하여 모바일 tap 시 위치가 움직이지 않음
+- pan / wheel zoom / pinch zoom / 전체보기 지원
+- physical interchange equivalence를 그대로 재사용
+- 2호선/경의중앙선 신촌과 5호선/경의중앙선 양평은 서로 다른 reference anchor 유지
+- `총신대입구(이수)` ↔ `이수`는 같은 physical anchor
+- reference에 표기되지 않은 `의정부경전철 차량기지 임시승강장`만 유일한 synthetic terminal-extension anchor이며 UI에서 dashed extension으로 구분
+- current-location/GPS permission 및 runtime map-provider/tile 요청 없음
 - Android hardware back은 footprint → visit picker → settings 순으로 열린 overlay를 먼저 닫음
 
-Phase 2는 `VisitRecord` persistence schema를 변경하지 않습니다. 지도용 별도 방문 DB를 만들지 않습니다.
+Anchor source/generation/audit 상세: `docs/FOOTPRINT_MAP_REFERENCE.md`.
+
+Phase 2는 `VisitRecord` persistence schema를 변경하지 않으며 별도 방문 DB를 만들지 않습니다.
 
 ## Phase 3 — Unvisited-aware random
 

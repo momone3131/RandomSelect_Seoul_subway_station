@@ -27,6 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify footprint anchor generation
+        run: |
+          npm run generate:footprint-anchors
+          git diff --exit-code -- src/data/footprint-map-anchors.ts
+
       - name: Test
         run: npm test
 
@@ -79,6 +84,8 @@ jobs:
           grep -q 'data-selftest-cards="3"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-cycle-reset="true"' /tmp/random-seoul-dom.html
           grep -q 'RANDOM SEOUL' /tmp/random-seoul-dom.html
+          curl --silent --fail http://127.0.0.1:4173/footprint-seoul-subway-reference.svg > /dev/null
+          test -f dist/footprint-seoul-subway-reference.svg
 
           "$CHROME_BIN" \
             --headless=new \

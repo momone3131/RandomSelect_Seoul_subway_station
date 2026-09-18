@@ -182,22 +182,27 @@ Roadmap source: `VISIT_HISTORY_PLAN.md`.
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - `다녀온 곳`에 방문 기록이 하나 이상 있으면 `발자취 노선도` CTA 노출
-- durable `VisitRecord`를 physical station 기준으로 그룹화; 별도 지도용 방문 DB 없음
-- 지형 지도 대신 전체 지하철 line/station topology를 schematic rail + station dots로 표시
-- 같은 환승역의 여러 노선/여러 방문은 하나의 physical visit로 취급하고 각 해당 line node를 방문 상태로 강조
-- node detail에서 방문일, 당시 노선, 실제 방문으로 체크한 음식 종목과 명소 history 확인
-- 신촌/양평 동명이역은 분리, `총신대입구(이수)` ↔ `이수`는 통합
-- footprint 화면에서는 station coordinates / Google resolver / OpenStreetMap tile을 사용하지 않음
-- node 선택 시 schematic을 재렌더하지 않아 모바일 tap 시 node가 이동하는 문제 제거
-- current-location/GPS permission 추가 없음
-- Android hardware back에서 footprint/visit/settings overlay를 우선 닫음
+- 한 노선씩 나열하지 않고 **수도권 전체 노선도 한 장**을 reference surface로 사용
+- bundled public-domain SVG + generated static anchor table; footprint open 시 외부 지도 네트워크 호출 없음
+- **24개 노선 / 800개 line×station mappings = 800/800 verified**
+- durable `VisitRecord`를 physical station 기준으로 그룹화
+- 환승역 line variants는 같은 marker, 신촌/양평 동명이역은 서로 다른 anchor
+- `총신대입구(이수)` ↔ `이수`는 동일 anchor
+- 의정부경전철 차량기지 임시승강장만 reference 밖 synthetic dashed terminal extension
+- marker detail에서 방문일, 당시 노선, 실제 방문 음식/명소 history 확인
+- marker 선택 시 full map을 재렌더하지 않아 기존 모바일 tap/reposition 문제 제거
+- drag / wheel zoom / pinch zoom / fit-all 지원
+- GPS/current-location permission 추가 없음
+
+Reference/audit source: `FOOTPRINT_MAP_REFERENCE.md`.
 
 Verification:
-- Web Phase 2 PR #7 CI `35346526225` — **success**
-- Web source merge `2484cc7b323ec27a8049d165d027ae19894249b4`
-- Web deployment commit `ee493bdc4a6e875696d3c4984d352e644d30af53`
-- Android Phase 2 source head `a42458fd229322f10914d8f023a0b89286dd484c`
-- fixed `android-dev-latest` tag advanced to the Phase 2 build after shared tests / native Web build / Capacitor sync / Gradle assemble / release publish
+- full reference anchor audit: **800 / 800**
+- physical interchange equivalence audit: success
+- same-name non-interchange separation audit: success
+- adjacent reference-geometry sanity audit: success
+- Web PR #9 CI `35351895054` — **success**
+- tests / Vite build / headless browser smoke — **success**
 
 Next planned phases:
 3. unvisited-first/exclude random modes
