@@ -283,7 +283,7 @@ export function renderVisits(visits: readonly VisitRecord[], callbacks: VisitLis
     const card = make('div', 'history-item visit-item');
     const copy = make('div', 'history-copy');
     const name = make('div', 'history-name', visit.stationName);
-    const date = visit.visitedAt ? visit.visitedAt.replaceAll('-', '.') : '날짜 미기록';
+    const date = visit.visitedAt ? visit.visitedAt.replace(/-/g, '.') : '날짜 미기록';
     const meta = make('div', 'history-meta', `${line.name} · ${date}`);
     append(copy, name, meta);
 
