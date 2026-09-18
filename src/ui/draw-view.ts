@@ -1,5 +1,5 @@
 import type { AppState } from '../state/app-state';
-import type { FoodCategory, SubwayLine, SubwayStation } from '../domain/types';
+import type { DrawHistoryItem, FoodCategory, SubwayLine, SubwayStation } from '../domain/types';
 import { readableInk } from './color';
 import { append, byId, make, replaceContent } from './dom';
 import { placePrimaryDrawButton, type PrimaryDrawStage } from './primary-draw-placement';
@@ -172,6 +172,16 @@ function renderSteps(state: Readonly<AppState>): void {
   }
 }
 
+function currentCourseHistoryItem(state: Readonly<AppState>): DrawHistoryItem | undefined {
+  if (!state.currentLine || !state.currentStation || !state.currentFood) return undefined;
+  return state.history.find((item) =>
+    item.lineId === state.currentLine?.id
+    && item.stationName === state.currentStation?.name
+    && item.stationOrdinal === state.currentStation?.ordinal
+    && item.foodId === state.currentFood?.id
+  );
+}
+
 function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void {
   const locked = status.busy || status.modalOpen;
   const drawButton = byId<HTMLButtonElement>('draw_btn');
@@ -179,7 +189,7 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   const stationRedraw = byId<HTMLButtonElement>('station_redraw_btn');
   const foodRedraw = byId<HTMLButtonElement>('food_redraw_btn');
   const copy = byId<HTMLButtonElement>('copy_btn');
-  const instant = byId<HTMLInputElement>('instant');
+  const currentCourseVisit = byId<HTMLButtonElement>('current_course_visit_btn');
   const stage: PrimaryDrawStage = !state.currentLine
     ? 'line'
     : !state.currentStation
@@ -195,8 +205,20 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   stationRedraw.disabled = locked || !state.currentStation;
   foodRedraw.disabled = locked || !state.currentFood;
   copy.disabled = locked || !state.currentStation;
-  instant.disabled = status.busy;
-  instant.checked = state.preferences.instantDraw;
+  const currentHistory = stage === 'done' ? currentCourseHistoryItem(state) : undefined;
+  const currentVisit = currentHistory
+    ? state.visits.find((visit) => visit.sourceHistoryId === currentHistory.id)
+    : undefined;
+  currentCourseVisit.hidden = stage !== 'done';
+  currentCourseVisit.disabled = locked || !currentHistory || Boolean(currentVisit);
+  currentCourseVisit.className = `current-course-visit-btn${currentVisit ? ' saved' : ''}`;
+  currentCourseVisit.textContent = currentVisit ? '발자취에 등록됨' : '이 코스로 가기';
+  currentCourseVisit.setAttribute(
+    'aria-label',
+    currentVisit
+      ? `${state.currentStation?.name ?? ''}역 코스는 발자취에 등록되어 있습니다.`
+      : '현재 완성된 코스를 방문 기록으로 등록',
+  );
   byId<HTMLElement>('scope_count').textContent = `${state.preferences.selectedLineIds.length}개 노선`;
   byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`;
 
