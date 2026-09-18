@@ -138,6 +138,72 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['ev:동백'], attractions: [['dongbaek-lake-park', '동백호수공원', '호수공원', '동백호수공원 경기도 용인시 기흥구 동백동']] },
   { stations: ['gm:걸포북변'], attractions: [['geolpo-central-park', '걸포중앙공원', '공원', '걸포중앙공원 경기도 김포시 걸포동']] },
   { stations: ['gtx:동탄'], attractions: [['lotte-dept-dongtan', '롯데백화점 동탄점', '복합문화·쇼핑', '롯데백화점 동탄점 경기도 화성시 동탄역로 160']] },
+
+  // 2026-09-18 zero-coverage audit: map/local-source research for genuinely visit-worthy stops.
+  { stations: ['l1:전곡'], attractions: [['jeongok-ri-paleolithic-site', '전곡리 선사유적', '선사유적', '전곡리 선사유적 경기도 연천군 전곡읍 양연로 1510'], ['jeongok-prehistory-museum', '전곡선사박물관', '박물관', '전곡선사박물관 경기도 연천군 전곡읍 평화로443번길 2']] },
+  { stations: ['l1:동두천중앙'], attractions: [['dongducheon-central-market', '동두천 중앙시장', '전통시장', '동두천 중앙시장 경기도 동두천시 중앙동']] },
+  { stations: ['l1:망월사', 'l1:회룡'], attractions: [['wondobongsan-mountain', '원도봉산', '자연·산행', '원도봉탐방지원센터 경기도 의정부시 호원동']] },
+  { stations: ['l1:방학'], attractions: [['banghak-dokkaebi-market', '방학동 도깨비시장', '전통시장', '방학동 도깨비시장 서울 도봉구 방학동']] },
+  { stations: ['l1:신이문', 'l6:돌곶이'], attractions: [['uireung-royal-tomb', '의릉', '왕릉·문화유산', '의릉 서울 성북구 화랑로32길 146-20']] },
+  { stations: ['l1:남영'], attractions: [['democracy-movement-memorial-hall', '민주화운동기념관', '역사·전시', '민주화운동기념관 서울 용산구 한강대로71길 37']] },
+  { stations: ['l1:독산'], attractions: [['geumcheon-art-factory', '금천예술공장', '문화·예술', '금천예술공장 서울 금천구 범안로15길 57']] },
+  { stations: ['l1:명학'], attractions: [['anyang-art-center', '안양아트센터', '공연·문화', '안양아트센터 경기도 안양시 만안구 문예로36번길 16']] },
+  { stations: ['l1:오산대'], attractions: [['mulhyanggi-arboretum', '물향기수목원', '수목원', '물향기수목원 경기도 오산시 청학로 211']] },
+  { stations: ['l1:송탄'], attractions: [['songtan-tourist-special-zone', '송탄 관광특구', '거리·상권', '송탄 관광특구 경기도 평택시 신장동']] },
+  { stations: ['l1:부천'], attractions: [['bucheon-free-market', '부천자유시장', '전통시장', '부천자유시장 경기도 부천시 소사구 자유로']] },
+  { stations: ['l1:백운'], attractions: [['bupyeong-art-center', '부평아트센터', '공연·문화', '부평아트센터 인천광역시 부평구 아트센터로 166']] },
+  { stations: ['l1:도화', 'l1:제물포'], attractions: [['subong-park', '수봉공원', '공원·전망', '수봉공원 인천광역시 미추홀구 수봉안길 84']] },
+  { stations: ['l1:도원'], attractions: [['incheon-football-stadium', '인천축구전용경기장', '스포츠·랜드마크', '인천축구전용경기장 인천광역시 중구 참외전로 246']] },
+
+  { stations: ['l2:을지로4가'], attractions: [['gwangjang-market', '광장시장', '전통시장', '광장시장 서울 종로구 창경궁로 88']] },
+  { stations: ['l2:잠실나루'], attractions: [['jamsil-hangang-park', '잠실한강공원', '한강공원', '잠실한강공원 서울 송파구 한가람로 65']] },
+  { stations: ['l2:신대방', 'sl:보라매병원'], attractions: [['boramae-park', '보라매공원', '공원', '보라매공원 서울 동작구 여의대방로20길 33']] },
+  { stations: ['l2:용두'], attractions: [['cheonggyecheon-museum', '청계천박물관', '박물관', '청계천박물관 서울 성동구 청계천로 530']] },
+
+  { stations: ['l3:동대입구'], attractions: [['jangchungdan-park', '장충단공원', '역사·공원', '장충단공원 서울 중구 동호로']] },
+  { stations: ['l3:불광'], attractions: [['bukhansan-ecological-park', '북한산생태공원', '생태·공원', '북한산생태공원 서울 은평구 불광동']] },
+  { stations: ['l3:학여울', 'sb:대모산입구'], attractions: [['setec', 'SETEC', '전시·문화', 'SETEC 서울 강남구 남부순환로 3104']] },
+  { stations: ['l3:수서'], attractions: [['daemosan-mountain', '대모산', '자연·산행', '대모산 서울 강남구']] },
+  { stations: ['l3:가락시장'], attractions: [['garak-market', '가락시장', '시장·먹거리', '가락시장 서울 송파구 양재대로 932']] },
+  { stations: ['l3:원당'], attractions: [['wondang-market', '원당시장', '전통시장', '원당시장 경기도 고양시 덕양구 마상로154번길 59']] },
+
+  { stations: ['l4:불암산'], attractions: [['buramsan-healing-town', '불암산 힐링타운', '자연·산책', '불암산 힐링타운 서울 노원구 한글비석로12길']] },
+  { stations: ['l4:수리산'], attractions: [['surisan-mountain', '수리산', '자연·산행', '수리산 도립공원 경기도 군포시']] },
+  { stations: ['l4:상록수'], attractions: [['choi-yongshin-memorial', '최용신기념관', '역사·기념관', '최용신기념관 경기도 안산시 상록구 샘골서길 64']] },
+
+  { stations: ['l5:방화', 'l5:개화산'], attractions: [['gaehwasan-trail', '개화산', '자연·산책', '개화산 전망대 서울 강서구']] },
+  { stations: ['l5:영등포시장'], attractions: [['times-square-yeongdeungpo', '타임스퀘어', '복합문화·쇼핑', '영등포 타임스퀘어']] },
+  { stations: ['l5:청구'], attractions: [['sindang-tteokbokki-town', '신당동 떡볶이타운', '거리·상권', '신당동 떡볶이타운 서울 중구 다산로33길']] },
+  { stations: ['l5:오금'], attractions: [['ogeum-park', '오금공원', '공원', '오금공원 서울 송파구 오금로 363']] },
+  { stations: ['l5:군자'], attractions: [['seoul-childrens-grand-park', '서울어린이대공원', '공원', '서울어린이대공원 서울 광진구 능동로 216']] },
+  { stations: ['l5:방이'], attractions: [['bangyi-dong-ancient-tombs', '서울 방이동 고분군', '역사유적', '서울 방이동 고분군 서울 송파구 오금로 219']] },
+
+  { stations: ['l7:먹골', 'l7:중화'], attractions: [['jungnang-rose-park', '중랑장미공원', '수변·공원', '중랑장미공원 서울 중랑구 중랑천로']] },
+  { stations: ['l7:학동'], attractions: [['nonhyeon-furniture-street', '논현동 가구거리', '특화거리', '논현동 가구거리 서울 강남구 학동로']] },
+  { stations: ['l7:숭실대입구'], attractions: [['korean-christian-museum', '숭실대학교 한국기독교박물관', '박물관·캠퍼스', '숭실대학교 한국기독교박물관 서울 동작구 상도로 369']] },
+
+  { stations: ['l8:장지'], attractions: [['jangjicheon-waterfront-park', '장지천 수변감성공원', '수변·공원', '장지천 수변감성공원 서울 송파구 문정동 631']] },
+
+  { stations: ['l9:양천향교'], attractions: [['yangcheon-hyanggyo', '양천향교', '문화유산', '양천향교 서울 강서구 양천로47나길 53'], ['gyeomjae-jeongseon-art-museum', '겸재정선미술관', '미술관', '겸재정선미술관 서울 강서구 양천로47길 36']] },
+
+  { stations: ['ic1:원인재'], attractions: [['woninjae', '원인재', '문화유산', '원인재 인천 연수구 경원대로 322']] },
+  { stations: ['ic1:계양'], attractions: [['gyulhyeon-naru', '경인아라뱃길 귤현나루', '수변·전망', '경인아라뱃길 귤현나루 인천 계양구 정서진로 1247']] },
+
+  { stations: ['gc:문산'], attractions: [['munsan-free-market', '문산자유시장', '전통시장', '문산자유시장 경기도 파주시 문산읍 문향로 57']] },
+  { stations: ['gc:풍산'], attractions: [['kim-dae-jung-residence-memorial', '김대중 대통령 사저 기념관', '역사·기념관', '김대중 대통령 사저 기념관 경기도 고양시 일산동구 햇살로95번길 34-12']] },
+  { stations: ['gc:백마'], attractions: [['anygol-food-culture-street', '애니골', '거리·상권', '애니골 경기도 고양시 일산동구 애니골길']] },
+  { stations: ['gc:행신'], attractions: [['haengsin-art-street', '행신아트거리', '거리·상권', '행신아트거리 경기도 고양시 덕양구 무원로54번길']] },
+
+  { stations: ['cc:금곡'], attractions: [['hongyureung-royal-tombs', '홍유릉', '왕릉·문화유산', '홍유릉 경기도 남양주시 홍유릉로 352-1']] },
+  { stations: ['cc:천마산'], attractions: [['cheonmasan-mountain', '천마산', '자연·산행', '천마산 경기도 남양주시 화도읍']] },
+  { stations: ['cc:대성리'], attractions: [['daeseongri-tourist-site', '대성리 국민관광지', '수변·관광지', '대성리 국민관광지 경기도 가평군 청평면 대성리']] },
+
+  { stations: ['sb:이매'], attractions: [['seongnam-arts-center', '성남아트센터', '공연·문화', '성남아트센터 경기도 성남시 분당구 성남대로 808']] },
+  { stations: ['sb:월곶'], attractions: [['wolgot-port', '월곶포구', '수변·포구', '월곶포구 경기도 시흥시 월곶동']] },
+
+  { stations: ['gm:사우'], attractions: [['gimpo-jangneung', '김포 장릉', '왕릉·문화유산', '김포 장릉 경기도 김포시 장릉로 79']] },
+
+  { stations: ['gj:발곡'], attractions: [['uijeongbu-music-library', '의정부음악도서관', '문화·도서관', '의정부음악도서관 경기도 의정부시 장곡로 280']] },
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
