@@ -56,11 +56,18 @@ describe('visit footprint full-network map contract', () => {
     expect(footprintView).toContain("make('div', 'footprint-detail-title')");
     expect(footprintView).toContain("title.appendChild(chip)");
     expect(footprintView).toContain("title.appendChild(make('h3'");
-    expect(styles).toContain('.footprint-modal{width:min(980px,100%);height:min(94dvh,900px);max-height:min(94dvh,900px)');
-    expect(styles).toContain('.footprint-body{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;overflow:hidden');
+    expect(styles).toContain('.footprint-modal{width:min(980px,100%);height:auto;max-height:min(calc(100dvh - 84px),820px)');
+    expect(styles).toContain('.footprint-body{display:flex;flex:0 1 auto;min-height:0;flex-direction:column;overflow:hidden');
     expect(styles).toContain('.footprint-map-viewport{position:relative;height:clamp(280px,46dvh,430px)');
     expect(styles).not.toContain('.footprint-modal.detail-open .footprint-map-viewport');
+    expect(styles).toContain('.footprint-detail{display:block;flex:0 0 148px;height:148px;min-height:148px;max-height:148px');
     expect(styles).toContain('.footprint-detail-title{display:flex;align-items:center');
+  });
+
+  it('does not let the detail area consume leftover mobile height', () => {
+    expect(styles).toContain('#footprint_overlay{padding-top:calc(22px + env(safe-area-inset-top));padding-bottom:calc(14px + env(safe-area-inset-bottom))}');
+    expect(styles).toContain('.footprint-modal{height:auto;max-height:calc(100dvh - 88px);transform:translateY(7px)');
+    expect(styles).toContain('.footprint-detail{flex-basis:142px;height:142px;min-height:142px;max-height:142px');
   });
 
   it('supports pan, pinch/wheel zoom and an explicit fit-all control', () => {
