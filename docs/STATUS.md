@@ -204,18 +204,17 @@ Roadmap: `docs/VISIT_HISTORY_PLAN.md`
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - one bundled public-domain full-network Seoul metropolitan subway diagram
-- 24 lines / **800 line×station reference anchors = 800/800 verified**
-- generator re-derives anchors from the bundled SVG and CI rejects drift
-- every non-synthetic anchor is checked against the exact SVG station label + coordinate
-- physical interchange variants share the same physical anchor
-- 2호선/경의중앙선 신촌 and 5호선/경의중앙선 양평 remain separate
-- `총신대입구(이수)` ↔ `이수` shares one anchor
-- Uijeongbu LRT depot temporary platform is the single documented dashed synthetic terminal extension
-- durable visit markers show visit count and detail history
-- marker selection never rebuilds/repositions the full map
-- drag / wheel zoom / pinch zoom / fit-all
+- 24 lines / 800 line×station anchors, exact reference audit retained
+- visited markers render in screen space so they remain visible at fit-all and zoomed views
+- horizontal `역명 · 최근 방문일` strip remains draggable/scrollable below the map
+- no detail is shown until a marker or strip item is selected
+- selected detail shows visit history plus per-record 수정/삭제
+- marker/strip selection updates state only; full map/marker DOM is not rebuilt
+- main screen no longer renders durable visit cards; it exposes only compact `발자취 노선도 보기` + count
+- recent draw history is registration-only: `다녀왔어요` → disabled `발자취에 등록됨`
+- new-save message points users to the footprint map
+- editing from footprint returns to the footprint hub after save/cancel
 - no footprint-time provider lookup, map tile request, GPS or current-location permission
-- Android native Web build includes the bundled reference SVG
 
-Reference and audit rules: `docs/FOOTPRINT_MAP_REFERENCE.md`.
+Reference and anchor audit rules: `docs/FOOTPRINT_MAP_REFERENCE.md`.
 
