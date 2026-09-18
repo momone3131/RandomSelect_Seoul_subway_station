@@ -181,13 +181,14 @@ Roadmap source: `VISIT_HISTORY_PLAN.md`.
 
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-- `다녀온 곳`에 방문 기록이 하나 이상 있으면 `발자취 지도` CTA 노출
+- `다녀온 곳`에 방문 기록이 하나 이상 있으면 `발자취 노선도` CTA 노출
 - durable `VisitRecord`를 physical station 기준으로 그룹화; 별도 지도용 방문 DB 없음
-- 같은 환승역의 여러 노선/여러 방문은 하나의 pin으로 통합하고 방문 횟수 표시
-- pin detail에서 방문일, 당시 노선, 실제 방문으로 체크한 음식 종목과 명소 history 확인
+- 지형 지도 대신 전체 지하철 line/station topology를 schematic rail + station dots로 표시
+- 같은 환승역의 여러 노선/여러 방문은 하나의 physical visit로 취급하고 각 해당 line node를 방문 상태로 강조
+- node detail에서 방문일, 당시 노선, 실제 방문으로 체크한 음식 종목과 명소 history 확인
 - 신촌/양평 동명이역은 분리, `총신대입구(이수)` ↔ `이수`는 통합
-- first-party static station coordinates 우선; 누락 역만 기존 station resolver와 30-day cache 사용
-- OpenStreetMap raster tile background + attribution
+- footprint 화면에서는 station coordinates / Google resolver / OpenStreetMap tile을 사용하지 않음
+- node 선택 시 schematic을 재렌더하지 않아 모바일 tap 시 node가 이동하는 문제 제거
 - current-location/GPS permission 추가 없음
 - Android hardware back에서 footprint/visit/settings overlay를 우선 닫음
 
