@@ -142,9 +142,24 @@ Draw history and visit history are different data domains.
 - Google Places restaurant results are intentionally excluded from visit records
 - `visit-view.ts` owns the visit picker and durable visit list
 
-This shared TypeScript contract is the planned source for later footprint-map, unvisited-aware random and visit statistics features.
+This shared TypeScript contract is the source for the footprint map and remains the planned source for unvisited-aware random and visit statistics.
 
-## 9. Build / deployment
+## 9. Visit footprint map
+
+Phase 2 stays on top of the existing durable `VisitRecord` collection.
+
+- `station-equivalence.ts` exposes canonical physical-station identity for visit grouping
+- `visit-footprint.ts` groups multiple records and line variants into one physical station
+- `footprint-map-view.ts` owns the map overlay, pin selection and per-station visit history
+- static station coordinates are averaged across available equivalent-line references for interchange pin placement
+- stations without static coordinates reuse `StationLocationService`; therefore the existing 30-day resolver cache and Web/native Places boundary remain intact
+- OpenStreetMap raster tiles are presentation-only and are not persisted as visit data
+- no current-location/GPS input is consumed
+- Android native back handling closes footprint/visit/settings overlays before app navigation/exit
+
+The footprint map does not alter the `VisitRecord` storage schema and does not persist Google/OSM map results as a reusable location database.
+
+## 10. Build / deployment
 
 Web: tests → Vite build → browser smoke → verified root promotion → Pages.
 
