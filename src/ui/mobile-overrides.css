@@ -70,11 +70,11 @@ body{background:var(--bg)}
 .visit-hub .visit-map-btn{margin-left:auto;min-height:38px;padding:7px 12px}
 .history-visit-btn:disabled{cursor:default;opacity:.74}
 
-.footprint-modal{width:min(980px,100%);height:min(94dvh,900px);max-height:min(94dvh,900px);display:flex;flex-direction:column;overflow:hidden}
+.footprint-modal{width:min(980px,100%);height:auto;max-height:min(calc(100dvh - 84px),820px);display:flex;flex-direction:column;overflow:hidden}
 .footprint-head{position:relative;z-index:10;flex:0 0 auto;align-items:flex-start;background:var(--paper)}
 .footprint-head h2{margin-bottom:3px}
 .footprint-summary{margin:0;color:var(--muted);font-size:11px;line-height:1.4}
-.footprint-body{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;overflow:hidden;padding:0 20px 18px}
+.footprint-body{display:flex;flex:0 1 auto;min-height:0;flex-direction:column;overflow:hidden;padding:0 20px 18px}
 .footprint-map-wrap{position:relative;flex:0 0 auto;overflow:hidden;border:1px solid #d3d7d0;border-radius:13px;background:#f5f5f3}
 .footprint-map-viewport{position:relative;height:clamp(280px,46dvh,430px);min-height:0;overflow:hidden;background:#f5f5f3;touch-action:none;cursor:grab;overscroll-behavior:contain}
 .footprint-map-viewport:active{cursor:grabbing}
@@ -106,8 +106,8 @@ body{background:var(--bg)}
 .footprint-visit-summary.selected{border-color:#29483b;background:#d9f27c;box-shadow:0 2px 0 #91a75b}
 .footprint-strip-empty{padding:10px 11px;border-radius:9px;background:#f0eee8;color:#7a827b;font-size:11px}
 
-.footprint-detail{display:block;flex:1 1 auto;min-height:125px;overflow-y:auto;overscroll-behavior:contain;margin-top:4px;padding:9px 10px;border-radius:11px;background:#e8eee3}
-.footprint-detail-placeholder{display:grid;min-height:105px;height:100%;place-items:center;color:#6e7a73;font-size:11px;font-weight:750}
+.footprint-detail{display:block;flex:0 0 148px;height:148px;min-height:148px;max-height:148px;overflow-y:auto;overscroll-behavior:contain;margin-top:4px;padding:9px 10px;border-radius:11px;background:#e8eee3}
+.footprint-detail-placeholder{display:grid;height:100%;place-items:center;color:#6e7a73;font-size:11px;font-weight:750}
 .footprint-detail-head{display:flex;align-items:center;min-height:27px}
 .footprint-detail-title{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
 .footprint-detail-title h3{margin:0;font-size:18px;line-height:1.2}
@@ -122,18 +122,20 @@ body{background:var(--bg)}
 .footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0;min-height:30px;margin:0;padding:4px 8px}
 
 @media(max-width:720px){
- .footprint-modal{height:96dvh;max-height:96dvh}
+ #footprint_overlay{padding-top:calc(22px + env(safe-area-inset-top));padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+ .footprint-modal{height:auto;max-height:calc(100dvh - 88px);transform:translateY(7px)}
  .footprint-body{padding:0 12px 12px}
  .footprint-map-viewport{height:clamp(260px,43dvh,360px)}
  .footprint-visit-marker{width:28px;height:28px}
  .footprint-visit-marker.selected{width:34px;height:34px}
- .footprint-detail{min-height:135px;padding:8px 9px}
+ .footprint-detail{flex-basis:142px;height:142px;min-height:142px;max-height:142px;padding:8px 9px}
 }
 @media(max-width:430px){
  .visit-hub .visit-hub-head{align-items:center;flex-wrap:nowrap}
  .visit-hub .visit-map-btn{width:auto;flex:0 0 auto;margin:0}
  .footprint-map-viewport{height:clamp(245px,41dvh,330px)}
  .footprint-visit-summary{max-width:210px}
+ .footprint-detail{flex-basis:136px;height:136px;min-height:136px;max-height:136px}
  .footprint-detail-title{gap:5px}
  .footprint-detail-title h3{font-size:17px}
 }
