@@ -1,69 +1,54 @@
-# Latest Change — Visit History Phase 4
+# Latest Change — Main visit UX promotion
 
 Date: 2026-09-19
 
 ## Product decision
 
-Visit History Phase 2 is complete. Phase 3 unvisited-aware / visited-excluded random modes are intentionally skipped.
+방문 기록과 발자취는 장기 사용의 핵심 기능이므로 최근 추첨 기록 아래에 묻히지 않도록 메인 결과 흐름 가까이 올립니다.
 
-Random selection remains independent from visit history. If a previously visited station is drawn again, the user decides whether to keep it or use the existing redraw action.
+또한 코스가 완성된 직후 최근 기록까지 내려가지 않아도 같은 방문 기록 picker를 열 수 있게 합니다.
 
-## Phase 4 entry
+## Main UI changes
 
-The main `발자취` section now exposes two sibling actions:
+- 메인 `바로 뽑기 (애니메이션 없이)` 체크박스를 제거
+- production draw는 기존 settle/reveal animation을 항상 사용
+- 과거 저장된 instant preference가 있더라도 메인 추첨 동작에는 더 이상 영향을 주지 않음
+- `발자취` hub를 최근 추첨 기록 아래에서 위로 이동
+- 최종 위치는 curated `추천 명소`와 `복사 · 네이버지도 · 구글지도` action row 다음
+- live 추천 식당/술집 결과보다 **위**에 유지하여 Places 결과를 펼쳐도 발자취가 다시 아래로 밀리지 않음
+- 기존 `발자취 노선도 보기` + `방문 통계` sibling actions 유지
 
-- `발자취 노선도 보기`
-- `방문 통계`
+## Current-course visit action
 
-Statistics are a separate screen; opening the footprint map is not required first.
+코스가 `노선 + 역 + 음식/주류`까지 완성되면:
 
-## Statistics contract
+- `이 코스로 가기` 버튼을 `새 코스` 바로 왼쪽에 표시
+- 두 버튼은 완료 상태에서 같은 row에 나란히 배치
+- `이 코스로 가기`는 최근 추첨 카드의 `다녀왔어요`와 **동일한 방문 기록 picker**를 엶
+- 역은 필수, 음식/명소/방문일은 기존 visit contract 그대로 적용
+- 저장 후 같은 버튼은 `발자취에 등록됨`으로 바뀌고 비활성화
+- 동일 source history record로 중복 방문 기록을 만들지 않음
 
-All statistics are derived read-only from durable `VisitRecord` data. No new statistics storage key or visit-schema migration was added.
-
-Displayed metrics:
-
-- unique visited physical stations / all physical stations + progress percentage
-- per-line visited station counts and percentages
-- total durable visit records
-- latest user-entered visit date + undated record count
-- confirmed food/alcohol unique categories + confirmation count
-- confirmed attraction unique places + revisit-inclusive count
-- confirmed attraction prominence breakdown: Diamond / Gold / Silver / Standard, each with unique-place count and revisit-inclusive count
-
-Only user-confirmed food and attraction choices count. Merely shown draw candidates do not.
-
-## Interchange rule
-
-Overall coverage counts one physical interchange once.
-
-Per-line progress credits that visited physical station to **every line that belongs to the interchange**, regardless of which line produced the original draw.
-
-Example: a visit saved from **1호선 신도림** counts:
-
-- overall physical-station progress: 1 visited station
-- 1호선 progress: 신도림 +1
-- 2호선 progress: 신도림 +1
-
-Revisiting 신도림 does not add another station to either line's coverage.
-
-The same canonical station-equivalence rules as the footprint map are reused: 신촌/양평 same-name non-interchanges stay separate and 총신대입구(이수) ↔ 이수 stays unified.
+최근 추첨 목록의 `다녀왔어요` 진입도 그대로 유지합니다.
 
 ## Verification
 
 Web:
-- Phase 4 PR #16 CI `35367289293` — success
-- main merge `e15b8b6108d6c3664174a53f3a3e918a44a5276f`
-- main CI `35367506018` — success
-- Web Release `35367506047` — success
-- deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`
-- deployed bundle `assets/modular-Ct4Elvwv.js`
+- PR #17 CI `35368693765` — success
+- current-course action + instant UI removal + initial footprint promotion
+- PR #18 CI `35368949986` — success
+- footprint hub final placement directly below map actions
+- final source merge `7bdfcc2f65e35be10bf006005545884b5c298e6a`
+- main CI `35369033009` — success
+- Web Release `35369033238` — success
+- deployment commit `e633c7b3bb63ffb5d24ba2e23a94fdb4bc556460`
+- deployed bundle `assets/modular--Htlab0P.js`
+- deployed bundle directly checked: `이 코스로 가기` / `발자취에 등록됨` present, `바로 뽑기` absent
 
 Android:
 - branch `feature/random-seoul-android`
-- Phase 4 synced head `a5a9b78bf83c1929f32de521b53d4a28771d5539`
-- Android CI `35367476033` — success
-- shared tests, native Web build, Capacitor sync, Gradle APK assembly and fixed latest-development release all passed
-- `random-seoul-latest.apk` updated 2026-09-19 KST, size `11,525,425` bytes
+- synced source head `de2e21cb463adc088fa60164bb6d5c1fad44ed82`
+- Android CI `35369057004` — success
+- shared tests, native Web build, Capacitor sync, APK assembly and fixed latest-development release all passed
+- `random-seoul-latest.apk` size `11,526,053` bytes
 
-Detailed roadmap: `docs/VISIT_HISTORY_PLAN.md`.
