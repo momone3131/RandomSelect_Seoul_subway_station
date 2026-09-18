@@ -74,7 +74,7 @@ const controller = new RandomSeoulController(
 );
 const settingsView = new SettingsModalView();
 const visitModal = new VisitModalView();
-const footprintMap = new FootprintMapView(stationLocations);
+const footprintMap = new FootprintMapView();
 
 let busy = false;
 let toastTimer: number | undefined;

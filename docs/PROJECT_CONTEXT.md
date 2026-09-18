@@ -110,13 +110,14 @@ Phase 1:
 - clearing recent draw history leaves visits untouched
 
 Phase 2:
-- `다녀온 곳 → 발자취 지도`
-- `VisitRecord` groups by physical station; multiple line variants/visits become one pin
+- `다녀온 곳 → 발자취 노선도`
+- `VisitRecord` groups by physical station; multiple line variants/visits share one physical visit state
 - 신촌/양평 same-name non-interchanges remain separate
 - 총신대입구(이수) ↔ 이수 is one pin
-- pin detail shows visit count and date/line/confirmed food/confirmed attraction history
-- static station coordinates first; existing station resolver/cache only for missing coordinates
-- OpenStreetMap raster background; no GPS/current-location permission
+- every subway line/station is shown as a schematic rail + node; visited nodes are larger/filled
+- node detail shows visit count and date/line/confirmed food/confirmed attraction history
+- node selection changes only selection/detail state, not the schematic DOM
+- no map tiles, station-coordinate resolver, GPS/current-location permission or footprint network lookup
 - Android back closes footprint/visit overlays before app navigation/exit
 
 Next: Phase 3 unvisited-aware/excluded random → Phase 4 simple visit statistics.
