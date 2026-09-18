@@ -348,7 +348,10 @@ describe('curated attractions', () => {
     expect(getCuratedAttractions('l2', '서초')).toEqual([
       expect.objectContaining({ id: 'national-library-of-korea', tier: 'silver' }),
     ]);
-    expect(getCuratedAttractions('l3', '화정').map((item) => item.name)).toEqual(['화정 문화의거리']);
+    expect(getCuratedAttractions('l3', '화정').map((item) => item.name)).toEqual([
+      '화정 문화의거리',
+      '고양어린이박물관',
+    ]);
     expect(getCuratedAttractions('l5', '명일').map((item) => item.name)).toEqual(['명일전통시장']);
     expect(getCuratedAttractions('l8', '암사역사공원').map((item) => item.name)).toEqual(['암사역사공원']);
     expect(getCuratedAttractions('ic2', '석바위시장').map((item) => item.name)).toEqual(['석바위시장']);
