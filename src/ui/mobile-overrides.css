@@ -64,10 +64,6 @@ body{background:var(--bg)}
 
 
 /* Phase 2 — durable visit footprint full-network reference map / visit history hub. */
-.visit-hub{margin-top:18px;padding-top:16px;border-top:1px solid #d8d9cf}
-.visit-hub[hidden]{display:none!important}
-.visit-hub .visit-hub-head{gap:10px;align-items:center}
-.visit-hub .visit-map-btn{margin-left:auto;min-height:38px;padding:7px 12px}
 .history-visit-btn:disabled{cursor:default;opacity:.74}
 
 .footprint-modal{width:min(980px,100%);height:auto;max-height:min(calc(100dvh - 84px),820px);display:flex;flex-direction:column;overflow:hidden}
@@ -159,8 +155,6 @@ body{background:var(--bg)}
  .footprint-detail{flex-basis:142px;height:142px;min-height:142px;max-height:142px;padding:8px 9px}
 }
 @media(max-width:430px){
- .visit-hub .visit-hub-head{align-items:center;flex-wrap:nowrap}
- .visit-hub .visit-map-btn{width:auto;flex:0 0 auto;margin:0}
  .footprint-map-viewport{height:clamp(245px,41dvh,330px)}
  .footprint-visit-summary{max-width:210px}
  .footprint-detail{flex-basis:136px;height:136px;min-height:136px;max-height:136px}
