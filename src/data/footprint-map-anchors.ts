@@ -813,5 +813,5 @@ export const FOOTPRINT_MAP_ANCHORS: Readonly<Record<string, FootprintMapAnchor>>
 };
 
 export function getFootprintMapAnchor(lineId: string, stationName: string): FootprintMapAnchor | undefined {
-  return FOOTPRINT_MAP_ANCHORS[`${lineId}:${stationName}`];
+  return FOOTPRINT_MAP_ANCHORS[lineId + ":" + stationName];
 }
