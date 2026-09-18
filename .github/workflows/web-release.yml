@@ -94,6 +94,7 @@ jobs:
             'http://127.0.0.1:4173/modular.html?selftest=1' > /tmp/random-seoul-release-dom.html
           grep -q 'data-app-ready="true"' /tmp/random-seoul-release-dom.html
           grep -q 'data-selftest="passed"' /tmp/random-seoul-release-dom.html
+          grep -q 'data-selftest-visit-statistics="true"' /tmp/random-seoul-release-dom.html
           grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-release-dom.html
           grep -q 'RANDOM SEOUL' /tmp/random-seoul-release-dom.html
           test -f dist/footprint-seoul-subway-reference.svg
@@ -105,14 +106,19 @@ jobs:
         shell: bash
         run: |
           mkdir -p assets
-          rm -f assets/modular-*.js assets/modulepreload-polyfill-*.js
+          rm -f assets/modular-*.js assets/modular-*.css assets/modulepreload-polyfill-*.js
           cp dist/modular.html index.html
           cp dist/footprint-seoul-subway-reference.svg footprint-seoul-subway-reference.svg
           cp dist/assets/modular-*.js assets/
+          cp dist/assets/modular-*.css assets/
           cp dist/assets/modulepreload-polyfill-*.js assets/
           cp dist/icon-192.png icon-192.png
           cp dist/icon-512.png icon-512.png
           cp dist/site.webmanifest site.webmanifest
+          # The statistics view emits a separate CSS asset; validate the root copy.
+          for stylesheet in dist/assets/modular-*.css; do
+            cmp "$stylesheet" "assets/$(basename "$stylesheet")"
+          done
 
       - name: Commit deployed Web files
         shell: bash
