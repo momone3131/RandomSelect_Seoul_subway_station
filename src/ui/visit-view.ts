@@ -19,6 +19,7 @@ export interface VisitFormSubmission {
 
 export interface VisitListCallbacks {
   onOpenMap(): void;
+  onOpenStatistics(): void;
 }
 
 function todayLocal(): string {
@@ -57,7 +58,12 @@ function ensureVisitSection(): HTMLElement {
   mapButton.id = 'footprint_map_btn';
   mapButton.type = 'button';
 
-  append(head, title, mapButton);
+  const statisticsButton = make('button', 'history-visit-btn visit-statistics-btn', '방문 통계');
+  statisticsButton.id = 'visit_statistics_btn';
+  statisticsButton.type = 'button';
+  const actions = make('div', 'visit-hub-actions');
+  append(actions, mapButton, statisticsButton);
+  append(head, title, actions);
   section.appendChild(head);
 
   const history = document.querySelector<HTMLElement>('section.history');
@@ -263,4 +269,5 @@ export function renderVisits(visits: readonly VisitRecord[], callbacks: VisitLis
 
   const mapButton = byId<HTMLButtonElement>('footprint_map_btn');
   mapButton.onclick = visits.length ? callbacks.onOpenMap : null;
+  byId<HTMLButtonElement>('visit_statistics_btn').onclick = callbacks.onOpenStatistics;
 }

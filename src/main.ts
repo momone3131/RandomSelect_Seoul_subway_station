@@ -12,6 +12,8 @@ import { renderDrawView } from './ui/draw-view';
 import { renderHistory } from './ui/history-view';
 import { FootprintMapView } from './ui/footprint-map-view';
 import { renderVisits, VisitModalView } from './ui/visit-view';
+import { VisitStatisticsView } from './ui/visit-statistics-view';
+import { runVisitStatisticsSmoke } from './testing/visit-statistics-smoke';
 import { renderAttractions, resetAttractionView } from './ui/attraction-view';
 import {
   renderRestaurantError,
@@ -75,6 +77,7 @@ const controller = new RandomSeoulController(
 const settingsView = new SettingsModalView();
 const visitModal = new VisitModalView();
 const footprintMap = new FootprintMapView();
+const visitStatistics = new VisitStatisticsView(() => renderState());
 
 let busy = false;
 let toastTimer: number | undefined;
@@ -204,14 +207,14 @@ function updateStatusCopy(): void {
 let returnToFootprintAfterVisitModal = false;
 
 function openVisitFromHistory(item: Parameters<typeof renderHistory>[0][number]): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
   returnToFootprintAfterVisitModal = false;
   visitModal.openFromHistory(item);
   renderState();
 }
 
 function openVisitRecordFromFootprint(visit: Parameters<typeof renderVisits>[0][number]): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || visitStatistics.isOpen) return;
   returnToFootprintAfterVisitModal = true;
   footprintMap.close();
   visitModal.openVisit(visit);
@@ -231,13 +234,19 @@ const footprintCallbacks = {
 };
 
 function openFootprintMap(): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
   const visits = store.getSnapshot().visits;
   if (!visits.length) return;
   void footprintMap.open(visits, footprintCallbacks).catch((error) => {
     console.error(error);
     notify('발자취 노선도를 불러오지 못했어요.');
   });
+  renderState();
+}
+
+function openVisitStatistics(): void {
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
+  visitStatistics.open(store.getSnapshot().visits);
   renderState();
 }
 
@@ -251,9 +260,10 @@ function closeVisitModalAndMaybeReturnToFootprint(): void {
 
 function renderState(): void {
   const state = store.getSnapshot();
-  renderDrawView(state, { busy, modalOpen: settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen });
+  renderDrawView(state, { busy, modalOpen: settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen });
   renderHistory(state.history, state.visits, openVisitFromHistory);
-  renderVisits(state.visits, { onOpenMap: openFootprintMap });
+  renderVisits(state.visits, { onOpenMap: openFootprintMap, onOpenStatistics: openVisitStatistics });
+  visitStatistics.refresh(state.visits);
   if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions);
   else resetAttractionView();
   updateStatusCopy();
@@ -274,7 +284,7 @@ async function performDraw(
   action: () => Promise<unknown> | unknown,
   animationStage?: AnimatedDrawStage,
 ): Promise<void> {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
   busy = true;
   renderState();
 
@@ -298,7 +308,7 @@ async function performDraw(
 }
 
 async function requestRestaurants(scrollToResults = true): Promise<void> {
-  if (busy || restaurantLookupBusy || restaurantLookupComplete || settingsView.isOpen || visitModal.isOpen) return;
+  if (busy || restaurantLookupBusy || restaurantLookupComplete || settingsView.isOpen || visitModal.isOpen || visitStatistics.isOpen) return;
   const key = currentRestaurantKey();
   const context = currentRestaurantContext();
   if (!key || !context) return;
@@ -339,6 +349,7 @@ async function requestRestaurants(scrollToResults = true): Promise<void> {
 }
 
 async function runMainDraw(): Promise<void> {
+  if (visitStatistics.isOpen) return;
   const stage = controller.getStage();
   if (stage === 'done') {
     store.resetCourse();
@@ -409,6 +420,7 @@ async function copyResult(): Promise<void> {
 byId<HTMLButtonElement>('draw_btn').addEventListener('click', () => { void runMainDraw(); });
 restaurantRequest.button.addEventListener('click', () => { void requestRestaurants(); });
 byId<HTMLButtonElement>('restart_btn').addEventListener('click', () => {
+  if (visitStatistics.isOpen) return;
   store.resetCourse();
   void performDraw(() => controller.redrawLine(), 'line');
 });
@@ -433,12 +445,12 @@ byId<HTMLButtonElement>('google_map_btn').addEventListener('click', () => {
 });
 
 byId<HTMLButtonElement>('settings_btn').addEventListener('click', () => {
-  if (restaurantLookupBusy || visitModal.isOpen || footprintMap.isOpen) return;
+  if (restaurantLookupBusy || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
   settingsView.open('line', store.getSnapshot().preferences.selectedLineIds);
   renderState();
 });
 byId<HTMLButtonElement>('food_settings_btn').addEventListener('click', () => {
-  if (restaurantLookupBusy || visitModal.isOpen || footprintMap.isOpen) return;
+  if (restaurantLookupBusy || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
   settingsView.open('food', store.getSnapshot().preferences.selectedFoodIds);
   renderState();
 });
@@ -509,6 +521,13 @@ byId<HTMLButtonElement>('clear_history').addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
+  if (visitStatistics.isOpen) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      visitStatistics.close();
+    }
+    return;
+  }
   if (footprintMap.isOpen) {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -578,6 +597,8 @@ async function runBrowserSelfTest(): Promise<void> {
       throw new Error('Self-test full restart did not return to the line-complete stage.');
     }
 
+    runVisitStatisticsSmoke(visitStatistics);
+    document.body.dataset.selftestVisitStatistics = 'true';
     document.body.dataset.selftestCycleReset = 'true';
     document.body.dataset.selftest = 'passed';
   } catch (error) {
