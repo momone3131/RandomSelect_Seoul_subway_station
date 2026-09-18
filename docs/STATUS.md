@@ -184,9 +184,9 @@ Android uses the same shared curation/tier/test contract as Web.
 - shared Web/Android source snapshots the attraction candidates shown at draw time
 
 Roadmap: `docs/VISIT_HISTORY_PLAN.md`
-1. durable visits
-2. footprint map
-3. unvisited-first / visited-excluded random
+1. durable visits — complete
+2. footprint map — complete
+3. unvisited-first / visited-excluded random — next
 4. simple visit statistics
 
 
@@ -197,3 +197,23 @@ Roadmap: `docs/VISIT_HISTORY_PLAN.md`
 - Gradle debug APK — success
 - Android CI `35339228627` — success
 - fixed latest development APK republished: `11,433,508` bytes
+
+
+## Durable visit footprint map — Phase 2
+
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
+
+- durable `VisitRecord` remains the only visit source of truth
+- physical interchange line variants collapse into one pin; same-name non-interchanges remain separate
+- `총신대입구(이수)` ↔ `이수` is one physical station
+- pin detail shows visit count and per-visit date / line / confirmed food / confirmed attractions
+- static station coordinates are preferred; missing stations reuse the existing native Places station resolver + cache
+- OpenStreetMap raster tiles render the map background with attribution
+- no GPS/current-location permission added
+- Android hardware back closes footprint and visit overlays before app navigation/exit
+
+Verification:
+- Web Phase 2 PR #7 CI `35346526225` — success
+- Web source merge `2484cc7b323ec27a8049d165d027ae19894249b4`
+- Android Phase 2 source head `a42458fd229322f10914d8f023a0b89286dd484c`
+- `android-dev-latest` advanced to the Phase 2 build after the full Android workflow completed
