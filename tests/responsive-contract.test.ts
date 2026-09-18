@@ -12,6 +12,7 @@ const drawAnimation = readFileSync(new URL('../src/ui/draw-animation.ts', import
 const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
 const attractionView = readFileSync(new URL('../src/ui/attraction-view.ts', import.meta.url), 'utf8');
 const settingsView = readFileSync(new URL('../src/ui/settings-view.ts', import.meta.url), 'utf8');
+const visitView = readFileSync(new URL('../src/ui/visit-view.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 describe('Random Seoul responsive visual contract', () => {
@@ -192,6 +193,18 @@ describe('Random Seoul responsive visual contract', () => {
     expect(main).toContain('`${state.currentStation.name} 가자!`');
     expect(main).not.toContain('목록의 ${state.currentStation.ordinal}번째 역');
     expect(main).not.toContain('예시: ${state.currentFood.examples}');
+  });
+
+  it('keeps durable visit records separate from recent draw history', () => {
+    expect(visitView).toContain("'다녀온 곳 '");
+    expect(visitView).toContain('방문 역 · 필수');
+    expect(visitView).toContain("'실제로 먹었나요?'");
+    expect(visitView).toContain("'실제로 들른 명소'");
+    expect(visitView).toContain("input.name = 'visit_attraction'");
+    expect(main).toContain('saveVisits(storage, state.visits)');
+    expect(main).toContain('최근 추첨 기록만 지웠어요. 방문 기록은 유지돼요.');
+    expect(styles).toContain('.history-visit-btn');
+    expect(styles).toContain('.visit-modal');
   });
 
   it('uses concise stage labels', () => {
