@@ -209,8 +209,8 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   const currentVisit = currentHistory
     ? state.visits.find((visit) => visit.sourceHistoryId === currentHistory.id)
     : undefined;
-  heroVisit.hidden = stage !== 'done';
-  heroVisit.disabled = locked || !currentHistory;
+  heroVisit.hidden = stage !== 'done' || !currentHistory;
+  heroVisit.disabled = locked;
   heroVisit.className = `hero-visit-btn${currentVisit ? ' saved' : ''}`;
   heroVisit.textContent = currentVisit ? '발자취' : '등록';
   heroVisit.setAttribute(
