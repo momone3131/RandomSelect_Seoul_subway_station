@@ -59,19 +59,18 @@ export function placePrimaryDrawButton(stage: PrimaryDrawStage): void {
   bindPressFeedback(drawButton);
 
   const panels = Object.values(PANEL_BY_STAGE).map((id) => byId<HTMLElement>(id));
-  const doneActions = byId<HTMLElement>('done_actions');
+  const actionZone = document.querySelector<HTMLElement>('.action-zone');
+  if (!actionZone) throw new Error('Missing .action-zone.');
 
   for (const panel of panels) panel.classList.remove('next-draw');
 
   if (stage === 'done') {
     releasePressedPanel();
-    doneActions.hidden = false;
     drawButton.classList.remove('integrated');
-    if (drawButton.parentElement !== doneActions) doneActions.appendChild(drawButton);
+    if (drawButton.parentElement !== actionZone) actionZone.prepend(drawButton);
     return;
   }
 
-  doneActions.hidden = true;
   const panel = byId<HTMLElement>(PANEL_BY_STAGE[stage]);
   panel.classList.add('next-draw');
   drawButton.classList.add('integrated');
