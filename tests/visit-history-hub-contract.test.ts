@@ -4,6 +4,9 @@ import { describe, expect, it } from 'vitest';
 const historyView = readFileSync(new URL('../src/ui/history-view.ts', import.meta.url), 'utf8');
 const visitView = readFileSync(new URL('../src/ui/visit-view.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+const drawView = readFileSync(new URL('../src/ui/draw-view.ts', import.meta.url), 'utf8');
+const placement = readFileSync(new URL('../src/ui/primary-draw-placement.ts', import.meta.url), 'utf8');
+const shell = readFileSync(new URL('../src/ui/shell.html', import.meta.url), 'utf8');
 
 describe('durable visit history hub contract', () => {
   it('allows initial registration from recent history but routes later management to footprints', () => {
@@ -17,6 +20,27 @@ describe('durable visit history hub contract', () => {
     expect(visitView).toContain('section.hidden = visits.length === 0');
     expect(visitView).not.toContain("const card = make('div', 'history-item visit-item')");
     expect(visitView).not.toContain("'visit_list'");
+  });
+
+  it('promotes the footprint hub directly below the main draw shell', () => {
+    expect(visitView).toContain("drawShell.insertAdjacentElement('afterend', section)");
+    expect(visitView).not.toContain("history.insertAdjacentElement('afterend', section)");
+  });
+
+  it('offers the completed current course beside the new-course action', () => {
+    expect(shell).toContain('id="current_course_visit_btn"');
+    expect(shell).toContain('id="done_actions"');
+    expect(placement).toContain("if (drawButton.parentElement !== doneActions) doneActions.appendChild(drawButton)");
+    expect(drawView).toContain("currentCourseVisit.textContent = currentVisit ? '발자취에 등록됨' : '이 코스로 가기'");
+    expect(main).toContain("byId<HTMLButtonElement>('current_course_visit_btn').addEventListener('click'");
+    expect(main).toContain('openVisitFromHistory(item)');
+  });
+
+  it('removes the instant-draw checkbox and keeps normal draw animation as the product behavior', () => {
+    expect(shell).not.toContain('id="instant"');
+    expect(shell).not.toContain('바로 뽑기');
+    expect(main).not.toContain("setInstantDraw((event.currentTarget");
+    expect(main).toContain('instant: selfTestMode');
   });
 
   it('tells new registrations where their durable record can be found', () => {
