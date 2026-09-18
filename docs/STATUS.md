@@ -154,7 +154,7 @@ Direct download:
 
 ## Durable visit history — Phase 1
 
-Status: **IMPLEMENTED / final Web+Android verification pending**
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - recent draw history remains max12 and disposable
 - new durable key: `random_seoul_visits_v1`
@@ -167,6 +167,13 @@ Status: **IMPLEMENTED / final Web+Android verification pending**
 - durable visit list supports edit/delete
 - clearing recent draw history explicitly leaves visits intact
 - new draw-history items snapshot shown attraction IDs/names for later visit editing
+
+Verification:
+- Web CI `35339108030` — success
+- Web Release `35339108075` — success
+- Pages deployment — success
+- Android CI `35339228627` — success
+- Android fixed latest APK updated 2026-09-18, `11,433,508` bytes
 
 Roadmap source: `VISIT_HISTORY_PLAN.md`.
 
