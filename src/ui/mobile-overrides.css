@@ -80,7 +80,7 @@ body{background:var(--bg)}
 .footprint-extension-layer,.footprint-marker-layer{position:absolute;inset:0}
 .footprint-extension-layer{z-index:2;pointer-events:none}
 .footprint-marker-layer{z-index:3;pointer-events:none}
-.footprint-visit-marker{--marker-inverse-scale:1;position:absolute;z-index:4;width:31px;height:31px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;transform:translate(-50%,-50%) scale(var(--marker-inverse-scale));transform-origin:center;pointer-events:auto;cursor:pointer;touch-action:manipulation}
+.footprint-visit-marker{--marker-inverse-scale:1;position:absolute;z-index:4;width:31px;height:31px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;transform:scale(var(--marker-inverse-scale)) translate(-50%,-50%);transform-origin:0 0;pointer-events:auto;cursor:pointer;touch-action:manipulation}
 .footprint-visit-marker::before{content:"";position:absolute;inset:3px;border:3px solid #29483b;border-radius:50%;background:rgba(217,242,124,.9);box-shadow:0 1px 5px rgba(24,42,34,.28)}
 .footprint-visit-marker-core{position:absolute;inset:0;z-index:1;display:grid;place-items:center;color:#29483b;font-size:13px;font-weight:950;line-height:1}
 .footprint-visit-marker.selected::before{inset:0;border-width:4px;background:#efffa8;box-shadow:0 0 0 4px rgba(217,242,124,.65),0 2px 8px rgba(24,42,34,.34)}
