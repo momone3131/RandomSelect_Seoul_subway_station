@@ -62,33 +62,35 @@ body{background:var(--bg)}
  .visit-dialog-body{padding:0 17px 16px}
 }
 
-/* Phase 2 — durable visit footprint map. */
+/* Phase 2 — durable visit footprint subway schematic. */
 .visit-history .section-head{gap:10px;align-items:center}
 .visit-map-btn{margin-left:auto}
-.footprint-modal{width:min(820px,100%);max-height:min(92vh,820px);overflow:auto}
+.footprint-modal{width:min(900px,100%);max-height:min(94vh,900px);overflow:auto}
 .footprint-head{align-items:flex-start}
 .footprint-head h2{margin-bottom:3px}
 .footprint-summary{margin:0;color:var(--muted);font-size:11px;line-height:1.4}
 .footprint-body{padding:0 22px 22px}
 .footprint-map-status{min-height:20px;margin:0 0 8px;color:#64726b;font-size:11px;font-weight:700}
-.footprint-map-wrap{position:relative;overflow:hidden;border:1px solid #cfd5cc;border-radius:13px;background:#e9ece5}
-.footprint-map{position:relative;height:clamp(330px,55vh,520px);overflow:hidden;background:#e5e8e1}
-.footprint-tile-layer,.footprint-marker-layer{position:absolute;inset:0}
-.footprint-tile-layer{z-index:1}
-.footprint-marker-layer{z-index:2;pointer-events:none}
-.footprint-tile{position:absolute;width:256px;height:256px;max-width:none;user-select:none;-webkit-user-drag:none}
-.footprint-pin{--pin-line:#29483b;--pin-ink:#fff;position:absolute;z-index:3;width:34px;height:42px;padding:0;border:0;background:transparent;transform:translate(-50%,-100%);cursor:pointer;pointer-events:auto;filter:drop-shadow(0 2px 2px rgba(35,48,43,.24))}
-.footprint-pin::after{content:"";position:absolute;left:50%;bottom:3px;width:10px;height:10px;background:var(--pin-line);transform:translateX(-50%) rotate(45deg);border-radius:1px}
-.footprint-pin-core{position:absolute;left:50%;top:3px;z-index:1;display:grid;place-items:center;width:28px;height:28px;border:3px solid #fff;border-radius:50%;background:var(--pin-line);color:var(--pin-ink);font-size:11px;font-weight:900;transform:translateX(-50%);box-shadow:0 0 0 1px rgba(29,44,38,.18)}
-.footprint-pin.selected .footprint-pin-core{box-shadow:0 0 0 3px #d9f27c,0 0 0 5px #29483b}
-.footprint-pin:focus-visible{outline:3px solid #29483b;outline-offset:3px;border-radius:12px}
-.footprint-zoom-controls{position:absolute;top:10px;right:10px;z-index:5;display:grid;overflow:hidden;border:1px solid #bdc7bd;border-radius:8px;background:#fffdf9;box-shadow:0 2px 8px rgba(31,48,40,.12)}
-.footprint-zoom-controls button{width:38px;height:36px;border:0;background:#fffdf9;color:#29483b;font-size:20px;font-weight:800;line-height:1;cursor:pointer}
-.footprint-zoom-controls button+button{border-top:1px solid #d4d8d1}
-.footprint-attribution{position:absolute;right:5px;bottom:4px;z-index:5;padding:2px 5px;border-radius:4px;background:rgba(255,253,249,.88);font-size:9px}
-.footprint-attribution a{color:#52645b;text-decoration:none}
-.footprint-map-empty{position:absolute;inset:0;display:grid;place-items:center;padding:24px;color:#68756e;font-size:12px;text-align:center}
-.footprint-missing{margin:8px 2px 0;color:#876a5f;font-size:10px;line-height:1.45}
+.footprint-map-wrap{overflow:hidden;border:1px solid #d4d8d1;border-radius:13px;background:#f3f1eb}
+.footprint-network-scroll{height:min(58vh,560px);overflow:auto;overscroll-behavior:contain;background:#f8f6f0;scrollbar-gutter:stable}
+.footprint-network{display:grid;gap:4px;min-width:max-content;padding:12px 14px 18px}
+.footprint-line-row{display:grid;grid-template-columns:96px auto;align-items:center;min-height:70px}
+.footprint-line-label{position:sticky;left:0;z-index:5;display:flex;align-items:center;gap:8px;align-self:stretch;padding:11px 8px 11px 2px;background:linear-gradient(90deg,#f8f6f0 0%,#f8f6f0 82%,rgba(248,246,240,.75) 92%,rgba(248,246,240,0) 100%)}
+.footprint-line-label strong{display:block;font-size:11px;white-space:nowrap}
+.footprint-line-label small{display:block;margin-top:2px;color:#7a857e;font-size:9px;white-space:nowrap}
+.footprint-line-badge{display:grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border-radius:15px;background:var(--line);color:var(--line-ink);font-size:11px;font-weight:900}
+.footprint-line-track{position:relative;display:grid;grid-template-columns:repeat(var(--station-count),minmax(25px,1fr));align-items:center;height:64px}
+.footprint-line-track::before{content:"";position:absolute;left:12px;right:12px;top:27px;height:5px;border-radius:4px;background:var(--line);opacity:.72}
+.footprint-station-cell{position:relative;display:grid;place-items:center;height:64px;z-index:1}
+.footprint-station-node{position:relative;display:grid;place-items:center;width:9px;height:9px;padding:0;border:2px solid var(--line);border-radius:50%;background:#f8f6f0;box-sizing:border-box}
+button.footprint-station-node{appearance:none;font:inherit;cursor:pointer;touch-action:manipulation}
+.footprint-station-node.visited{width:20px;height:20px;border:3px solid #fff;background:var(--line);box-shadow:0 0 0 1px rgba(31,48,40,.22),0 2px 5px rgba(31,48,40,.2)}
+.footprint-station-node.visited::after{content:"";position:absolute;inset:-6px;border:2px solid transparent;border-radius:50%;pointer-events:none}
+.footprint-station-node.visited.selected::after{border-color:#29483b;box-shadow:0 0 0 3px #d9f27c}
+.footprint-station-node:focus-visible{outline:3px solid #29483b;outline-offset:5px}
+.footprint-visit-count{display:grid;place-items:center;min-width:13px;height:13px;padding:0 3px;border-radius:7px;background:#29483b;color:#fff;font-size:7px;font-weight:900;line-height:1}
+.footprint-station-label{position:absolute;left:50%;top:39px;max-width:90px;transform:translateX(-50%) rotate(-38deg);transform-origin:top center;white-space:nowrap;color:#32483e;font-size:9px;font-weight:800;pointer-events:none}
+.footprint-map-empty{display:grid;place-items:center;min-width:320px;height:280px;padding:24px;color:#68756e;font-size:12px;text-align:center}
 .footprint-detail{margin-top:12px;padding:14px;border-radius:12px;background:#e8eee3}
 .footprint-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .footprint-detail-head h3{margin:0;font-size:20px;line-height:1.25}
@@ -101,15 +103,25 @@ body{background:var(--bg)}
 .footprint-visit-row-head span{color:#6a766f}
 .footprint-visit-row p{margin:5px 0 0;color:#475a51;font-size:11px;line-height:1.45}
 @media(max-width:720px){
- .footprint-modal{max-height:94vh}
- .footprint-body{padding:0 14px 14px}
- .footprint-map{height:min(52vh,430px)}
+ .footprint-modal{max-height:95vh}
+ .footprint-body{padding:0 13px 14px}
+ .footprint-network-scroll{height:56vh}
+ .footprint-network{padding:9px 10px 16px}
+ .footprint-line-row{grid-template-columns:82px auto;min-height:66px}
+ .footprint-line-label{padding-right:6px}
+ .footprint-line-badge{min-width:25px;height:25px;font-size:10px}
+ .footprint-line-label strong{font-size:10px}
+ .footprint-line-label small{font-size:8px}
+ .footprint-line-track{height:61px;grid-template-columns:repeat(var(--station-count),minmax(23px,1fr))}
+ .footprint-line-track::before{top:25px}
+ .footprint-station-cell{height:61px}
+ .footprint-station-label{top:37px;font-size:8px}
  .footprint-detail{padding:12px}
 }
 @media(max-width:430px){
  .visit-history .section-head{align-items:flex-start;flex-wrap:wrap}
  .visit-map-btn{margin-left:0}
- .footprint-map{height:47vh;min-height:300px}
+ .footprint-network-scroll{height:53vh}
  .footprint-detail-head{display:grid}
  .footprint-line-chips{justify-content:flex-start}
 }
