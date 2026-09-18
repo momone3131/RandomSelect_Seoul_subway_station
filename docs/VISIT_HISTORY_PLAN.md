@@ -1,6 +1,6 @@
 # Random Seoul — Visit History / Long-term Use Roadmap
 
-Last updated: 2026-09-18
+Last updated: 2026-09-19
 
 이 문서는 Random Seoul의 단기 랜덤 추첨을 장기 사용 경험으로 연결하는 방문 기록 로드맵입니다.
 
@@ -61,35 +61,53 @@ Main 화면에는 durable visit card 목록을 노출하지 않고 방문 기록
 
 ## Phase 3 — Unvisited-aware random
 
-Status: **PLANNED**
+Status: **SKIPPED / PRODUCT DECISION**
 
-방문 기록을 랜덤 기능 자체와 연결합니다.
+방문 기록을 랜덤 추첨 확률이나 후보에서 자동 제외하는 기능은 넣지 않습니다.
 
-Modes:
-- `완전 랜덤` — 현재 기본 동작
-- `안 가본 역 우선` — 미방문 역에 가중치를 주되 랜덤성 유지
-- `다녀온 역 제외` — 방문 완료 physical station을 후보에서 제외
+- 랜덤 추첨은 방문 여부와 무관하게 현재의 완전 랜덤 규칙을 유지
+- 같은 역이 다시 나오면 사용자가 그대로 갈지, 역만 다시 뽑을지 직접 선택
+- 방문 기록 때문에 추첨 결과가 보이지 않게 바뀌거나 확률이 달라지지 않음
 
-Default remains full random. 방문 기록이 사용자의 추첨 선택을 자동으로 바꾸지 않으며, 위 기능은 명시적 option으로 제공합니다.
+이 결정으로 방문 기록은 추첨을 제어하는 필터가 아니라 사용자의 실제 탐험 기록으로만 사용합니다.
 
 ## Phase 4 — Simple visit statistics
 
-Status: **PLANNED**
+Status: **IMPLEMENTED / VERIFYING WEB + ANDROID**
 
 복잡한 소셜/랭킹 게임화 대신 개인 탐험 진행도를 가볍게 보여줍니다.
 
-Candidate metrics:
-- 가본 고유 역 / 전체 역
+Entry:
+- 메인 `발자취` 영역에서 `발자취 노선도 보기` 옆에 별도 `방문 통계` 버튼 제공
+- 노선도와 통계는 서로 독립된 화면이며, 통계를 보기 위해 노선도를 먼저 열 필요 없음
+
+Metrics:
+- 가본 고유 physical station / 앱 전체 physical station과 진행률
 - 노선별 방문 역 수와 비율
+  - 환승역을 방문하면 저장된 원래 노선만이 아니라 **그 physical station이 속한 모든 노선** 진행도에 1역씩 반영
+  - 예: 1호선 추첨으로 신도림을 방문해도 1호선 + 2호선 양쪽 진행도에 신도림 1역 반영
+  - 같은 역 재방문은 해당 노선 진행도에서 중복 증가하지 않음
 - 총 방문 기록 수
-- 최근 방문일
-- 음식 종목 / 명소 방문 수
+- 최근 입력 방문일 + 방문일 미입력 기록 수
+- 실제 방문 체크한 음식/주류 종목 수 + 체크 횟수
+- 실제 방문 체크한 명소의 고유 장소 수 + 재방문 포함 횟수
+- 방문 명소 prominence 등급별 집계
+  - Diamond / Gold / Silver / Standard 각각 고유 방문 장소 수
+  - 재방문 포함 체크 횟수도 함께 표시
+  - 현재 `attractionTierForId()` 분류를 사용하므로 tier가 나중에 조정되면 통계도 현재 기준으로 재계산
 
 Avoid:
 - 친구 ranking
 - 강제 출석체크
 - streak 압박
 - 과도한 badge system
+
+Implementation:
+- 계산 source of truth는 기존 `VisitRecord`뿐이며 별도 통계 DB/스키마를 추가하지 않음
+- 전체 역/노선별 denominator도 앱의 현재 역 카탈로그 + physical-station equivalence에서 계산
+- 신촌/양평 동명이역 분리, 총신대입구(이수)↔이수 alias 등 Phase 2의 동일한 역 동등성 규칙을 재사용
+- 통계는 조회 시 즉시 파생하므로 방문 기록 수정/삭제가 곧바로 반영됨
+- 친구 ranking / streak / badge 경쟁은 추가하지 않음
 
 목표는 Random Seoul의 핵심인 우연한 외출을 유지하면서, 사용자가 시간이 지날수록 **내가 채운 서울·수도권 발자취**를 소유하게 하는 것입니다.
 
