@@ -4,10 +4,13 @@ import { FOOD_CATEGORIES } from '../src/data/food-categories';
 import {
   HISTORY_STORAGE_KEY,
   SETTINGS_STORAGE_KEY,
+  VISITS_STORAGE_KEY,
   loadHistory,
   loadPreferences,
+  loadVisits,
   saveHistory,
   savePreferences,
+  saveVisits,
 } from '../src/services/storage/app-persistence';
 import type { StorageService } from '../src/services/storage/storage';
 
@@ -45,6 +48,51 @@ describe('stable web persistence compatibility', () => {
     const storage = new MemoryStorage();
     storage.values.set(SETTINGS_STORAGE_KEY, { selected_foods: ['c_dimsum', 'w_pizza'] });
     expect(loadPreferences(storage).selectedFoodIds).toEqual(['c_dimsum', 'w_pizza']);
+  });
+
+  it('stores visit records independently from the capped recent draw history', () => {
+    const storage = new MemoryStorage();
+    const visit = {
+      id: 'visit-1',
+      sourceHistoryId: 'r1',
+      lineId: 'l2',
+      stationName: '시청',
+      stationOrdinal: 1,
+      drawnFoodId: 'c_dimsum',
+      foodId: 'c_dimsum',
+      shownAttractions: [{ id: 'deoksugung-palace', name: '덕수궁' }],
+      attractions: [{ id: 'deoksugung-palace', name: '덕수궁' }],
+      visitedAt: '2026-09-18',
+      createdAt: 123,
+    };
+
+    saveVisits(storage, [visit]);
+    expect(storage.values.has(VISITS_STORAGE_KEY)).toBe(true);
+
+    storage.values.set(HISTORY_STORAGE_KEY, []);
+    expect(loadHistory(storage)).toEqual([]);
+    expect(loadVisits(storage)).toEqual([visit]);
+  });
+
+  it('persists shown attraction snapshots on new draw-history items without breaking old records', () => {
+    const storage = new MemoryStorage();
+    saveHistory(storage, [{
+      id: 'r2',
+      lineId: 'l3',
+      stationName: '화정',
+      stationOrdinal: 7,
+      foodId: 'c_dimsum',
+      attractionOptions: [
+        { id: 'hwajeong-culture-street', name: '화정 문화의거리' },
+        { id: 'goyang-childrens-museum', name: '고양어린이박물관' },
+      ],
+    }]);
+
+    const loaded = loadHistory(storage);
+    expect(loaded[0]?.attractionOptions).toEqual([
+      { id: 'hwajeong-culture-street', name: '화정 문화의거리' },
+      { id: 'goyang-childrens-museum', name: '고양어린이박물관' },
+    ]);
   });
 
   it('migrates the existing v9 history shape without changing its storage contract', () => {
