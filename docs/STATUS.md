@@ -155,11 +155,16 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 Shared curated-attraction data was re-audited in multiple passes using actual map/transit proximity plus municipal tourism/cultural sources rather than tourism lists alone.
 
 - baseline after interchange fix: 391 zero / 307 one / 102 two
-- final 800 line/station outcomes: **262 zero / 432 one / 106 two**
+- final 800 line/station outcomes: **262 zero / 431 one / 107 two**
 - attraction coverage: **67.3%**
 - physical missing station groups: **237**
-- unique surfaced attractions: **419 = Diamond 4 / Gold 25 / Silver 100 / Standard 290**
+- unique surfaced attractions: **420 = Diamond 4 / Gold 25 / Silver 100 / Standard 291**
 - planned/unbuilt, generic neighborhood-only, or bus-dependent/far candidates remain intentionally uncurated
 - over-aggressive candidates are removed when access evidence does not match the drawn station
 
 Android uses the same shared curation/tier/test contract as Web.
+
+
+### Hwajeong follow-up
+- 화정역 now returns 화정 문화의거리 + 고양어린이박물관.
+- 고양어린이박물관 remains Standard prominence.
