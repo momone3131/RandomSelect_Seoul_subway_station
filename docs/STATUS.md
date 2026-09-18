@@ -203,18 +203,19 @@ Roadmap: `docs/VISIT_HISTORY_PLAN.md`
 
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-- durable `VisitRecord` remains the only visit source of truth
-- footprint UI is a terrain-free subway schematic built from shared `SUBWAY_LINES` topology/order
-- every station is a small node; visited physical stations are larger/filled
-- physical interchange line variants share one visit state; same-name non-interchanges remain separate
-- `총신대입구(이수)` ↔ `이수` is one physical station
-- node detail shows visit count and per-visit date / line / confirmed food / confirmed attractions
-- selecting a visited node does not rebuild the schematic DOM, eliminating the mobile tap/reposition issue
-- footprint UI uses no station-coordinate resolver, map tile provider, GPS or current-location permission
-- Android hardware back closes footprint and visit overlays before app navigation/exit
+- one bundled public-domain full-network Seoul metropolitan subway diagram
+- 24 lines / **800 line×station reference anchors = 800/800 verified**
+- generator re-derives anchors from the bundled SVG and CI rejects drift
+- every non-synthetic anchor is checked against the exact SVG station label + coordinate
+- physical interchange variants share the same physical anchor
+- 2호선/경의중앙선 신촌 and 5호선/경의중앙선 양평 remain separate
+- `총신대입구(이수)` ↔ `이수` shares one anchor
+- Uijeongbu LRT depot temporary platform is the single documented dashed synthetic terminal extension
+- durable visit markers show visit count and detail history
+- marker selection never rebuilds/repositions the full map
+- drag / wheel zoom / pinch zoom / fit-all
+- no footprint-time provider lookup, map tile request, GPS or current-location permission
+- Android native Web build includes the bundled reference SVG
 
-Verification:
-- Web Phase 2 PR #7 CI `35346526225` — success
-- Web source merge `2484cc7b323ec27a8049d165d027ae19894249b4`
-- Android Phase 2 source head `a42458fd229322f10914d8f023a0b89286dd484c`
-- `android-dev-latest` advanced to the Phase 2 build after the full Android workflow completed
+Reference and audit rules: `docs/FOOTPRINT_MAP_REFERENCE.md`.
+
