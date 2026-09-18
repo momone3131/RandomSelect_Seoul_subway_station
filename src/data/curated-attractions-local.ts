@@ -204,6 +204,88 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['gm:사우'], attractions: [['gimpo-jangneung', '김포 장릉', '왕릉·문화유산', '김포 장릉 경기도 김포시 장릉로 79']] },
 
   { stations: ['gj:발곡'], attractions: [['uijeongbu-music-library', '의정부음악도서관', '문화·도서관', '의정부음악도서관 경기도 의정부시 장곡로 280']] },
+
+  // 2026-09-18 zero-coverage audit, second pass.
+  { stations: ['l2:서초'], attractions: [['national-library-of-korea', '국립중앙도서관', '도서관·문화', '국립중앙도서관 서울 서초구 반포대로 201']] },
+  { stations: ['l3:화정'], attractions: [['hwajeong-culture-street', '화정 문화의거리', '거리·상권', '화정 문화의거리 경기도 고양시 덕양구 화정로 56-1']] },
+  { stations: ['l3:금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
+
+  { stations: ['l5:길동'], attractions: [['gil-dong-bokjori-market', '길동복조리시장', '전통시장', '길동복조리시장 서울 강동구 양재대로116길']] },
+  { stations: ['l5:명일'], attractions: [['myeongil-market', '명일전통시장', '전통시장', '명일전통시장 서울 강동구 양재대로138길 22']] },
+  { stations: ['l5:둔촌동'], attractions: [['duncheon-station-market', '둔촌역 전통시장', '전통시장', '둔촌역 전통시장 서울 강동구 풍성로58길']] },
+  { stations: ['l5:마천'], attractions: [['macheon-central-market', '마천중앙시장', '전통시장', '마천중앙시장 서울 송파구 마천로51가길 23']] },
+
+  { stations: ['l8:암사역사공원'], attractions: [['amsa-history-park', '암사역사공원', '역사·공원', '암사역사공원 서울 강동구 암사동 137-2']] },
+
+  { stations: ['ic2:석바위시장'], attractions: [['seokbawi-market', '석바위시장', '전통시장', '석바위시장 인천 미추홀구 경인로485번길 17-1']] },
+  { stations: ['ic2:인천가좌'], attractions: [['incheon-gajwa-market', '인천 가좌시장', '전통시장', '가좌시장 인천 서구 원적로96번길 5']] },
+
+  { stations: ['gc:가좌'], attractions: [['gyeongui-line-forest-park', '경의선숲길', '도심산책', '경의선숲길 가좌역 서울 마포구']] },
+  { stations: ['gc:한국항공대'], attractions: [['kau-aerospace-museum', '한국항공대학교 항공우주박물관', '박물관·캠퍼스', '한국항공대학교 항공우주박물관 경기도 고양시 덕양구 항공대학로 76']] },
+
+  { stations: ['sb:기흥'], attractions: [['nam-june-paik-art-center', '백남준아트센터', '미술관', '백남준아트센터 경기도 용인시 기흥구 백남준로 10']] },
+  { stations: ['sb:인천논현'], attractions: [['neulsolgil-park', '늘솔길공원', '공원·체험', '늘솔길공원 인천 남동구 앵고개로 783']] },
+
+  { stations: ['sh:신천'], attractions: [['sammi-market', '삼미시장', '전통시장', '삼미시장 경기도 시흥시 신천동']] },
+
+  { stations: ['ui:솔샘'], attractions: [['bukhansan-dullegil-solsaem', '북한산둘레길 흰구름길', '자연·산책', '북한산둘레길 흰구름길 솔샘역 서울 강북구']] },
+
+  { stations: ['gj:의정부시청'], attractions: [['uijeongbu-arts-center', '의정부예술의전당', '공연·문화', '의정부예술의전당 경기도 의정부시 의정로 1']] },
+
+  { stations: ['ev:삼가'], attractions: [['yongin-mireu-stadium', '용인미르스타디움', '스포츠·랜드마크', '용인미르스타디움 경기도 용인시 처인구 동백죽전대로 61']] },
+
+  { stations: ['gm:구래'], attractions: [['gimpo-independence-memorial', '김포독립운동기념관', '역사·기념관', '김포독립운동기념관 경기도 김포시 양촌읍 양곡2로30번길 46']] },
+
+  { stations: ['l1:역곡'], attractions: [['yeokgok-sangsang-market', '역곡상상시장', '문화관광형시장', '역곡상상시장 경기도 부천시 원미구 부일로749번길']] },
+  { stations: ['l1:송내'], attractions: [['boksagol-culture-center', '복사골문화센터', '복합문화공간', '복사골문화센터 경기도 부천시 원미구 장말로 107']] },
+
+
+  // 2026-09-18 zero-coverage audit, third pass.
+  { stations: ['l1:창동', 'l4:창동'], attractions: [['seoul-photo-museum', '서울시립 사진미술관', '미술관', '서울시립 사진미술관 서울 도봉구 마들로13길 68'], ['seoul-robot-ai-museum', '서울로봇인공지능과학관', '과학·체험', '서울로봇인공지능과학관 서울 도봉구 마들로13길 56']] },
+  { stations: ['l4:숙대입구'], attractions: [['sookmyung-moonshin-museum', '숙명여자대학교 문신미술관', '미술관·캠퍼스', '숙명여자대학교 문신미술관 서울 용산구 청파로47길 100']] },
+
+  { stations: ['l5:송정', 'l9:공항시장'], attractions: [['airport-market', '공항시장', '전통시장', '공항시장 서울 강서구 개화동로31길 39']] },
+  { stations: ['l9:신방화'], attractions: [['bangsin-market', '방신전통시장', '전통시장', '방신전통시장 서울 강서구 방화동로16길 31']] },
+  { stations: ['l5:마곡'], attractions: [['lg-art-center-seoul', 'LG아트센터 서울', '공연·문화', 'LG아트센터 서울 서울 강서구 마곡중앙로 136']] },
+  { stations: ['l5:상일동'], attractions: [['godeok-traditional-market', '고덕전통시장', '전통시장', '고덕전통시장 서울 강동구 고덕로83길 36']] },
+  { stations: ['l2:까치산', 'l5:까치산'], attractions: [['kkachisan-market', '까치산시장', '전통시장', '까치산시장 서울 강서구 화곡동 663-15']] },
+
+  { stations: ['l6:새절', 'l6:증산'], attractions: [['eungam-daerim-market', '응암동 대림시장', '전통시장·먹거리', '대림시장 서울 은평구 응암로4길 22']] },
+  { stations: ['l6:상월곡'], attractions: [['karts-seokgwan-campus', '한국예술종합학교 석관동캠퍼스', '예술·캠퍼스', '한국예술종합학교 석관동캠퍼스 서울 성북구 화랑로32길 146-37']] },
+
+  { stations: ['l7:중곡'], attractions: [['junggok-jeil-market', '중곡제일시장', '전통시장', '중곡제일시장 서울 광진구 중곡동 229-5']] },
+  { stations: ['l7:남성'], attractions: [['namseong-station-market', '남성역골목시장', '전통시장', '남성역골목시장 서울 동작구 사당로16가길 19']] },
+  { stations: ['l7:남구로'], attractions: [['namguro-market', '남구로시장', '전통시장·다문화', '남구로시장 서울 구로구 구로동로26길 58']] },
+
+  { stations: ['l8:송파'], attractions: [['seokchon-market-local', '석촌시장', '전통시장', '석촌시장 서울 송파구 송파대로37길 40']] },
+
+
+  // 2026-09-18 zero-coverage audit, map-verified follow-up.
+  { stations: ['l3:백석'], attractions: [['bellacitta-ilsan', '벨라시타', '복합문화·쇼핑', '벨라시타 경기도 고양시 일산동구 강송로 33']] },
+  { stations: ['l9:등촌'], attractions: [['deungchon-market', '등촌시장', '전통시장', '등촌시장 서울 양천구 목동중앙북로7길']] },
+  { stations: ['l7:산곡'], attractions: [['wonjeoksan-park', '원적산공원', '공원·산책', '원적산공원 인천광역시 부평구 산곡동']] },
+
+
+  // 2026-09-18 zero-coverage audit, official-access follow-up.
+  { stations: ['l5:강동'], attractions: [['gangfull-cartoon-street', '강풀만화거리', '문화거리', '강풀만화거리 서울 강동구 천호대로168가길']] },
+  { stations: ['l3:도곡'], attractions: [['yangjaecheon-stream', '양재천', '수변·산책', '양재천 도곡역 서울 강남구']] },
+  { stations: ['l3:일원'], attractions: [['daemosan-mountain', '대모산', '자연·산행', '대모산 일원역 서울 강남구']] },
+  { stations: ['l6:월곡'], attractions: [['dongduk-womens-university', '동덕여자대학교', '캠퍼스', '동덕여자대학교 서울 성북구 화랑로13길 60']] },
+  { stations: ['l7:강남구청', 'sb:강남구청'], attractions: [['dosan-park', '도산공원', '역사·공원', '도산공원 서울 강남구 도산대로45길 20']] },
+
+
+  // 2026-09-18 zero-coverage audit, verified market follow-up.
+  { stations: ['l4:상계'], attractions: [['sanggye-central-market', '상계중앙시장', '전통시장', '상계중앙시장 서울 노원구 상계로23가길 24']] },
+  { stations: ['l5:신금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
+
+
+  // 2026-09-18 zero-coverage audit, final official-access checks.
+  { stations: ['l6:마포구청'], attractions: [['mapo-agricultural-fish-market', '마포농수산물시장', '시장·먹거리', '마포농수산물시장 서울 마포구 월드컵로 235']] },
+  { stations: ['l3:약수', 'l6:약수'], attractions: [['dasan-fortress-library', '다산성곽도서관', '문화·성곽산책', '다산성곽도서관 서울 중구 동호로17길 173']] },
+  { stations: ['l4:길음'], attractions: [['seongbuk-media-culture-maru', '서울성북미디어문화마루', '복합문화공간', '서울성북미디어문화마루 서울 성북구 길음로7길 20']] },
+  { stations: ['l3:녹번'], attractions: [['eunpyeong-culture-arts-center', '은평문화예술회관', '공연·문화', '은평문화예술회관 서울 은평구 녹번로 16']] },
+  { stations: ['l7:신중동'], attractions: [['lotte-dept-jungdong', '롯데백화점 중동점', '복합쇼핑', '롯데백화점 중동점 경기도 부천시 원미구 길주로 300']] },
+
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
