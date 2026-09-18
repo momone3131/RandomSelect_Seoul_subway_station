@@ -1,6 +1,6 @@
 # Random Seoul — Development Status
 
-Last updated: 2026-09-18
+Last updated: 2026-09-19
 
 라이브 Git 상태가 최우선입니다.
 
@@ -228,9 +228,23 @@ Verification:
 - Android `android-dev-latest` advanced to the same visit-hub source: footprint view / main flow / styles / UX contract tests all match the Android branch
 - native Vite now includes shared root public assets, so the bundled full-network SVG is present in the APK Web assets
 
-Next planned phases:
-3. unvisited-first/exclude random modes
-4. simple visit statistics
+## Visit statistics — Phase 4
+
+Status: **IMPLEMENTED IN PR #16 / FINAL VERIFICATION IN PROGRESS**
+
+- Phase 3 unvisited-first / visited-exclusion draw modes are intentionally skipped; random selection remains unchanged by visit history
+- main 발자취 hub adds `방문 통계` beside `발자취 노선도 보기`
+- overall progress: unique visited physical station / all physical stations
+- per-line progress: visited physical interchange counts on **every member line**, not only the line stored on the visit record
+  - explicit regression example: 1호선 신도림 visit increments both 1호선 and 2호선 coverage by one station
+- total visit records and latest entered visit date
+- confirmed food/alcohol unique categories + confirmation count
+- confirmed attraction unique places + revisit-inclusive count
+- current prominence breakdown: Diamond / Gold / Silver / Standard unique visited places + revisit-inclusive counts
+- no new visit/statistics persistence schema; all metrics derive from `VisitRecord` and update after edits/deletes
+- independent viewport-safe modal, sibling main button, Escape/backdrop/focus restoration support
+
+Roadmap after Phase 4: no Phase 3 random filtering planned; future additions should preserve complete-random behavior unless product direction changes.
 
 ## Build / CI gates
 
