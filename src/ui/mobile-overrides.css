@@ -118,6 +118,34 @@ body{background:var(--bg)}
 .footprint-visit-row-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px}
 .footprint-visit-row-head span{color:#6a766f}
 .footprint-visit-row p{margin:3px 0 0;color:#475a51;font-size:10px;line-height:1.4}
+.footprint-visit-highlights{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px}
+.footprint-food-chip,.footprint-visit-only{display:inline-flex;align-items:center;min-height:24px;padding:4px 7px;border-radius:7px;background:#eef1eb;color:#475a51;font-size:10px;font-weight:700;line-height:1.25}
+.footprint-visit-only{font-weight:600;color:#6a766f}
+.footprint-attraction-chip{
+ --footprint-attraction-fill:linear-gradient(#fffdf9,#fffdf9);
+ --footprint-attraction-rim:linear-gradient(#cbd3cb,#cbd3cb);
+ position:relative;isolation:isolate;display:inline-flex;align-items:center;min-height:24px;max-width:100%;
+ padding:3px 7px;border:1px solid transparent;border-radius:7px;
+ background:var(--footprint-attraction-fill) padding-box,var(--footprint-attraction-rim) border-box;
+ color:#34493f;font-size:10px;font-weight:780;line-height:1.25;white-space:normal
+}
+.footprint-attraction-tier-silver{
+ --footprint-attraction-rim:linear-gradient(110deg,#727a80 0%,#b8c0c5 18%,#f6f9fa 36%,#8d969c 51%,#dce2e5 70%,#ffffff 84%,#747d83 100%);
+ border-width:2px;box-shadow:0 1px 4px rgba(83,94,101,.13)
+}
+.footprint-attraction-tier-gold{
+ --footprint-attraction-rim:linear-gradient(110deg,#8f6500 0%,#d6a620 18%,#fff3ad 35%,#b67a00 50%,#f7d867 68%,#fff8cf 82%,#9e7000 100%);
+ border-width:2px;box-shadow:0 1px 4px rgba(159,111,0,.15)
+}
+.footprint-attraction-tier-diamond{
+ --footprint-attraction-rim:linear-gradient(118deg,#43cfd8 0%,#eaffff 10%,#7ecfff 20%,#ffffff 29%,#c6b2ff 38%,#61e2d9 48%,#f8ffff 58%,#8ccfff 69%,#d8c4ff 79%,#67dfe4 89%,#f9ffff 100%);
+ border-width:2px;box-shadow:0 0 0 1px rgba(178,249,255,.65),0 1px 5px rgba(67,207,216,.18)
+}
+.footprint-attraction-nightscape{
+ --footprint-attraction-fill:linear-gradient(148deg,#081227 0%,#132343 53%,#241a40 100%);
+ color:#f4f8ff;text-shadow:0 1px 8px rgba(92,139,213,.18)
+}
+.footprint-attraction-nightscape::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.86) 0 1px,transparent 1.6px),radial-gradient(circle at 79% 24%,rgba(156,211,255,.68) 0 1px,transparent 1.7px)}
 .footprint-visit-actions{display:flex;justify-content:stretch;gap:6px;margin-top:6px}
 .footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0;min-height:30px;margin:0;padding:4px 8px}
 

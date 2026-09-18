@@ -43,6 +43,8 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - 노선도 아래에는 `역명 · 최근 방문일` compact horizontal strip을 항상 표시하고 옆으로 밀어 방문 역을 탐색
 - 처음 열었을 때는 상세기록을 펼치지 않으며 marker 또는 strip item을 선택한 경우에만 상세 표시
 - 선택 상세에서 날짜/노선/실제 방문 음식·명소를 확인하고 개별 방문기록 수정/삭제 가능
+- 실제 방문으로 체크한 명소는 발자취 상세에서 기존 prominence 테두리(Diamond/Gold/Silver/Standard)를 재사용하고 Nightscape는 어두운 야경 스타일로 표시
+- 명소 등급명 텍스트는 표시하지 않으며 노선도 방문역 marker 자체에는 명소 스타일을 섞지 않음
 - 상세가 열린 상태에서도 horizontal strip은 계속 스크롤 가능
 - marker 선택은 map DOM을 재생성하지 않고 selection/detail만 갱신하여 모바일 tap 시 위치가 움직이지 않음
 - pan / wheel zoom / pinch zoom / 전체보기 지원
