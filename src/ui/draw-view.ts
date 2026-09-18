@@ -189,7 +189,7 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   const stationRedraw = byId<HTMLButtonElement>('station_redraw_btn');
   const foodRedraw = byId<HTMLButtonElement>('food_redraw_btn');
   const copy = byId<HTMLButtonElement>('copy_btn');
-  const currentCourseVisit = byId<HTMLButtonElement>('current_course_visit_btn');
+  const heroVisit = byId<HTMLButtonElement>('hero_visit_btn');
   const stage: PrimaryDrawStage = !state.currentLine
     ? 'line'
     : !state.currentStation
@@ -209,15 +209,15 @@ function renderControls(state: Readonly<AppState>, status: DrawViewStatus): void
   const currentVisit = currentHistory
     ? state.visits.find((visit) => visit.sourceHistoryId === currentHistory.id)
     : undefined;
-  currentCourseVisit.hidden = stage !== 'done';
-  currentCourseVisit.disabled = locked || !currentHistory || Boolean(currentVisit);
-  currentCourseVisit.className = `current-course-visit-btn${currentVisit ? ' saved' : ''}`;
-  currentCourseVisit.textContent = currentVisit ? '발자취에 등록됨' : '이 코스로 가기';
-  currentCourseVisit.setAttribute(
+  heroVisit.hidden = stage !== 'done' || !currentHistory;
+  heroVisit.disabled = locked;
+  heroVisit.className = `hero-visit-btn${currentVisit ? ' saved' : ''}`;
+  heroVisit.textContent = currentVisit ? '발자취' : '등록';
+  heroVisit.setAttribute(
     'aria-label',
     currentVisit
-      ? `${state.currentStation?.name ?? ''}역 코스는 발자취에 등록되어 있습니다.`
-      : '현재 완성된 코스를 방문 기록으로 등록',
+      ? '발자취 노선도 열기'
+      : '현재 완성된 코스를 발자취에 등록',
   );
   byId<HTMLElement>('scope_count').textContent = `${state.preferences.selectedLineIds.length}개 노선`;
   byId<HTMLElement>('food_scope_count').textContent = `${state.preferences.selectedFoodIds.length}종 음식`;
