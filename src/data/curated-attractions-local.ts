@@ -204,6 +204,42 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['gm:사우'], attractions: [['gimpo-jangneung', '김포 장릉', '왕릉·문화유산', '김포 장릉 경기도 김포시 장릉로 79']] },
 
   { stations: ['gj:발곡'], attractions: [['uijeongbu-music-library', '의정부음악도서관', '문화·도서관', '의정부음악도서관 경기도 의정부시 장곡로 280']] },
+
+  // 2026-09-18 zero-coverage audit, second pass.
+  { stations: ['l2:서초'], attractions: [['national-library-of-korea', '국립중앙도서관', '도서관·문화', '국립중앙도서관 서울 서초구 반포대로 201']] },
+  { stations: ['l2:신답'], attractions: [['dapsimni-antique-shopping-center', '답십리 고미술상가', '고미술·상가', '답십리 고미술상가 서울 동대문구 고미술로 21']] },
+  { stations: ['l3:화정'], attractions: [['hwajeong-culture-street', '화정 문화의거리', '거리·상권', '화정 문화의거리 경기도 고양시 덕양구 화정로 56-1']] },
+  { stations: ['l3:금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
+
+  { stations: ['l5:길동'], attractions: [['gil-dong-bokjori-market', '길동복조리시장', '전통시장', '길동복조리시장 서울 강동구 양재대로116길']] },
+  { stations: ['l5:명일'], attractions: [['myeongil-market', '명일전통시장', '전통시장', '명일전통시장 서울 강동구 양재대로138길 22']] },
+  { stations: ['l5:둔촌동'], attractions: [['duncheon-station-market', '둔촌역 전통시장', '전통시장', '둔촌역 전통시장 서울 강동구 풍성로58길']] },
+  { stations: ['l5:마천'], attractions: [['macheon-central-market', '마천중앙시장', '전통시장', '마천중앙시장 서울 송파구 마천로51가길 23']] },
+
+  { stations: ['l8:암사역사공원'], attractions: [['amsa-history-park', '암사역사공원', '역사·공원', '암사역사공원 서울 강동구 암사동 137-2']] },
+
+  { stations: ['ic2:석바위시장'], attractions: [['seokbawi-market', '석바위시장', '전통시장', '석바위시장 인천 미추홀구 경인로485번길 17-1']] },
+  { stations: ['ic2:인천가좌'], attractions: [['incheon-gajwa-market', '인천 가좌시장', '전통시장', '가좌시장 인천 서구 원적로96번길 5']] },
+
+  { stations: ['gc:가좌'], attractions: [['gyeongui-line-forest-park', '경의선숲길', '도심산책', '경의선숲길 가좌역 서울 마포구']] },
+  { stations: ['gc:한국항공대'], attractions: [['kau-aerospace-museum', '한국항공대학교 항공우주박물관', '박물관·캠퍼스', '한국항공대학교 항공우주박물관 경기도 고양시 덕양구 항공대학로 76']] },
+
+  { stations: ['sb:기흥'], attractions: [['nam-june-paik-art-center', '백남준아트센터', '미술관', '백남준아트센터 경기도 용인시 기흥구 백남준로 10']] },
+  { stations: ['sb:인천논현'], attractions: [['neulsolgil-park', '늘솔길공원', '공원·체험', '늘솔길공원 인천 남동구 앵고개로 783']] },
+
+  { stations: ['sh:신천'], attractions: [['sammi-market', '삼미시장', '전통시장', '삼미시장 경기도 시흥시 신천동']] },
+
+  { stations: ['ui:솔샘'], attractions: [['bukhansan-dullegil-solsaem', '북한산둘레길 흰구름길', '자연·산책', '북한산둘레길 흰구름길 솔샘역 서울 강북구']] },
+
+  { stations: ['gj:의정부시청'], attractions: [['uijeongbu-arts-center', '의정부예술의전당', '공연·문화', '의정부예술의전당 경기도 의정부시 의정로 1']] },
+
+  { stations: ['ev:삼가'], attractions: [['yongin-mireu-stadium', '용인미르스타디움', '스포츠·랜드마크', '용인미르스타디움 경기도 용인시 처인구 동백죽전대로 61']] },
+
+  { stations: ['gm:구래'], attractions: [['gimpo-independence-memorial', '김포독립운동기념관', '역사·기념관', '김포독립운동기념관 경기도 김포시 양촌읍 양곡2로30번길 46']] },
+
+  { stations: ['l1:역곡'], attractions: [['yeokgok-sangsang-market', '역곡상상시장', '문화관광형시장', '역곡상상시장 경기도 부천시 원미구 부일로749번길']] },
+  { stations: ['l1:송내'], attractions: [['boksagol-culture-center', '복사골문화센터', '복합문화공간', '복사골문화센터 경기도 부천시 원미구 장말로 107']] },
+
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
