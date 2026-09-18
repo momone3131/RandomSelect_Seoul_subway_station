@@ -571,7 +571,6 @@ async function runBrowserSelfTest(): Promise<void> {
     });
 
     await footprintMap.open(store.getSnapshot().visits);
-    await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
     const footprintMarker = document.querySelector<HTMLButtonElement>('.footprint-visit-marker');
     const footprintReference = document.querySelector<HTMLImageElement>('.footprint-reference-image');
     if (!footprintMarker || !footprintReference?.src.includes('footprint-seoul-subway-reference.svg')) {
