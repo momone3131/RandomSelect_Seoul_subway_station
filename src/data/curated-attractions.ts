@@ -6,14 +6,16 @@ import { getCuratedAttractions as getBaseCuratedAttractions } from './curated-at
 import { getExtraCuratedAttractions } from './curated-attractions-extra';
 import { getLocalCuratedAttractions } from './curated-attractions-local';
 import { getNightViewpointAttractions } from './curated-attractions-night-viewpoints';
+import { getEquivalentStationReferences } from './station-equivalence';
 
 export function getCuratedAttractions(lineId: string, stationName: string): AttractionRecommendation[] {
+  const equivalentStations = getEquivalentStationReferences(lineId, stationName);
   const merged = [
-    ...getBaseCuratedAttractions(lineId, stationName),
-    ...getAdjustedCuratedAttractions(lineId, stationName),
-    ...getExtraCuratedAttractions(lineId, stationName),
-    ...getLocalCuratedAttractions(lineId, stationName),
-    ...getNightViewpointAttractions(lineId, stationName),
+    ...equivalentStations.flatMap((station) => getBaseCuratedAttractions(station.lineId, station.stationName)),
+    ...equivalentStations.flatMap((station) => getAdjustedCuratedAttractions(station.lineId, station.stationName)),
+    ...equivalentStations.flatMap((station) => getExtraCuratedAttractions(station.lineId, station.stationName)),
+    ...equivalentStations.flatMap((station) => getLocalCuratedAttractions(station.lineId, station.stationName)),
+    ...equivalentStations.flatMap((station) => getNightViewpointAttractions(station.lineId, station.stationName)),
   ];
   const seen = new Set<string>();
   return merged
