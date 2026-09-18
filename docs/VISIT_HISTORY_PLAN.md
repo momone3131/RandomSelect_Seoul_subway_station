@@ -73,7 +73,7 @@ Status: **SKIPPED / PRODUCT DECISION**
 
 ## Phase 4 — Simple visit statistics
 
-Status: **IMPLEMENTED / VERIFYING WEB + ANDROID**
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 복잡한 소셜/랭킹 게임화 대신 개인 탐험 진행도를 가볍게 보여줍니다.
 
@@ -108,6 +108,12 @@ Implementation:
 - 신촌/양평 동명이역 분리, 총신대입구(이수)↔이수 alias 등 Phase 2의 동일한 역 동등성 규칙을 재사용
 - 통계는 조회 시 즉시 파생하므로 방문 기록 수정/삭제가 곧바로 반영됨
 - 친구 ranking / streak / badge 경쟁은 추가하지 않음
+
+Verification:
+- Phase 4 PR #16 CI `35367289293` — success
+- main CI `35367506018` / Web Release `35367506047` — success
+- Web deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`, bundle `assets/modular-Ct4Elvwv.js`
+- Android CI `35367476033` — success; fixed `android-dev-latest` APK republished
 
 목표는 Random Seoul의 핵심인 우연한 외출을 유지하면서, 사용자가 시간이 지날수록 **내가 채운 서울·수도권 발자취**를 소유하게 하는 것입니다.
 
