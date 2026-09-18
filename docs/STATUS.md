@@ -188,3 +188,12 @@ Roadmap: `docs/VISIT_HISTORY_PLAN.md`
 2. footprint map
 3. unvisited-first / visited-excluded random
 4. simple visit statistics
+
+
+### Phase 1 verification
+- shared tests — success
+- native Web build — success
+- Capacitor Android sync — success
+- Gradle debug APK — success
+- Android CI `35339228627` — success
+- fixed latest development APK republished: `11,433,508` bytes
