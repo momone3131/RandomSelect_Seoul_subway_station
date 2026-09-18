@@ -1,6 +1,6 @@
 # Random Seoul — Architecture
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
 
 ## 1. Architecture goals
 
@@ -29,6 +29,7 @@ src/
 │  ├─ curated-attractions-night-viewpoints.ts
 │  ├─ curated-attraction-tiers.ts
 │  ├─ curated-attraction-features.ts
+│  ├─ station-equivalence.ts
 │  └─ station-coordinates.ts
 ├─ domain/
 ├─ services/
@@ -83,16 +84,21 @@ UI context carries `isAlcohol` so recommendation title/CTA/empty copy can say `�
 
 ## 5. Curated attraction merge
 
+Before curation layers are merged, `station-equivalence.ts` expands a draw station to all line variants of the same physical interchange. The expansion is canonical and line-independent, so 왕십리/연신내/도봉산/etc. cannot return different attraction sets merely because a different line was drawn.
+
+Same-name stations that are not physical interchanges are explicitly excluded from automatic equivalence: 신촌 and 양평. The differently named 이수 interchange is explicitly paired as `l4:총신대입구(이수)` ↔ `l7:이수`.
+
 Exact order:
-1. base
-2. station adjustments
-3. extra
-4. local
-5. dedicated night-viewpoints
-6. ID dedupe
-7. max2
-8. prominence tier attachment
-9. orthogonal feature attachment
+1. physical interchange equivalence
+2. base
+3. station adjustments
+4. extra
+5. local
+6. dedicated night-viewpoints
+7. ID dedupe
+8. max2
+9. prominence tier attachment
+10. orthogonal feature attachment
 
 The night-viewpoint layer is last so it only fills available capacity.
 
