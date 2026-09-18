@@ -196,6 +196,10 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - 상세 선택 시 노선 뱃지 + 역명 + 방문 횟수를 한 줄로 압축
 - 상세 선택 전/후 전체 modal 높이와 노선도 viewport 높이는 동일하게 유지; 상세 공간을 처음부터 확보하여 레이아웃 점프 없음
 - modal header/닫기 버튼은 고정되고 상세 영역 자체가 남는 공간에서 스크롤하므로 긴 방문 history도 전체 panel 크기를 바꾸지 않음
+- iPhone 실사용 스크린샷 기준 상세 slot이 남은 높이를 모두 먹던 flex-grow 제거; 상세는 compact fixed slot(모바일 약 136–142px)
+- footprint modal은 94–96dvh 강제 높이를 제거하고 content-sized + viewport max로 변경하여 상하 여백을 확보
+- 모바일 safe-area 위쪽 간격과 약한 downward offset을 추가해 패널이 상태바에 과하게 붙지 않도록 조정
+- Web deployment `9d90fc8e5cebe24d44f7e6ed589592afc9de25c6`, bundle `assets/modular-BTIiVcFK.js`
 - marker/strip 선택 시 full map이나 marker DOM을 재렌더하지 않아 기존 모바일 tap/reposition 문제 제거
 - drag / wheel zoom / pinch zoom / fit-all 지원
 - 신규 방문 저장 toast는 `발자취 노선도에서 확인할 수 있어요`로 안내
