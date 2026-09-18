@@ -148,3 +148,18 @@ Android CI additionally verifies native Vite build, Capacitor sync, stable signi
 ### 2026-09-12
 
 - Random Seoul branding, permanent Web support, shared-core architecture, Phase 1 modular refactor, Android native foundation, Places bridge, and CI foundations established.
+
+
+## Zero-coverage attraction re-audit — 2026-09-18
+
+Shared curated-attraction data was re-audited using actual map/transit proximity plus municipal tourism/cultural sources rather than tourism lists alone.
+
+- 45 new unique destinations added
+- 8 existing strong destination IDs reused for additional nearby stations
+- 800 line/station outcomes: 319 zero / 377 one / 104 two
+- attraction coverage: 60.1%
+- physical missing station groups: 288
+- surfaced unique attractions: 375 = Diamond 4 / Gold 25 / Silver 96 / Standard 250
+- planned/unbuilt, generic neighborhood-only, or bus-dependent/far candidates remain intentionally uncurated
+
+Android uses the same shared curation/tier/test contract as Web.
