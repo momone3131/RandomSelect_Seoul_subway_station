@@ -266,6 +266,14 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['l9:등촌'], attractions: [['deungchon-market', '등촌시장', '전통시장', '등촌시장 서울 양천구 목동중앙북로7길']] },
   { stations: ['l7:산곡'], attractions: [['wonjeoksan-park', '원적산공원', '공원·산책', '원적산공원 인천광역시 부평구 산곡동']] },
 
+
+  // 2026-09-18 zero-coverage audit, official-access follow-up.
+  { stations: ['l5:강동'], attractions: [['gangfull-cartoon-street', '강풀만화거리', '문화거리', '강풀만화거리 서울 강동구 천호대로168가길']] },
+  { stations: ['l3:도곡'], attractions: [['yangjaecheon-stream', '양재천', '수변·산책', '양재천 도곡역 서울 강남구']] },
+  { stations: ['l3:일원'], attractions: [['daemosan-mountain', '대모산', '자연·산행', '대모산 일원역 서울 강남구']] },
+  { stations: ['l6:월곡'], attractions: [['dongduk-womens-university', '동덕여자대학교', '캠퍼스', '동덕여자대학교 서울 성북구 화랑로13길 60']] },
+  { stations: ['l7:강남구청', 'sb:강남구청'], attractions: [['dosan-park', '도산공원', '역사·공원', '도산공원 서울 강남구 도산대로45길 20']] },
+
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
