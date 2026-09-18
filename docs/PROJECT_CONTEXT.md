@@ -115,9 +115,13 @@ Phase 2:
 - 24 lines / 800 line×station reference anchors, 800/800 automated audit
 - physical interchange variants share an anchor; 신촌/양평 non-interchanges remain separate
 - 총신대입구(이수) ↔ 이수 shares one physical anchor
-- marker detail shows visit count and date/line/confirmed food/confirmed attraction history
+- visit markers stay screen-sized and visible at full-map fit and zoomed views
+- horizontal `역명 · 최근 방문일` strip remains scrollable under the map
+- no detail is shown on open; marker or strip selection opens visit count/date/line/confirmed food/attraction detail
+- selected detail owns per-record edit/delete; main page no longer shows durable visit cards
 - pan / wheel zoom / pinch zoom / fit-all
-- station selection changes only marker state/detail, not the map DOM
+- station selection changes only marker/strip state + detail, not the map DOM
+- recent history is only for first `다녀왔어요` registration; saved item becomes `발자취에 등록됨`
 - no map provider/tile lookup, station-coordinate resolver, GPS/current-location permission
 - one documented synthetic exception: 의정부경전철 차량기지 임시승강장
 
