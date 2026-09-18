@@ -218,7 +218,7 @@ function openVisitRecordFromFootprint(visit: Parameters<typeof renderVisits>[0][
   renderState();
 }
 
-function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): readonly Parameters<typeof renderVisits>[0] | undefined {
+function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): Parameters<typeof renderVisits>[0] | undefined {
   if (!window.confirm(`${visit.stationName}역 방문 기록을 삭제할까요?`)) return undefined;
   controller.deleteVisit(visit.id);
   notify('방문 기록을 삭제했어요.');
