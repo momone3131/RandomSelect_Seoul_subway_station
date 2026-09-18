@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "cap:sync:android": "npm run build:native && cap sync android"
+    "cap:sync:android": "npm run build:native && cap sync android",
+    "generate:footprint-anchors": "node scripts/generate-footprint-map-anchors.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",
