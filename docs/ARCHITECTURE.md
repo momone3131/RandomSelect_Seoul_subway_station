@@ -188,3 +188,17 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 ## Physical interchange station equivalence
 
 `src/data/station-equivalence.ts` canonicalizes real interchange station line variants before curated-attraction layers are merged. Same physical stations therefore share one attraction result across lines. Same-name non-interchanges `신촌` and `양평` remain separate, while `총신대입구(이수)` and `이수` are explicitly linked.
+
+
+## Durable visit footprint map
+
+The footprint map is a shared TypeScript feature layered on top of durable `VisitRecord` data.
+
+- `station-equivalence.ts` exposes canonical physical-station keys/display names
+- `domain/visit-footprint.ts` groups records by physical station and orders visit history
+- `ui/footprint-map-view.ts` renders the overlay, OpenStreetMap raster tiles, pins, zoom controls and visit detail
+- equivalent-line static station coordinates are averaged when available
+- missing static coordinates reuse `StationLocationService`; on Android that resolver continues through the native Places bridge and existing 30-day cache
+- map tiles are presentation-only; no separate visit/location database is created
+- no GPS/current-location permission is used
+- native Android back handling closes footprint/visit/settings overlays before normal navigation or exit
