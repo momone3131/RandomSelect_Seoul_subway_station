@@ -181,10 +181,13 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('grid-template-columns:repeat(3,minmax(0,1fr))');
   });
 
-  it('keeps completed-course commitment and new-course actions side by side', () => {
-    expect(styles).toContain('.done-actions{');
-    expect(styles).toContain('grid-template-columns:minmax(0,1fr) minmax(0,1fr)');
-    expect(styles).toContain('.current-course-visit-btn.saved:disabled');
+  it('keeps the hero visit action compact and the visit utilities visually quiet', () => {
+    expect(styles).toContain('.hero-title-row{display:flex');
+    expect(styles).toContain('.hero-visit-btn{');
+    expect(styles).toContain('.visit-tools{');
+    expect(styles).toContain('.visit-tool-btn{');
+    expect(styles).not.toContain('.done-actions{');
+    expect(styles).not.toContain('.current-course-visit-btn');
   });
 
   it('changes the hero prompt with the draw stage', () => {
