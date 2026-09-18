@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   FOOTPRINT_MAP_ANCHORS,
@@ -6,6 +7,41 @@ import {
 } from '../src/data/footprint-map-anchors';
 import { getEquivalentStationReferences } from '../src/data/station-equivalence';
 import { SUBWAY_LINES } from '../src/data/subway-lines';
+
+
+const referenceSvg = readFileSync(
+  new URL('../public/footprint-seoul-subway-reference.svg', import.meta.url),
+  'utf8',
+);
+
+function normalizeSvgText(value: string): string {
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, '')
+    .trim();
+}
+
+function referenceLabelCoordinates(): Map<string, Set<string>> {
+  const result = new Map<string, Set<string>>();
+  const regex = /<text\b([^>]*)>([\s\S]*?)<\/text>/g;
+  for (const match of referenceSvg.matchAll(regex)) {
+    const matrix = match[1]?.match(/transform="matrix\(([^)]*)\)"/);
+    if (!matrix) continue;
+    const values = matrix[1]!.trim().split(/[\s,]+/).map(Number);
+    if (values.length < 6 || values.some((value) => !Number.isFinite(value))) continue;
+
+    const label = normalizeSvgText(match[2] ?? '');
+    if (!label) continue;
+    const coordinate = values[4]!.toFixed(4) + ',' + values[5]!.toFixed(4);
+    const coordinates = result.get(label) ?? new Set<string>();
+    coordinates.add(coordinate);
+    result.set(label, coordinates);
+  }
+  return result;
+}
+
+const referenceCoordinates = referenceLabelCoordinates();
 
 const stationOutcomes = SUBWAY_LINES.flatMap((line) =>
   line.stations.map((station) => ({ lineId: line.id, stationName: station.name })),
@@ -24,6 +60,19 @@ describe('full-network footprint reference mapping', () => {
         getFootprintMapAnchor(station.lineId, station.stationName),
         `missing footprint anchor: ${station.lineId}:${station.stationName}`,
       ).toBeDefined();
+    }
+  });
+
+
+  it('binds every non-synthetic anchor to the exact label coordinate in the bundled SVG', () => {
+    for (const [key, anchor] of Object.entries(FOOTPRINT_MAP_ANCHORS)) {
+      if (anchor.source === 'synthetic-terminal-extension') continue;
+      const coordinates = referenceCoordinates.get(anchor.referenceLabel);
+      expect(coordinates, `missing SVG label for ${key}: ${anchor.referenceLabel}`).toBeDefined();
+      expect(
+        coordinates!.has(anchor.x.toFixed(4) + ',' + anchor.y.toFixed(4)),
+        `SVG coordinate mismatch for ${key}: ${anchor.referenceLabel}`,
+      ).toBe(true);
     }
   });
 
