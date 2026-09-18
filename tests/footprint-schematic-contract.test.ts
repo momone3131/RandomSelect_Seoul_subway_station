@@ -48,6 +48,19 @@ describe('visit footprint full-network map contract', () => {
     expect(footprintView).toContain('this.callbacks?.onDelete(visit)');
     expect(styles).toContain('.footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0');
   });
+  it('reuses attraction prominence and nightscape styling for confirmed visited attractions', () => {
+    expect(footprintView).toContain("attractionTierForId");
+    expect(footprintView).toContain("isNightscapeAttraction");
+    expect(footprintView).toContain("for (const attraction of visit.attractions)");
+    expect(footprintView).toContain("footprint-attraction-tier-${tier}");
+    expect(footprintView).toContain("footprint-attraction-nightscape");
+    expect(footprintView).not.toContain("for (const attraction of visit.shownAttractions)");
+    expect(styles).toContain('.footprint-attraction-tier-diamond');
+    expect(styles).toContain('.footprint-attraction-tier-gold');
+    expect(styles).toContain('.footprint-attraction-tier-silver');
+    expect(styles).toContain('.footprint-attraction-nightscape');
+  });
+
 
   it('keeps the whole panel and map size stable before and after station selection', () => {
     expect(footprintView).not.toContain('detail-open');
