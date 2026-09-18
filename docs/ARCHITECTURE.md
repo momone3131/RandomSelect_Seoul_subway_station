@@ -192,14 +192,15 @@ Vite native build → Capacitor sync → Xcode/cloud build.
 
 ## Durable visit footprint full-network map
 
-The footprint UI shares exactly the same reference asset and anchor table with Web.
+The footprint UI shares the same full-network reference asset and anchor table with Web.
 
-- `public/footprint-seoul-subway-reference.svg`: bundled public-domain full-network diagram
-- `src/data/footprint-map-anchors.ts`: 800 typed line/station anchors
-- `scripts/generate-footprint-map-anchors.mjs`: deterministic reference-label extractor
-- `domain/visit-footprint.ts`: physical-station grouping
-- `ui/footprint-map-view.ts`: full-map pan/zoom and durable visit overlay
-- Android native build copies the reference through Vite's public asset pipeline; CI checks the built asset exists
+- reference map stays in the scaled stage
+- durable visit markers live in a separate viewport overlay and are positioned with `pan + anchor × scale`, preserving readable screen size at all zoom levels
+- horizontal visit summary strip is independent from map pan/zoom and stays scrollable while detail is open
+- no station is auto-selected on open; detail is explicit-selection only
+- selected detail owns per-record edit/delete
+- recent history owns only first registration; durable management is footprint-only
+- Android native build copies the reference through Vite's public asset pipeline
 - no Android map SDK, Places lookup, GPS or location permission is used by this footprint screen
 - native Android back handling closes footprint/visit/settings overlays before app navigation/exit
 
