@@ -1,6 +1,6 @@
 # Random Seoul — Project Plan
 
-Last updated: 2026-09-13
+Last updated: 2026-09-18
 
 이 문서는 Random Seoul 개발의 기준 계획입니다. 대화가 길어지더라도 구현 방향이 흐려지지 않도록 저장소 안에서 계속 갱신합니다.
 
@@ -166,3 +166,8 @@ Android에서 검증된 공통 코어를 유지하고 iOS 어댑터만 추가합
 - 단계별 출시 계획
 
 구현 세부 상태는 `docs/STATUS.md`, 구조 결정은 `docs/ARCHITECTURE.md`를 기준으로 합니다.
+
+
+## Interchange consistency rule
+
+동일한 실제 환승역은 어느 노선에서 추첨돼도 동일한 curated attraction 결과를 유지합니다. 동명이역은 자동 병합하지 않습니다.
