@@ -47,6 +47,17 @@ describe('visit footprint full-network map contract', () => {
     expect(styles).toContain('.footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0');
   });
 
+  it('compacts the selected detail without pushing the close button off-screen', () => {
+    expect(footprintView).toContain("dialog.classList.toggle('detail-open', open)");
+    expect(footprintView).toContain("make('div', 'footprint-detail-title')");
+    expect(footprintView).toContain("title.appendChild(chip)");
+    expect(footprintView).toContain("title.appendChild(make('h3'");
+    expect(styles).toContain('.footprint-modal{width:min(980px,100%);max-height:min(95dvh,960px);display:flex;flex-direction:column;overflow:hidden}');
+    expect(styles).toContain('.footprint-body{flex:1 1 auto;min-height:0;overflow-y:auto');
+    expect(styles).toContain('.footprint-modal.detail-open .footprint-map-viewport');
+    expect(styles).toContain('.footprint-detail-title{display:flex;align-items:center');
+  });
+
   it('supports pan, pinch/wheel zoom and an explicit fit-all control', () => {
     expect(footprintView).toContain("addEventListener('pointermove'");
     expect(footprintView).toContain("addEventListener('wheel'");
