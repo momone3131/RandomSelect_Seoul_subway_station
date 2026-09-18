@@ -132,12 +132,13 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 ## 7. Latest verified snapshot
 
 ### Web full-network footprint
-- PR #9 final CI `35352888242` — success
-- source merge `08cf695bb8e29881777cbb3ac5aeca4b203894e3`
-- deployment commit `a356ccf847a6496b26df9f673b94333263efc1af`
-- deployed bundle `assets/modular-CQ1CWBmD.js`
-- deployed root `footprint-seoul-subway-reference.svg` directly verified
-- old per-line schematic markers are absent from the deployed bundle
+- PR #10 visit-history hub CI `35356470654` — success
+- current source merge `bdf9326584648786e7679389e66c931a09c265d8`
+- current deployment commit `526f3ab6431cbd2481546a12fce040d78beeb3ba`
+- deployed bundle `assets/modular-_UoS7_f0.js`
+- visited markers remain screen-sized at fit-all/zoom
+- horizontal visit strip + explicit detail selection + footprint-only edit/delete verified in deployed bundle
+- main durable cards removed; recent-history saved state is registration-only
 
 ### Mapping verification
 - app outcomes: 800
