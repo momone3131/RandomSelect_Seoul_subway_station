@@ -207,7 +207,6 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
 
   // 2026-09-18 zero-coverage audit, second pass.
   { stations: ['l2:서초'], attractions: [['national-library-of-korea', '국립중앙도서관', '도서관·문화', '국립중앙도서관 서울 서초구 반포대로 201']] },
-  { stations: ['l2:신답'], attractions: [['dapsimni-antique-shopping-center', '답십리 고미술상가', '고미술·상가', '답십리 고미술상가 서울 동대문구 고미술로 21']] },
   { stations: ['l3:화정'], attractions: [['hwajeong-culture-street', '화정 문화의거리', '거리·상권', '화정 문화의거리 경기도 고양시 덕양구 화정로 56-1']] },
   { stations: ['l3:금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
 
@@ -278,6 +277,14 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   // 2026-09-18 zero-coverage audit, verified market follow-up.
   { stations: ['l4:상계'], attractions: [['sanggye-central-market', '상계중앙시장', '전통시장', '상계중앙시장 서울 노원구 상계로23가길 24']] },
   { stations: ['l5:신금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
+
+
+  // 2026-09-18 zero-coverage audit, final official-access checks.
+  { stations: ['l6:마포구청'], attractions: [['mapo-agricultural-fish-market', '마포농수산물시장', '시장·먹거리', '마포농수산물시장 서울 마포구 월드컵로 235']] },
+  { stations: ['l3:약수', 'l6:약수'], attractions: [['dasan-fortress-library', '다산성곽도서관', '문화·성곽산책', '다산성곽도서관 서울 중구 동호로17길 173']] },
+  { stations: ['l4:길음'], attractions: [['seongbuk-media-culture-maru', '서울성북미디어문화마루', '복합문화공간', '서울성북미디어문화마루 서울 성북구 길음로7길 20']] },
+  { stations: ['l3:녹번'], attractions: [['eunpyeong-culture-arts-center', '은평문화예술회관', '공연·문화', '은평문화예술회관 서울 은평구 녹번로 16']] },
+  { stations: ['l7:신중동'], attractions: [['lotte-dept-jungdong', '롯데백화점 중동점', '복합쇼핑', '롯데백화점 중동점 경기도 부천시 원미구 길주로 300']] },
 
 ];
 
