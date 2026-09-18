@@ -274,6 +274,11 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['l6:월곡'], attractions: [['dongduk-womens-university', '동덕여자대학교', '캠퍼스', '동덕여자대학교 서울 성북구 화랑로13길 60']] },
   { stations: ['l7:강남구청', 'sb:강남구청'], attractions: [['dosan-park', '도산공원', '역사·공원', '도산공원 서울 강남구 도산대로45길 20']] },
 
+
+  // 2026-09-18 zero-coverage audit, verified market follow-up.
+  { stations: ['l4:상계'], attractions: [['sanggye-central-market', '상계중앙시장', '전통시장', '상계중앙시장 서울 노원구 상계로23가길 24']] },
+  { stations: ['l5:신금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
+
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
