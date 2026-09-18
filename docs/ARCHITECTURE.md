@@ -150,14 +150,14 @@ Phase 2 stays on top of the existing durable `VisitRecord` collection.
 
 - `station-equivalence.ts` exposes canonical physical-station identity for visit grouping
 - `visit-footprint.ts` groups multiple records and line variants into one physical station
-- `footprint-map-view.ts` owns the map overlay, pin selection and per-station visit history
-- static station coordinates are averaged across available equivalent-line references for interchange pin placement
-- stations without static coordinates reuse `StationLocationService`; therefore the existing 30-day resolver cache and Web/native Places boundary remain intact
-- OpenStreetMap raster tiles are presentation-only and are not persisted as visit data
-- no current-location/GPS input is consumed
+- `footprint-map-view.ts` owns the schematic overlay, visited-node selection and per-station visit history
+- `SUBWAY_LINES` supplies line/station order directly; footprint rendering does not use geographic station coordinates
+- all stations render as small nodes, while visited physical stations render as larger filled nodes
+- selecting a visited node only updates selected CSS/ARIA state plus details; the schematic DOM is not rebuilt on tap
+- footprint rendering has no map-tile or Places dependency and consumes no current-location/GPS input
 - Android native back handling closes footprint/visit/settings overlays before app navigation/exit
 
-The footprint map does not alter the `VisitRecord` storage schema and does not persist Google/OSM map results as a reusable location database.
+The footprint schematic does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
 
 ## 10. Build / deployment
 
