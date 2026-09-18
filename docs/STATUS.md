@@ -191,11 +191,11 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - 의정부경전철 차량기지 임시승강장만 reference 밖 synthetic dashed terminal extension
 - 방문 marker는 SVG scale과 분리된 screen-space overlay라 전체보기/확대 모두에서 고정 크기로 식별 가능
 - 노선도 아래 `역명 · 최근 방문일` horizontal strip을 드래그/스크롤해 방문역 탐색
-- 초기에는 상세를 숨기고 marker/strip 선택 시에만 방문일·당시 노선·실제 방문 음식/명소 history 표시
+- 초기 상세 영역에는 `역을 누르면 상세·수정`만 표시하고 marker/strip 선택 시 방문일·당시 노선·실제 방문 음식/명소 history로 교체
 - selected detail에서 개별 방문기록 수정/삭제 가능; strip은 상세가 열린 상태에서도 계속 스크롤 가능
 - 상세 선택 시 노선 뱃지 + 역명 + 방문 횟수를 한 줄로 압축
-- 상세가 열리면 노선도 viewport를 자동 축소/refit하고 modal header는 고정하여 작은 화면에서도 상단 닫기 버튼이 유지됨
-- 긴 동일역 방문 history는 상세 내부에서 제한 높이로 스크롤
+- 상세 선택 전/후 전체 modal 높이와 노선도 viewport 높이는 동일하게 유지; 상세 공간을 처음부터 확보하여 레이아웃 점프 없음
+- modal header/닫기 버튼은 고정되고 상세 영역 자체가 남는 공간에서 스크롤하므로 긴 방문 history도 전체 panel 크기를 바꾸지 않음
 - marker/strip 선택 시 full map이나 marker DOM을 재렌더하지 않아 기존 모바일 tap/reposition 문제 제거
 - drag / wheel zoom / pinch zoom / fit-all 지원
 - 신규 방문 저장 toast는 `발자취 노선도에서 확인할 수 있어요`로 안내
