@@ -30,15 +30,22 @@ Persistence:
 
 ## Phase 2 — Footprint map
 
-Status: **PLANNED**
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-가칭 `발자취` / `다녀온 곳` 지도.
+`다녀온 곳` 영역의 `발자취 지도`에서 durable visit records를 지도에 표시합니다.
 
-- 저장된 방문 역을 지도에 pin으로 표시
-- 같은 역의 여러 방문 기록은 하나의 station pin + 방문 횟수/날짜 history로 표현
-- pin 선택 시 방문 날짜, 선택해서 기록한 음식 종목, 방문 명소를 확인
-- current-location/GPS permission 없이 구현
-- physical interchange equivalence를 적용하여 같은 실제 환승역이 노선별 중복 pin으로 갈라지지 않게 함
+- 저장된 방문 역을 지도 pin으로 표시
+- 같은 physical station의 여러 방문 기록은 **pin 하나 + 방문 횟수 + 날짜별 history**로 표현
+- pin 선택 시 방문 날짜, 당시 노선, 사용자가 실제 방문으로 선택한 음식 종목/명소를 확인
+- physical interchange equivalence를 그대로 재사용하여 노선별 환승역 중복 pin 방지
+- known same-name non-interchange인 신촌/양평은 별도 pin 유지
+- `총신대입구(이수)` ↔ `이수`는 하나의 physical station으로 통합
+- station 위치는 first-party static coordinates 우선, 없는 역만 기존 station resolver + 30-day cache 사용
+- 지도 배경은 OpenStreetMap raster tiles + attribution 사용
+- current-location/GPS permission을 요구하지 않음
+- Android hardware back은 footprint → visit picker → settings 순으로 열린 overlay를 먼저 닫음
+
+Phase 2는 `VisitRecord` persistence schema를 변경하지 않습니다. 지도용 별도 방문 DB를 만들지 않습니다.
 
 ## Phase 3 — Unvisited-aware random
 
