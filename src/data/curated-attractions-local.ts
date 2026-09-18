@@ -260,6 +260,12 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
 
   { stations: ['l8:송파'], attractions: [['seokchon-market-local', '석촌시장', '전통시장', '석촌시장 서울 송파구 송파대로37길 40']] },
 
+
+  // 2026-09-18 zero-coverage audit, map-verified follow-up.
+  { stations: ['l3:백석'], attractions: [['bellacitta-ilsan', '벨라시타', '복합문화·쇼핑', '벨라시타 경기도 고양시 일산동구 강송로 33']] },
+  { stations: ['l9:등촌'], attractions: [['deungchon-market', '등촌시장', '전통시장', '등촌시장 서울 양천구 목동중앙북로7길']] },
+  { stations: ['l7:산곡'], attractions: [['wonjeoksan-park', '원적산공원', '공원·산책', '원적산공원 인천광역시 부평구 산곡동']] },
+
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
