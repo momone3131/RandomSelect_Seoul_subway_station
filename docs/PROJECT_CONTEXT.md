@@ -66,7 +66,7 @@ Physical interchange handling:
 Current prominence:
 - Diamond 4
 - Gold 25
-- Silver 88
+- Silver 100
 - remaining surfaced IDs Standard
 
 Diamond fixed: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
@@ -98,7 +98,7 @@ Nightscape changes the card interior to dark navy/indigo/purple night sky; promi
 
 ## 6. Durable visit loop
 
-Phase 1 + Phase 2 are implemented and verified on Web + Android. Phase 3 is intentionally skipped; Phase 4 visit statistics is implemented and under final Web/Android verification.
+Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase 3 is intentionally skipped.
 
 Phase 1:
 - visits are persisted separately from recent draw history
@@ -145,29 +145,27 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Web full-network footprint
-- PR #10 visit-history hub CI `35356470654` — success
-- current source merge `bdf9326584648786e7679389e66c931a09c265d8`
-- current deployment commit `526f3ab6431cbd2481546a12fce040d78beeb3ba`
-- deployed bundle `assets/modular-_UoS7_f0.js`
-- visited markers remain screen-sized at fit-all/zoom
-- horizontal visit strip + explicit detail selection + footprint-only edit/delete verified in deployed bundle
-- main durable cards removed; recent-history saved state is registration-only
-- Android fixed `android-dev-latest` now matches the visit-hub footprint view, visit/main UI, styles and contract tests
-- native Vite uses the shared `public/` directory so the full-network SVG ships in Android
+### Phase 4 Web
+- PR #16 CI `35367289293` — success
+- merge `e15b8b6108d6c3664174a53f3a3e918a44a5276f`
+- main CI `35367506018` — success
+- Web Release `35367506047` — success
+- deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`
+- bundle `assets/modular-Ct4Elvwv.js`
 
-### Mapping verification
-- app outcomes: 800
-- generated anchors: 800
-- 799 anchors match the exact station label + coordinate in the bundled reference SVG
-- 1 documented synthetic exception: 의정부경전철 차량기지 임시승강장
-- physical interchange equality / 신촌·양평 separation / adjacent geometry sanity: all passed
-- deterministic regeneration zero-diff gate: passed
+### Phase 4 Android
+- branch `feature/random-seoul-android`, PR #3
+- source head `a5a9b78bf83c1929f32de521b53d4a28771d5539`
+- Android CI `35367476033` — success
+- shared tests → native build → Capacitor sync → APK assembly → fixed latest release all passed
+- `random-seoul-latest.apk` size `11,525,425` bytes
 
-### Android full-network footprint
-- working branch `feature/random-seoul-android`, PR #3
-- fixed `android-dev-latest` has the full-network footprint view, 800-anchor table, bundled reference SVG and exact SVG-anchor audit test
-- Android build/release workflow publishes only after shared tests → native Web build → Capacitor sync → Gradle assembleDebug
+### Visit/statistics invariants
+- physical interchange equality / 신촌·양평 non-interchange separation / 이수 alias: preserved
+- 1호선 신도림 visit credits both 1호선 and 2호선 progress
+- revisits do not inflate station coverage
+- confirmed attraction tier counts use current Diamond / Gold / Silver / Standard classification
+- no visit/statistics schema migration and no GPS/location permission
 
 ## 8. Source-of-truth docs
 
