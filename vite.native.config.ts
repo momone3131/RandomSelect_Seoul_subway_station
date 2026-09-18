@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: 'native',
+  publicDir: '../public',
   base: './',
   define: {
     // The native runtime never uses this value as a Web API key. It only keeps
