@@ -154,6 +154,7 @@ Phase 2 stays on top of the existing durable `VisitRecord` collection.
 - `station-equivalence.ts`: canonical physical-station identity used to collapse interchange line variants
 - `visit-footprint.ts`: groups multiple records and line variants into one physical visit station
 - `footprint-map-view.ts`: full-map pan/zoom surface, screen-space visit marker overlay, horizontal visit summary strip, selected-station detail and edit/delete actions
+- footprint detail derives presentation-only attraction prominence with `attractionTierForId()` and Nightscape with `isNightscapeAttraction()` from the confirmed `VisitRecord.attractions` subset; no VisitRecord schema change
 - station markers use the reference SVG's own label geometry; geographic latitude/longitude is not involved
 - visited markers are rendered in a non-scaled viewport overlay and re-positioned from anchor×map-transform, keeping their screen size visible at fit-all and zoomed views
 - marker/strip selection updates CSS/ARIA state + detail only; it does not rebuild or reposition the map
