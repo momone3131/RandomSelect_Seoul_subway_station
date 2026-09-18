@@ -207,7 +207,7 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
 
   // 2026-09-18 zero-coverage audit, second pass.
   { stations: ['l2:서초'], attractions: [['national-library-of-korea', '국립중앙도서관', '도서관·문화', '국립중앙도서관 서울 서초구 반포대로 201']] },
-  { stations: ['l3:화정'], attractions: [['hwajeong-culture-street', '화정 문화의거리', '거리·상권', '화정 문화의거리 경기도 고양시 덕양구 화정로 56-1']] },
+  { stations: ['l3:화정'], attractions: [['hwajeong-culture-street', '화정 문화의거리', '거리·상권', '화정 문화의거리 경기도 고양시 덕양구 화정로 56-1'], ['goyang-childrens-museum', '고양어린이박물관', '박물관·체험', '고양어린이박물관 경기도 고양시 덕양구 화중로 26']] },
   { stations: ['l3:금호'], attractions: [['geumnam-market', '금남시장', '전통시장', '금남시장 서울 성동구 독서당로 303-7']] },
 
   { stations: ['l5:길동'], attractions: [['gil-dong-bokjori-market', '길동복조리시장', '전통시장', '길동복조리시장 서울 강동구 양재대로116길']] },
