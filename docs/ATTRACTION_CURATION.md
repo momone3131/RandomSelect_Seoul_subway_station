@@ -1,6 +1,6 @@
 # Random Seoul — Attraction Curation Policy
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
 
 이 문서는 추천 명소 추가·제거, prominence tier, orthogonal feature를 관리하는 기준입니다.
 
@@ -34,6 +34,17 @@ Last updated: 2026-09-17
 - 실제 체류·구경 가치 / 규모 / 특색 / 분위기 / 문화성 / 지역성 / 접근성 / 운영 안정성 / 정확한 mapQuery를 함께 판단
 - 공식 관광자료는 존재성·대표성·운영 상태와 특수 속성 검토의 우선 참고자료
 - 2곳 강제 채우기 금지; 정말 약한 역은 0개가 정상
+
+## Physical interchange consistency
+
+명소 큐레이션은 **실제 같은 환승역이면 어느 노선에서 뽑혀도 동일한 결과**를 보여야 합니다.
+
+- 같은 이름의 실제 환승역은 모든 노선 키를 하나의 station-equivalence group으로 묶은 뒤 기존 curation layer를 병합합니다.
+- 단순 동명이역은 묶지 않습니다. 현재 명시적 예외는 `신촌`(2호선 / 경의중앙선)과 `양평`(5호선 서울 / 경의중앙선 경기)입니다.
+- 역명이 다른 동일 환승역은 명시적으로 연결합니다. 현재 `총신대입구(이수)` ↔ `이수`를 동일 역으로 처리합니다.
+- 이 규칙은 약한 명소를 새로 채우는 것이 아니라, 이미 한 노선에 존재하는 동일 역의 큐레이션을 다른 환승 노선에도 일관되게 공유하는 규칙입니다.
+
+Source of truth: `src/data/station-equivalence.ts`.
 
 ## Prominence tier — exclusive axis
 
@@ -158,7 +169,7 @@ Thus:
 
 Merge priority:
 
-**base → station adjustments → extra → local → night-viewpoints → dedupe → max2 → tier + features**
+**physical interchange equivalence → base → station adjustments → extra → local → night-viewpoints → dedupe → max2 → tier + features**
 
 ## Map target integrity
 
@@ -177,6 +188,7 @@ Merge priority:
 - `curated-attractions-night-viewpoints.ts`: dedicated elevated viewpoint supplement
 - `curated-attraction-tiers.ts`: prominence classifier
 - `curated-attraction-features.ts`: orthogonal features
-- `curated-attractions.ts`: merge/dedupe/max2/enrichment public entry
+- `station-equivalence.ts`: physical interchange line-key equivalence / same-name non-interchange exceptions
+- `curated-attractions.ts`: interchange expansion + merge/dedupe/max2/enrichment public entry
 
-Tests cover station-key validity, tier boundaries, strict Nightscape inclusion/exclusion, overlap behavior, max2 and map targets.
+Tests cover station-key validity, physical-interchange consistency, same-name non-interchange separation, tier boundaries, strict Nightscape inclusion/exclusion, overlap behavior, max2 and map targets.
