@@ -493,6 +493,15 @@ export class FootprintMapView {
     this.renderDetails();
   }
 
+  private syncDetailLayout(open: boolean): void {
+    const dialog = byId<HTMLElement>('footprint_dialog');
+    const wasOpen = dialog.classList.contains('detail-open');
+    dialog.classList.toggle('detail-open', open);
+    if (wasOpen !== open) {
+      window.requestAnimationFrame(() => this.fitAll());
+    }
+  }
+
   private renderDetails(): void {
     const detail = byId<HTMLElement>('footprint_detail');
     const group = this.selectedGroupId
@@ -501,19 +510,16 @@ export class FootprintMapView {
 
     if (!group) {
       detail.hidden = true;
+      this.syncDetailLayout(false);
       replaceContent(detail, document.createDocumentFragment());
       return;
     }
 
     detail.hidden = false;
+    this.syncDetailLayout(true);
     const fragment = document.createDocumentFragment();
     const head = make('div', 'footprint-detail-head');
-    const titleWrap = make('div');
-    const name = make('h3', '', `${group.stationName}역`);
-    const meta = make('p', '', `${group.visits.length}회 방문`);
-    append(titleWrap, name, meta);
-
-    const lineWrap = make('div', 'footprint-line-chips');
+    const title = make('div', 'footprint-detail-title');
     const lineIds = Array.from(new Set(group.references.map((reference) => reference.lineId)));
     for (const lineId of lineIds) {
       const line = SUBWAY_LINE_BY_ID.get(lineId);
@@ -522,9 +528,11 @@ export class FootprintMapView {
       chip.title = line.name;
       chip.style.setProperty('--line', line.color);
       chip.style.setProperty('--line-ink', readableInk(line.color));
-      lineWrap.appendChild(chip);
+      title.appendChild(chip);
     }
-    append(head, titleWrap, lineWrap);
+    title.appendChild(make('h3', '', `${group.stationName}역`));
+    title.appendChild(make('span', 'footprint-detail-count', `${group.visits.length}회 방문`));
+    head.appendChild(title);
     fragment.appendChild(head);
 
     const history = make('div', 'footprint-visit-history');
