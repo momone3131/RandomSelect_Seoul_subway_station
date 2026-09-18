@@ -197,7 +197,7 @@ describe('Random Seoul responsive visual contract', () => {
 
   it('keeps durable visit records separate from recent draw history', () => {
     expect(visitView).toContain("'다녀온 곳 '");
-    expect(visitView).toContain("'방문 역 · 필수'");
+    expect(visitView).toContain('방문 역 · 필수');
     expect(visitView).toContain("'실제로 먹었나요?'");
     expect(visitView).toContain("'실제로 들른 명소'");
     expect(visitView).toContain("input.name = 'visit_attraction'");
