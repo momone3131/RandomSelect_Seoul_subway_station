@@ -69,17 +69,14 @@ body{background:var(--bg)}
 .visit-hub .visit-map-btn{margin-left:auto;min-height:38px;padding:7px 12px}
 .history-visit-btn:disabled{cursor:default;opacity:.74}
 
-.footprint-modal{width:min(980px,100%);max-height:min(95dvh,960px);display:flex;flex-direction:column;overflow:hidden}
+.footprint-modal{width:min(980px,100%);height:min(94dvh,900px);max-height:min(94dvh,900px);display:flex;flex-direction:column;overflow:hidden}
 .footprint-head{position:relative;z-index:10;flex:0 0 auto;align-items:flex-start;background:var(--paper)}
-.footprint-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain}
 .footprint-head h2{margin-bottom:3px}
 .footprint-summary{margin:0;color:var(--muted);font-size:11px;line-height:1.4}
-.footprint-body{padding:0 20px 18px}
-.footprint-map-status{min-height:20px;margin:0 0 8px;color:#64726b;font-size:11px;font-weight:700}
-.footprint-map-wrap{position:relative;overflow:hidden;border:1px solid #d3d7d0;border-radius:13px;background:#f5f5f3}
-.footprint-map-viewport{position:relative;height:min(64vh,650px);min-height:360px;overflow:hidden;background:#f5f5f3;touch-action:none;cursor:grab;overscroll-behavior:contain}
+.footprint-body{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;overflow:hidden;padding:0 20px 18px}
+.footprint-map-wrap{position:relative;flex:0 0 auto;overflow:hidden;border:1px solid #d3d7d0;border-radius:13px;background:#f5f5f3}
+.footprint-map-viewport{position:relative;height:clamp(280px,46dvh,430px);min-height:0;overflow:hidden;background:#f5f5f3;touch-action:none;cursor:grab;overscroll-behavior:contain}
 .footprint-map-viewport:active{cursor:grabbing}
-.footprint-modal.detail-open .footprint-map-viewport{height:min(42vh,440px);min-height:260px}
 .footprint-reference-stage{position:absolute;left:0;top:0;width:5724px;height:6516px;transform-origin:0 0;will-change:transform}
 .footprint-reference-image{position:absolute;inset:0;width:5724px;height:6516px;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .footprint-extension-layer{position:absolute;inset:0;z-index:2;pointer-events:none}
@@ -100,23 +97,22 @@ body{background:var(--bg)}
 .footprint-zoom-controls .footprint-fit-btn{font-size:10px;letter-spacing:-.04em}
 .footprint-reference-source{position:absolute;right:7px;bottom:6px;z-index:8;padding:3px 6px;border-radius:5px;background:rgba(255,253,249,.88);color:#66736d;font-size:8px;pointer-events:none}
 
-.footprint-visit-browser{margin-top:12px}
-.footprint-browser-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 2px 7px}
+.footprint-visit-browser{flex:0 0 auto;margin-top:10px}
+.footprint-browser-head{display:flex;align-items:center;margin:0 2px 6px}
 .footprint-browser-head strong{font-size:12px}
-.footprint-browser-head span{color:#758079;font-size:9px;text-align:right}
-.footprint-visit-strip{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin}
+.footprint-visit-strip{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 7px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:thin}
 .footprint-visit-summary{flex:0 0 auto;max-width:240px;min-height:38px;padding:8px 11px;border:1px solid #cbd2c9;border-radius:9px;background:#fffdf9;color:#34493f;font-size:11px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;scroll-snap-align:start;cursor:pointer}
 .footprint-visit-summary.selected{border-color:#29483b;background:#d9f27c;box-shadow:0 2px 0 #91a75b}
 .footprint-strip-empty{padding:10px 11px;border-radius:9px;background:#f0eee8;color:#7a827b;font-size:11px}
 
-.footprint-detail{margin-top:5px;padding:10px 11px;border-radius:11px;background:#e8eee3}
-.footprint-detail[hidden]{display:none!important}
+.footprint-detail{display:block;flex:1 1 auto;min-height:125px;overflow-y:auto;overscroll-behavior:contain;margin-top:4px;padding:9px 10px;border-radius:11px;background:#e8eee3}
+.footprint-detail-placeholder{display:grid;min-height:105px;height:100%;place-items:center;color:#6e7a73;font-size:11px;font-weight:750}
 .footprint-detail-head{display:flex;align-items:center;min-height:27px}
 .footprint-detail-title{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
 .footprint-detail-title h3{margin:0;font-size:18px;line-height:1.2}
 .footprint-detail-count{color:var(--muted);font-size:10px;font-weight:750;white-space:nowrap}
 .footprint-line-chip{display:grid;place-items:center;min-width:23px;height:23px;padding:0 5px;border-radius:12px;background:var(--line);color:var(--line-ink);font-size:9px;font-weight:850}
-.footprint-visit-history{display:grid;gap:5px;margin-top:8px;max-height:min(25vh,220px);overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
+.footprint-visit-history{display:grid;gap:5px;margin-top:8px;padding-right:2px}
 .footprint-visit-row{padding:8px 9px;border-radius:8px;background:#fffdf9}
 .footprint-visit-row-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px}
 .footprint-visit-row-head span{color:#6a766f}
@@ -125,23 +121,18 @@ body{background:var(--bg)}
 .footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0;min-height:30px;margin:0;padding:4px 8px}
 
 @media(max-width:720px){
- .footprint-modal{max-height:96dvh}
+ .footprint-modal{height:96dvh;max-height:96dvh}
  .footprint-body{padding:0 12px 12px}
- .footprint-map-viewport{height:55dvh;min-height:330px}
- .footprint-modal.detail-open .footprint-map-viewport{height:clamp(220px,34dvh,310px);min-height:220px}
+ .footprint-map-viewport{height:clamp(260px,43dvh,360px)}
  .footprint-visit-marker{width:28px;height:28px}
  .footprint-visit-marker.selected{width:34px;height:34px}
- .footprint-detail{padding:9px 10px}
- .footprint-visit-history{max-height:190px}
+ .footprint-detail{min-height:135px;padding:8px 9px}
 }
 @media(max-width:430px){
  .visit-hub .visit-hub-head{align-items:center;flex-wrap:nowrap}
  .visit-hub .visit-map-btn{width:auto;flex:0 0 auto;margin:0}
- .footprint-map-viewport{height:52dvh;min-height:320px}
- .footprint-modal.detail-open .footprint-map-viewport{height:clamp(210px,32dvh,275px);min-height:210px}
- .footprint-browser-head span{display:none}
+ .footprint-map-viewport{height:clamp(245px,41dvh,330px)}
  .footprint-visit-summary{max-width:210px}
  .footprint-detail-title{gap:5px}
  .footprint-detail-title h3{font-size:17px}
- .footprint-visit-history{max-height:175px}
 }
