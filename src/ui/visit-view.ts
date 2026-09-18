@@ -62,7 +62,7 @@ function ensureVisitSection(): HTMLElement {
   const count = make('span', 'count-bubble', '0');
   count.id = 'visit_count';
   title.appendChild(count);
-  const mapButton = make('button', 'history-visit-btn visit-map-btn', '발자취 지도') as HTMLButtonElement;
+  const mapButton = make('button', 'history-visit-btn visit-map-btn', '발자취 노선도') as HTMLButtonElement;
   mapButton.id = 'footprint_map_btn';
   mapButton.type = 'button';
   mapButton.hidden = true;
