@@ -57,3 +57,19 @@ for (const group of MANUAL_INTERCHANGE_GROUPS) {
 export function getEquivalentStationReferences(lineId: string, stationName: string): readonly StationReference[] {
   return equivalentStationsByKey.get(stationKey(lineId, stationName)) ?? [{ lineId, stationName }];
 }
+
+export function getPhysicalStationKey(lineId: string, stationName: string): string {
+  return getEquivalentStationReferences(lineId, stationName)
+    .map((station) => stationKey(station.lineId, station.stationName))
+    .slice()
+    .sort()
+    .join('|');
+}
+
+export function getPhysicalStationDisplayName(lineId: string, stationName: string): string {
+  const names = Array.from(new Set(
+    getEquivalentStationReferences(lineId, stationName).map((station) => station.stationName),
+  ));
+  if (names.length === 1) return names[0];
+  return names.find((name) => !name.includes('(')) ?? names[0] ?? stationName;
+}
