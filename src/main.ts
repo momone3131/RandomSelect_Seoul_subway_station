@@ -201,41 +201,59 @@ function updateStatusCopy(): void {
   helper.textContent = '추천 명소를 보고, 원하면 주변 추천 장소를 찾아보세요.';
 }
 
+let returnToFootprintAfterVisitModal = false;
+
 function openVisitFromHistory(item: Parameters<typeof renderHistory>[0][number]): void {
   if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
-  const existing = store.getSnapshot().visits.find((visit) => visit.sourceHistoryId === item.id);
-  visitModal.openFromHistory(item, existing);
+  returnToFootprintAfterVisitModal = false;
+  visitModal.openFromHistory(item);
   renderState();
 }
 
-function openVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
+function openVisitRecordFromFootprint(visit: Parameters<typeof renderVisits>[0][number]): void {
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  returnToFootprintAfterVisitModal = true;
+  footprintMap.close();
   visitModal.openVisit(visit);
   renderState();
 }
 
-function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): void {
-  if (!window.confirm(`${visit.stationName}역 방문 기록을 삭제할까요?`)) return;
+function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): readonly Parameters<typeof renderVisits>[0] | undefined {
+  if (!window.confirm(`${visit.stationName}역 방문 기록을 삭제할까요?`)) return undefined;
   controller.deleteVisit(visit.id);
   notify('방문 기록을 삭제했어요.');
+  return store.getSnapshot().visits;
 }
+
+const footprintCallbacks = {
+  onEdit: openVisitRecordFromFootprint,
+  onDelete: deleteVisitRecord,
+};
 
 function openFootprintMap(): void {
   if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen) return;
   const visits = store.getSnapshot().visits;
   if (!visits.length) return;
-  void footprintMap.open(visits).catch((error) => {
+  void footprintMap.open(visits, footprintCallbacks).catch((error) => {
     console.error(error);
-    notify('발자취 지도를 불러오지 못했어요.');
+    notify('발자취 노선도를 불러오지 못했어요.');
   });
   renderState();
+}
+
+function closeVisitModalAndMaybeReturnToFootprint(): void {
+  const shouldReturn = returnToFootprintAfterVisitModal;
+  returnToFootprintAfterVisitModal = false;
+  visitModal.close();
+  renderState();
+  if (shouldReturn) openFootprintMap();
 }
 
 function renderState(): void {
   const state = store.getSnapshot();
   renderDrawView(state, { busy, modalOpen: settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen });
   renderHistory(state.history, state.visits, openVisitFromHistory);
-  renderVisits(state.visits, { onEdit: openVisitRecord, onDelete: deleteVisitRecord, onOpenMap: openFootprintMap });
+  renderVisits(state.visits, { onOpenMap: openFootprintMap });
   if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions);
   else resetAttractionView();
   updateStatusCopy();
@@ -463,27 +481,26 @@ byId<HTMLElement>('footprint_overlay').addEventListener('click', (event) => {
   }
 });
 
-byId<HTMLButtonElement>('close_visit').addEventListener('click', () => {
-  visitModal.close();
-  renderState();
-});
-byId<HTMLButtonElement>('cancel_visit').addEventListener('click', () => {
-  visitModal.close();
-  renderState();
-});
+byId<HTMLButtonElement>('close_visit').addEventListener('click', closeVisitModalAndMaybeReturnToFootprint);
+byId<HTMLButtonElement>('cancel_visit').addEventListener('click', closeVisitModalAndMaybeReturnToFootprint);
 byId<HTMLButtonElement>('save_visit').addEventListener('click', () => {
   const submission = visitModal.getSubmission();
   if (!submission) return;
+  const wasEditing = Boolean(submission.visitId);
+  const shouldReturn = returnToFootprintAfterVisitModal;
+  returnToFootprintAfterVisitModal = false;
   controller.saveVisit(submission);
   visitModal.close();
   renderState();
-  notify('방문 기록을 저장했어요.');
+  notify(
+    wasEditing
+      ? '방문 기록을 수정했어요.'
+      : '방문 기록을 저장했어요. 발자취 노선도에서 확인할 수 있어요.',
+  );
+  if (shouldReturn) openFootprintMap();
 });
 byId<HTMLElement>('visit_overlay').addEventListener('click', (event) => {
-  if (event.target === event.currentTarget) {
-    visitModal.close();
-    renderState();
-  }
+  if (event.target === event.currentTarget) closeVisitModalAndMaybeReturnToFootprint();
 });
 
 byId<HTMLButtonElement>('clear_history').addEventListener('click', () => {
@@ -503,8 +520,7 @@ document.addEventListener('keydown', (event) => {
   if (visitModal.isOpen) {
     if (event.key === 'Escape') {
       event.preventDefault();
-      visitModal.close();
-      renderState();
+      closeVisitModalAndMaybeReturnToFootprint();
     }
     return;
   }
