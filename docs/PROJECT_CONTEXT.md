@@ -1,6 +1,6 @@
 # Random Seoul — Project Context / Handoff
 
-Last updated: 2026-09-18
+Last updated: 2026-09-19
 
 새 채팅/개발 세션은 **live GitHub → STATUS → ARCHITECTURE/PROJECT_PLAN → 이 문서** 순으로 최신성을 확인합니다.
 
@@ -98,7 +98,7 @@ Nightscape changes the card interior to dark navy/indigo/purple night sky; promi
 
 ## 6. Durable visit loop
 
-Phase 1 + Phase 2 are implemented and verified on Web + Android.
+Phase 1 + Phase 2 are implemented and verified on Web + Android. Phase 3 is intentionally skipped; Phase 4 visit statistics is implemented and under final Web/Android verification.
 
 Phase 1:
 - visits are persisted separately from recent draw history
@@ -128,7 +128,18 @@ Phase 2:
 - no map provider/tile lookup, station-coordinate resolver, GPS/current-location permission
 - one documented synthetic exception: 의정부경전철 차량기지 임시승강장
 
-Next: Phase 3 unvisited-aware/excluded random → Phase 4 simple visit statistics.
+Phase 3 decision:
+- unvisited-first / visited-station exclusion modes are not being built
+- repeated draws remain user-controlled via the existing redraw flow; visit history never changes random probability
+
+Phase 4:
+- main `발자취` hub has sibling `발자취 노선도 보기` + `방문 통계` buttons
+- statistics are derived only from durable `VisitRecord`
+- physical-station overall coverage dedupes interchanges
+- **per-line progress credits every line belonging to a visited interchange**; e.g. a Line 1 신도림 visit also counts 신도림 on Line 2
+- confirmed food/alcohol and attractions are counted separately from mere draw candidates
+- attraction visit stats include current Diamond / Gold / Silver / Standard breakdown with unique places + revisit-inclusive counts
+- no statistics persistence/schema is added; edits/deletes recompute immediately
 
 Source: `docs/VISIT_HISTORY_PLAN.md`.
 
