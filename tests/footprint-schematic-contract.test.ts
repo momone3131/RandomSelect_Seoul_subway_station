@@ -29,14 +29,16 @@ describe('visit footprint full-network map contract', () => {
     expect(footprintView).not.toContain('this.renderMarkers();\n        this.renderDetails();');
   });
 
-  it('keeps a horizontally scrollable compact visit strip and opens detail only after selection', () => {
+  it('keeps a horizontally scrollable compact visit strip with a concise idle detail hint', () => {
     expect(footprintView).toContain("'footprint_visit_strip'");
     expect(footprintView).toContain('renderVisitStrip()');
-    expect(footprintView).toContain('detail.hidden = true');
-    expect(footprintView).toContain('detail.hidden = false');
+    expect(footprintView).toContain("'역을 누르면 상세·수정'");
+    expect(footprintView).not.toContain('detail.hidden = true');
+    expect(footprintView).not.toContain('detail.hidden = false');
     expect(styles).toContain('.footprint-visit-strip{display:flex');
     expect(styles).toContain('overflow-x:auto');
     expect(styles).toContain('touch-action:pan-x');
+    expect(styles).toContain('.footprint-detail-placeholder{display:grid');
   });
 
   it('supports edit/delete actions inside selected footprint detail', () => {
@@ -47,14 +49,17 @@ describe('visit footprint full-network map contract', () => {
     expect(styles).toContain('.footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0');
   });
 
-  it('compacts the selected detail without pushing the close button off-screen', () => {
-    expect(footprintView).toContain("dialog.classList.toggle('detail-open', open)");
+  it('keeps the whole panel and map size stable before and after station selection', () => {
+    expect(footprintView).not.toContain('detail-open');
+    expect(footprintView).not.toContain('footprint_map_status');
+    expect(footprintView).not.toContain('밝은 원이 방문한 역이에요');
     expect(footprintView).toContain("make('div', 'footprint-detail-title')");
     expect(footprintView).toContain("title.appendChild(chip)");
     expect(footprintView).toContain("title.appendChild(make('h3'");
-    expect(styles).toContain('.footprint-modal{width:min(980px,100%);max-height:min(95dvh,960px);display:flex;flex-direction:column;overflow:hidden}');
-    expect(styles).toContain('.footprint-body{flex:1 1 auto;min-height:0;overflow-y:auto');
-    expect(styles).toContain('.footprint-modal.detail-open .footprint-map-viewport');
+    expect(styles).toContain('.footprint-modal{width:min(980px,100%);height:min(94dvh,900px);max-height:min(94dvh,900px)');
+    expect(styles).toContain('.footprint-body{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;overflow:hidden');
+    expect(styles).toContain('.footprint-map-viewport{position:relative;height:clamp(280px,46dvh,430px)');
+    expect(styles).not.toContain('.footprint-modal.detail-open .footprint-map-viewport');
     expect(styles).toContain('.footprint-detail-title{display:flex;align-items:center');
   });
 
