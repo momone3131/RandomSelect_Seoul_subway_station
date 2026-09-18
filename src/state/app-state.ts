@@ -3,6 +3,7 @@ import type {
   DrawHistoryItem,
   FoodCategory,
   RestaurantRecommendation,
+  VisitRecord,
   SubwayLine,
   SubwayStation,
 } from '../domain/types';
@@ -21,6 +22,7 @@ export interface AppState {
   attractions: AttractionRecommendation[];
   recommendations: RestaurantRecommendation[];
   history: DrawHistoryItem[];
+  visits: VisitRecord[];
 }
 
 export type AppStateListener = (state: Readonly<AppState>) => void;
@@ -90,5 +92,6 @@ export function createInitialState(
     attractions: [],
     recommendations: [],
     history: [],
+    visits: [],
   };
 }
