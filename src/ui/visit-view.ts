@@ -66,9 +66,9 @@ function ensureVisitSection(): HTMLElement {
   append(head, title, actions);
   section.appendChild(head);
 
-  const history = document.querySelector<HTMLElement>('section.history');
-  if (!history) throw new Error('Missing draw history section.');
-  history.insertAdjacentElement('afterend', section);
+  const drawShell = document.getElementById('draw_shell');
+  if (!drawShell) throw new Error('Missing draw shell.');
+  drawShell.insertAdjacentElement('afterend', section);
   return section;
 }
 
