@@ -63,10 +63,13 @@ Alcohol recommendation search:
 - visual progress strip hidden
 - attraction prominence tier text hidden
 - main `바로 뽑기` checkbox removed; production draw always uses the normal reveal animation
-- completed course shows `이 코스로 가기 | 새 코스` in one row
-- `이 코스로 가기` opens the same visit picker as recent-history `다녀왔어요`
-- after visit save, that action becomes disabled `발자취에 등록됨`
-- 발자취 hub sits directly below `복사 · 네이버지도 · 구글지도`, above live restaurant/술집 results
+- completed course restores the original single `새 코스` primary action
+- completed headline `이 코스로 가자!` gets one compact state action on its right:
+  - `등록` before visit save
+  - `발자취` after visit save; opens footprint map directly
+- recent-history `다녀왔어요` remains as a second registration entry
+- no separate 발자취 card/module on main
+- `발자취 노선도` + `방문 통계` are quiet utility buttons directly below the station-list control
 
 ## Attraction coverage
 
@@ -130,32 +133,32 @@ Current 12:
 
 DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체는 일반 추천/기존 tier는 유지하지만 Nightscape에서는 제외합니다.
 
-## Latest verified Web — promoted visit UX
+## Latest verified Web — simplified main visit UX
 
-- PR #17 CI `35368693765` — **success**
-- PR #18 CI `35368949986` — **success**
-- final source merge `7bdfcc2f65e35be10bf006005545884b5c298e6a`
-- main CI `35369033009` — **success**
-- Web Release `35369033238` — **success**
-- deployment commit `e633c7b3bb63ffb5d24ba2e23a94fdb4bc556460`
-- public bundle: `assets/modular--Htlab0P.js`
-- deployed bundle verified for `이 코스로 가기`, `발자취에 등록됨`, footprint/statistics entry, and absence of `바로 뽑기`
-- footprint hub final DOM position: immediately after `map_actions`, so Places result expansion cannot push it below recommendation results
+- PR #20 CI `35371137305` — **success**
+- source merge `411c67d53d34e28ce0d161d41dead99ec563b38c`
+- main CI `35371239332` — **success**
+- Web Release `35371239392` — **success**
+- deployment commit `9c4bbb70fcde5f6ca5dc2b7ac27df9dfe5379411`
+- Pages `35371297273` — **success**
+- public bundle: `assets/modular-CaV-K9e8.js`
+- deployed bundle verified for `등록`, `발자취`, `새 코스`, `추천 식당 보기`, `발자취 노선도`, `방문 통계`
+- old completed-course `이 코스로 가기` button row and old `발자취 노선도 보기` module copy are absent
 
-## Latest verified Android — promoted visit UX
+## Latest verified Android — simplified main visit UX
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- source head: `de2e21cb463adc088fa60164bb6d5c1fad44ed82`
-- Android CI `35369057004` — **success**
+- source head: `4a568e6caf9325c72f85bead1ea9f6b1de105b8a`
+- Android CI `35371313423` — **success**
 - shared tests — success
 - native Web build / Capacitor sync — success
 - Gradle debug APK assembly — success
 - fixed latest-development APK republished successfully
 - APK `random-seoul-latest.apk`
-- size: `11,526,053` bytes
+- size: `11,525,705` bytes
 - asset updated: 2026-09-19 KST
 
 Direct download:

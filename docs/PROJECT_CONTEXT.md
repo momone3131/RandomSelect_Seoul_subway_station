@@ -98,12 +98,12 @@ Nightscape changes the card interior to dark navy/indigo/purple night sky; promi
 
 ## 6. Durable visit loop
 
-Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase 3 is intentionally skipped. The main visit UX is promoted near the completed draw result.
+Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase 3 is intentionally skipped. Main visit UX is intentionally minimal: one hero state action plus two quiet utilities below the station list.
 
 Phase 1:
 - visits are persisted separately from recent draw history
-- first registration is available from both recent-history `다녀왔어요` and completed-course `이 코스로 가기`
-- completed-course action appears immediately left of `새 코스`; after save it becomes disabled `발자취에 등록됨`
+- first registration is available from both recent-history `다녀왔어요` and completed-course hero `등록`
+- completed-course hero action sits to the right of `이 코스로 가자!`; after save it becomes `발자취` and opens the footprint map
 - station is always saved
 - drawn food is user-confirmed optional
 - shown attractions are user-confirmed optional multi-select
@@ -112,7 +112,7 @@ Phase 1:
 - clearing recent draw history leaves visits untouched
 
 Phase 2:
-- main 발자취 hub is promoted directly below `복사 · 네이버지도 · 구글지도` and above live restaurant/술집 results
+- no separate main 발자취 hub/module; only quiet `발자취 노선도` + `방문 통계` buttons below the station-list control
 - `다녀온 곳 → 발자취 노선도`
 - bundled public-domain **수도권 전체 노선도 한 장** 위에 방문 physical station marker overlay
 - 24 lines / 800 line×station reference anchors, 800/800 automated audit
@@ -148,29 +148,30 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Promoted visit UX — Web
-- PR #17 CI `35368693765` — success
-- PR #18 CI `35368949986` — success
-- final source merge `7bdfcc2f65e35be10bf006005545884b5c298e6a`
-- main CI `35369033009` / Web Release `35369033238` — success
-- deployment commit `e633c7b3bb63ffb5d24ba2e23a94fdb4bc556460`
-- bundle `assets/modular--Htlab0P.js`
-- `바로 뽑기` removed from main UI; normal reveal animation is the product behavior
-- completed course exposes `이 코스로 가기 | 새 코스`
-- 발자취 hub is directly after `map_actions`, above live recommendation results
+### Simplified main visit UX — Web
+- PR #20 CI `35371137305` — success
+- source merge `411c67d53d34e28ce0d161d41dead99ec563b38c`
+- main CI `35371239332` / Web Release `35371239392` — success
+- deployment commit `9c4bbb70fcde5f6ca5dc2b7ac27df9dfe5379411`
+- Pages `35371297273` — success
+- bundle `assets/modular-CaV-K9e8.js`
+- `새 코스` / restaurant discovery restored to original flow
+- hero state action: `등록` → visit picker, saved `발자취` → footprint map
+- no separate 발자취 module; quiet footprint/statistics utilities sit below station list
 
-### Promoted visit UX — Android
+### Simplified main visit UX — Android
 - branch `feature/random-seoul-android`, PR #3
-- source head `de2e21cb463adc088fa60164bb6d5c1fad44ed82`
-- Android CI `35369057004` — success
-- fixed `android-dev-latest` APK republished, size `11,526,053` bytes
+- source head `4a568e6caf9325c72f85bead1ea9f6b1de105b8a`
+- Android CI `35371313423` — success
+- fixed `android-dev-latest` APK republished, size `11,525,705` bytes
 
 ### Visit/statistics invariants
-- current-course registration reuses the exact existing visit picker/VisitRecord contract
-- one source history item cannot be registered twice through the new action
+- recent-history `다녀왔어요` remains
+- hero `등록` reuses the same VisitRecord/source-history contract
+- same source course is not duplicated
 - physical interchange equality / 신촌·양평 separation / 이수 alias preserved
 - 1호선 신도림 visit credits both 1호선 and 2호선 progress
-- no new persistence schema and no GPS/location permission
+- no persistence schema or GPS/location permission change
 
 ## 8. Source-of-truth docs
 
