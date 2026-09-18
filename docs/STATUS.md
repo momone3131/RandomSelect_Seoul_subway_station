@@ -200,9 +200,13 @@ Verification:
 - full reference anchor audit: **800 / 800**
 - physical interchange equivalence audit: success
 - same-name non-interchange separation audit: success
+- exact bundled-SVG label + coordinate audit for all 799 reference anchors: success
 - adjacent reference-geometry sanity audit: success
-- Web PR #9 CI `35351895054` — **success**
-- tests / Vite build / headless browser smoke — **success**
+- deterministic anchor regeneration / zero-diff gate: success
+- Web PR #9 final CI `35352888242` — **success**
+- source merge `08cf695bb8e29881777cbb3ac5aeca4b203894e3`
+- Web deployment commit `a356ccf847a6496b26df9f673b94333263efc1af`
+- deployed bundle `assets/modular-CQ1CWBmD.js` + root reference SVG directly verified
 
 Next planned phases:
 3. unvisited-first/exclude random modes
@@ -220,6 +224,7 @@ Android: shared tests → native Web build → Capacitor sync → Gradle `assemb
 - `STATUS.md`: current facts / verification
 - `PROJECT_PLAN.md`: product intent / policy
 - `VISIT_HISTORY_PLAN.md`: long-term visit loop roadmap
+- `FOOTPRINT_MAP_REFERENCE.md`: full-network reference provenance / 800-anchor audit
 - `ARCHITECTURE.md`: technical/data flow
 - `ATTRACTION_CURATION.md`: attraction selection/map/tier/feature policy
 - `ATTRACTION_TIER_AUDIT.md`: prominence audit evidence
