@@ -1,6 +1,6 @@
 # Random Seoul — Development Status
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
 
 라이브 Git 상태가 최우선입니다.
 
@@ -78,6 +78,17 @@ Current prominence counts:
 - remaining Standard
 
 Diamond fixed 4: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
+
+### Physical interchange consistency
+
+Curated attractions are shared across line variants of the **same physical interchange station** before the normal layer merge.
+
+- same-name physical interchanges resolve to one canonical result regardless of which line produced the draw
+- known same-name non-interchanges stay separate: 2호선 신촌 vs 경의중앙선 신촌, 5호선 양평 vs 경의중앙선 양평
+- differently named physical interchange alias is explicit: 4호선 `총신대입구(이수)` ↔ 7호선 `이수`
+- current draw-unit coverage after the fix: 800 line/station outcomes = 391 with 0 attractions / 307 with 1 / 102 with 2
+- the fix fills 30 previously empty line/station variants without adding weaker attractions
+
 
 ## Nightscape — strict elevated-view definition
 
