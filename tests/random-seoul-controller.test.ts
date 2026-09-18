@@ -87,4 +87,47 @@ describe('RandomSeoulController', () => {
     expect(restaurantRequest?.center).toEqual({ latitude: 37.563588, longitude: 126.975411 });
     expect(places.requests.some((request) => request.textQuery.includes('2호선'))).toBe(false);
   });
+
+  it('records a station visit separately while food and attractions stay user-selected', async () => {
+    const places = new ScenarioPlaces();
+    const storage = new MemoryStorage();
+    const store = new AppStore(createInitialState(['l2'], ['c_dimsum']));
+    const locations = new StationLocationService(places, storage, () => 1_000_000);
+    const controller = new RandomSeoulController(store, places, locations, () => 0, () => 1_000_000);
+
+    await controller.drawNext();
+    await controller.drawNext();
+    await controller.drawNext();
+
+    const history = store.getSnapshot().history[0];
+    expect(history?.stationName).toBe('시청');
+    expect(history?.attractionOptions?.length).toBeGreaterThan(0);
+
+    const firstAttraction = history?.attractionOptions?.[0];
+    expect(firstAttraction).toBeDefined();
+
+    controller.saveVisit({
+      sourceHistoryId: history!.id,
+      lineId: history!.lineId,
+      stationName: history!.stationName,
+      stationOrdinal: history!.stationOrdinal,
+      drawnFoodId: history!.foodId,
+      shownAttractions: history!.attractionOptions ?? [],
+      includeFood: false,
+      selectedAttractionIds: [firstAttraction!.id],
+      visitedAt: '2026-09-18',
+    });
+
+    expect(store.getSnapshot().visits).toHaveLength(1);
+    expect(store.getSnapshot().visits[0]).toEqual(expect.objectContaining({
+      stationName: '시청',
+      foodId: undefined,
+      attractions: [firstAttraction],
+      visitedAt: '2026-09-18',
+    }));
+
+    controller.clearHistory();
+    expect(store.getSnapshot().history).toEqual([]);
+    expect(store.getSnapshot().visits).toHaveLength(1);
+  });
 });
