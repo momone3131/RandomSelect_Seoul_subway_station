@@ -1,6 +1,6 @@
 # Random Seoul — Project Plan
 
-Last updated: 2026-09-18
+Last updated: 2026-09-19
 
 이 문서는 Random Seoul의 제품 방향과 변경 불가 원칙을 기록합니다. 최신 구현/검증 상태는 `STATUS.md`, 구조는 `ARCHITECTURE.md`를 우선 확인합니다.
 
@@ -41,7 +41,7 @@ Food scope는 **42종**을 동일 확률의 draw categories로 취급합니다.
 Alcohol-primary의 기준은 “술도 파는가”가 아니라 **술을 마시는 것이 방문의 주요 목적이 되는 업종인가**입니다. 따라서 치킨, 고기구이, 양꼬치 등은 일반 food category로 유지합니다.
 
 Food settings:
-- 전체 선택 / 전체 해제 유지
+- 전체 선택/해제 유지
 - dynamic `주류 포함 / 주류 제외` preset 제공
 - 주류 포함/제외는 6개 alcohol IDs만 일괄 toggle하고 다른 선택은 보존
 
@@ -83,7 +83,7 @@ Both share:
 
 Prominence tier:
 - Diamond / Gold / Silver / Standard
-- tier name not shown
+- tier name not shown on recommendation cards
 - Diamond fixed 4: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을
 
 Orthogonal Nightscape feature:
@@ -122,14 +122,16 @@ Orthogonal Nightscape feature:
 
 ## 9. Long-term visit loop
 
-Current status: **Phase 1 + Phase 2 implemented / verified on Web + Android**.
+Current status: **Phase 1 + Phase 2 complete; Phase 3 dropped; Phase 4 implemented**. 플랫폼별 최신 검증/배포 결과는 `LATEST_CHANGE.md`와 PR #16을 확인합니다.
 
-기본 개발 순서:
+개발 단계:
 
 1. **방문 기록 분리 저장** — 완료
 2. **발자취 지도** — 완료; 전체 노선도 screen-space 방문 marker + horizontal 방문기록 strip + 선택 상세/수정/삭제
-3. **안 가본 역 우선·제외 랜덤** — 다음 단계; 기본 완전 랜덤은 유지
-4. **간단한 방문 통계** — 이후; 고유 방문 역/노선별 진행도 등
+3. **안 가본 역 우선·제외 랜덤** — 사용자 결정으로 제외(2026-09-19). 보류가 아니며 구현하지 않음. 같은 역이 나오면 사용자가 재방문/재추첨을 선택하고 방문 기록은 추첨 확률/후보를 바꾸지 않음.
+4. **간단한 방문 통계** — 구현. 메인 발자취 영역의 `발자취 노선도 보기` 옆에 `방문 통계` 버튼으로 독립 진입.
+
+통계는 고유 방문 역/전체 역, 노선별 진행도, 총 방문 횟수, 최근 입력 방문일, 체크한 음식·주류/명소 및 명소 등급별 집계를 표시합니다. 환승역은 전체에서 하나로, 각 소속 노선 진행도에서는 한 역씩 반영하며 열차 탑승 여부를 의미하지 않습니다. 기존 `VisitRecord`에서 계산하고 별도 통계 저장소는 만들지 않습니다.
 
 상세 source of truth: `docs/VISIT_HISTORY_PLAN.md`.
 
