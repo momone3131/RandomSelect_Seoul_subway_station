@@ -106,8 +106,8 @@ Orthogonal Nightscape feature:
 - result/action 중심, 설명 copy 최소화
 - main `바로 뽑기` checkbox는 제거; 정상 reveal animation을 기본/유일 product behavior로 유지
 - 코스 완성 시 기존 `새 코스` primary action은 단독 위치를 유지
-- 상단 `이 코스로 가자!` 오른쪽에 작은 상태 action을 노출: 미등록 `등록`, 등록 완료 `발자취`
-- `등록`은 최근 기록 `다녀왔어요`와 동일한 visit picker를 사용하고, 저장 후 `발자취`는 footprint map을 직접 엶
+- 상단 `이 코스로 가자!` 오른쪽에 테두리 없는 낮은 강조의 작은 상태 action을 노출: 미등록 `등록`, 등록 완료 `발자취`
+- `등록`은 최근 기록 `발자취 등록하기`와 동일한 visit picker를 사용하고, 저장 후 `발자취`는 footprint map을 직접 엶
 - 별도 발자취 카드/module은 만들지 않으며 `발자취 노선도` / `방문 통계` 두 유틸리티만 역 목록 바로 아래에 낮은 강조로 배치
 - passive neutral palette 유지
 - active draw lime + completed station actual line color 유지
@@ -141,7 +141,7 @@ Current status: **Phase 1 + Phase 2 complete; Phase 3 dropped; Phase 4 implement
 상세 source of truth: `docs/VISIT_HISTORY_PLAN.md`.
 
 Phase 1 규칙:
-- 최초 방문 등록 진입은 최근 추첨 카드의 `다녀왔어요`와 현재 완성 코스 상단의 `등록` 두 곳에서 가능
+- 최초 방문 등록 진입은 최근 추첨 카드의 `발자취 등록하기`와 현재 완성 코스 상단의 `등록` 두 곳에서 가능
 - 현재 코스는 저장 후 상단 action이 `발자취`로 바뀌어 footprint map을 직접 열며 동일 source record 중복 등록 금지
 - 최근 추첨 기록 삭제는 실제 방문 기록을 삭제하지 않음
 - 음식/명소는 뽑혔다는 이유만으로 자동 방문 처리하지 않음
