@@ -120,6 +120,7 @@ Phase 2:
 - no detail is shown on open; marker or strip selection opens visit count/date/line/confirmed food/attraction detail
 - selected detail owns per-record edit/delete; main page no longer shows durable visit cards
 - footprint panel has one stable size before/after selection: map height never changes, detail space is reserved from open, idle copy is `역을 누르면 상세·수정`, and header/close stays visible
+- screenshot-driven polish: detail no longer flex-grows into blank space; modal sizes to content with viewport cap and has more comfortable iPhone top spacing
 - pan / wheel zoom / pinch zoom / fit-all
 - station selection changes only marker/strip state + detail, not the map DOM
 - recent history is only for first `다녀왔어요` registration; saved item becomes `발자취에 등록됨`
