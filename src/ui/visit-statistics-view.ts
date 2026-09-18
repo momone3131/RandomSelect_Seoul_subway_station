@@ -17,6 +17,8 @@ function progress(value: number): HTMLElement {
   return track;
 }
 
+const TIER_LABELS = { diamond: '다이아몬드', gold: '골드', silver: '실버', standard: '스탠다드' } as const;
+
 function metric(title: string, value: string, detail: string, date = false): HTMLElement {
   const card = make('div', `visit-statistics-card${date ? ' is-date' : ''}`);
   append(card, make('h3', '', title), make('strong', '', value), make('small', '', detail));
@@ -139,6 +141,23 @@ export class VisitStatisticsView {
     );
     content.appendChild(metrics);
 
+    const tierTitle = make('h3', 'visit-statistics-tier-title', '방문 명소 등급');
+    tierTitle.id = 'visit_statistics_tier_title';
+    const tierGrid = make('div', 'visit-statistics-tier-grid');
+    tierGrid.setAttribute('aria-labelledby', tierTitle.id);
+    for (const tier of stats.attractionTiers) {
+      const card = make('div', `visit-statistics-tier-card visit-statistics-tier-${tier.tier}`);
+      card.dataset.tier = tier.tier;
+      append(
+        card,
+        make('span', 'visit-statistics-tier-name', TIER_LABELS[tier.tier]),
+        make('strong', '', `${tier.attractions}곳`),
+        make('small', '', tier.visits === tier.attractions ? `방문 ${tier.visits}회` : `재방문 포함 ${tier.visits}회`),
+      );
+      tierGrid.appendChild(card);
+    }
+    append(content, tierTitle, tierGrid);
+
     const lineTitle = make('h3', 'visit-statistics-lines-title', '노선별 방문 진행도');
     lineTitle.id = 'visit_statistics_lines_title';
     const lines = make('ul', 'visit-statistics-lines');
@@ -165,7 +184,7 @@ export class VisitStatisticsView {
     append(rules,
       make('summary', '', '집계 기준'),
       make('p', '', '전체 역 수는 환승역을 하나로 셉니다. 노선별 진행도에는 해당 환승역이 속한 각 노선에 방문이 반영되며, 열차 탑승 여부를 뜻하지 않습니다.'),
-      make('p', '', '음식·주류와 명소는 실제로 다녀왔다고 체크한 것만 셉니다. 같은 종목·명소는 한 종류·한 곳으로 세고 재방문 횟수는 따로 표시합니다.'),
+      make('p', '', '음식·주류와 명소는 실제로 다녀왔다고 체크한 것만 셉니다. 같은 종목·명소는 한 종류·한 곳으로 세고 재방문 횟수는 따로 표시합니다. 명소 등급도 실제 방문 체크된 명소의 현재 등급을 기준으로 집계합니다.'),
       make('p', '', '방문일을 비워둔 기록도 방문 수에 포함됩니다. 최근 방문일에는 입력한 날짜만 사용합니다. 추첨 범위 설정은 통계의 전체 역 수를 바꾸지 않습니다.'),
     );
     content.appendChild(rules);
