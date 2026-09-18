@@ -206,6 +206,17 @@ function updateStatusCopy(): void {
 
 let returnToFootprintAfterVisitModal = false;
 
+function currentCourseHistoryItem(): Parameters<typeof renderHistory>[0][number] | undefined {
+  const state = store.getSnapshot();
+  if (!state.currentLine || !state.currentStation || !state.currentFood) return undefined;
+  return state.history.find((item) =>
+    item.lineId === state.currentLine?.id
+    && item.stationName === state.currentStation?.name
+    && item.stationOrdinal === state.currentStation?.ordinal
+    && item.foodId === state.currentFood?.id
+  );
+}
+
 function openVisitFromHistory(item: Parameters<typeof renderHistory>[0][number]): void {
   if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen || footprintMap.isOpen || visitStatistics.isOpen) return;
   returnToFootprintAfterVisitModal = false;
@@ -291,7 +302,7 @@ async function performDraw(
   try {
     if (animationStage) {
       await animateDrawStage(animationStage, store.getSnapshot(), {
-        instant: selfTestMode || store.getSnapshot().preferences.instantDraw,
+        instant: selfTestMode,
       });
     }
 
@@ -418,6 +429,12 @@ async function copyResult(): Promise<void> {
 }
 
 byId<HTMLButtonElement>('draw_btn').addEventListener('click', () => { void runMainDraw(); });
+byId<HTMLButtonElement>('current_course_visit_btn').addEventListener('click', () => {
+  const item = currentCourseHistoryItem();
+  if (!item) return;
+  if (store.getSnapshot().visits.some((visit) => visit.sourceHistoryId === item.id)) return;
+  openVisitFromHistory(item);
+});
 restaurantRequest.button.addEventListener('click', () => { void requestRestaurants(); });
 byId<HTMLButtonElement>('restart_btn').addEventListener('click', () => {
   if (visitStatistics.isOpen) return;
@@ -431,10 +448,6 @@ byId<HTMLButtonElement>('food_redraw_btn').addEventListener('click', () => {
   void performDraw(() => controller.redrawFood(), 'food');
 });
 byId<HTMLButtonElement>('copy_btn').addEventListener('click', () => { void copyResult(); });
-byId<HTMLInputElement>('instant').addEventListener('change', (event) => {
-  controller.setInstantDraw((event.currentTarget as HTMLInputElement).checked);
-});
-
 byId<HTMLButtonElement>('naver_map_btn').addEventListener('click', () => {
   const query = stationMapQuery();
   if (query) openNewTab(naverMapSearchUrl(query));
@@ -572,6 +585,12 @@ async function runBrowserSelfTest(): Promise<void> {
     if (!beforeRestaurants.currentLine || !beforeRestaurants.currentStation || !beforeRestaurants.currentFood) {
       throw new Error('Self-test did not complete line/station/food draw.');
     }
+    const currentCourseVisitButton = document.getElementById('current_course_visit_btn') as HTMLButtonElement | null;
+    if (!currentCourseVisitButton || currentCourseVisitButton.hidden || currentCourseVisitButton.textContent !== '이 코스로 가기') {
+      throw new Error('Completed course did not expose the current-course visit action.');
+    }
+    document.body.dataset.selftestCurrentCourseVisit = 'true';
+
     if (beforeRestaurants.recommendations.length !== 0) {
       throw new Error('Restaurant lookup ran before the user requested it.');
     }
