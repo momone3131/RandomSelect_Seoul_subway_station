@@ -1,6 +1,6 @@
 # Random Seoul — Architecture
 
-Last updated: 2026-09-18
+Last updated: 2026-09-19
 
 ## 1. Architecture goals
 
@@ -142,7 +142,7 @@ Draw history and visit history are different data domains.
 - Google Places restaurant results are intentionally excluded from visit records
 - `visit-view.ts` owns the visit picker plus compact main-screen footprint entry; durable visit list/edit/delete presentation lives inside `footprint-map-view.ts`
 
-This shared TypeScript contract is the source for the footprint map and remains the planned source for unvisited-aware random and visit statistics.
+This shared TypeScript contract is the source for the footprint map and visit statistics. Unvisited-aware random was intentionally skipped; visit history does not alter draw probability.
 
 ## 9. Visit footprint full-network map
 
@@ -169,7 +169,24 @@ Automated reference audit requires 800/800 mappings, interchange anchor equality
 
 Recent draw history is registration-only after a visit is saved; subsequent durable record management occurs inside the footprint UI. The footprint map does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
 
-## 10. Build / deployment
+## 10. Visit statistics
+
+Phase 4 is a read-only projection over `VisitRecord`.
+
+- `visit-statistics.ts`: pure aggregation; no storage writes and no random/draw dependencies
+- overall station coverage uses the same canonical physical-station key as the footprint map
+- per-line denominators dedupe repeated branch/loop entries within each line
+- a visited physical interchange credits every member line whose catalog contains that physical key; e.g. 1호선 신도림 visit credits both 1호선 and 2호선 progress
+- same-name non-interchanges (신촌/양평) stay separate and 이수 alias equivalence stays shared
+- confirmed food/alcohol counts use `VisitRecord.foodId` only
+- confirmed attraction counts use `VisitRecord.attractions` only
+- prominence breakdown calls `attractionTierForId()` at render-time aggregation, producing Diamond/Gold/Silver/Standard unique-place counts plus revisit-inclusive counts
+- the main visit hub exposes a sibling statistics button; the statistics modal is independent from the footprint modal
+- no `VisitRecord` schema migration or statistics persistence key is introduced
+
+Phase 3 unvisited-aware/exclusion drawing is intentionally not implemented. Repeated stations remain a user redraw decision.
+
+## 11. Build / deployment
 
 Web: tests → Vite build → browser smoke → verified root promotion → Pages.
 
