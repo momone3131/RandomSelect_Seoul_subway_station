@@ -21,6 +21,7 @@ export interface VisitFormSubmission {
 export interface VisitListCallbacks {
   onEdit(visit: VisitRecord): void;
   onDelete(visit: VisitRecord): void;
+  onOpenMap(): void;
 }
 
 function lineBadge(line: SubwayLine): HTMLElement {
@@ -61,7 +62,12 @@ function ensureVisitSection(): HTMLElement {
   const count = make('span', 'count-bubble', '0');
   count.id = 'visit_count';
   title.appendChild(count);
+  const mapButton = make('button', 'history-visit-btn visit-map-btn', '발자취 지도') as HTMLButtonElement;
+  mapButton.id = 'footprint_map_btn';
+  mapButton.type = 'button';
+  mapButton.hidden = true;
   head.appendChild(title);
+  head.appendChild(mapButton);
 
   const list = make('div', 'history-list visit-list');
   list.id = 'visit_list';
@@ -267,6 +273,9 @@ export class VisitModalView {
 export function renderVisits(visits: readonly VisitRecord[], callbacks: VisitListCallbacks): void {
   ensureVisitSection();
   byId<HTMLElement>('visit_count').textContent = String(visits.length);
+  const mapButton = byId<HTMLButtonElement>('footprint_map_btn');
+  mapButton.hidden = visits.length === 0;
+  mapButton.onclick = visits.length ? callbacks.onOpenMap : null;
   const fragment = document.createDocumentFragment();
 
   if (!visits.length) {
