@@ -177,8 +177,28 @@ Verification:
 
 Roadmap source: `VISIT_HISTORY_PLAN.md`.
 
+## Visit footprint map — Phase 2
+
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
+
+- `다녀온 곳`에 방문 기록이 하나 이상 있으면 `발자취 지도` CTA 노출
+- durable `VisitRecord`를 physical station 기준으로 그룹화; 별도 지도용 방문 DB 없음
+- 같은 환승역의 여러 노선/여러 방문은 하나의 pin으로 통합하고 방문 횟수 표시
+- pin detail에서 방문일, 당시 노선, 실제 방문으로 체크한 음식 종목과 명소 history 확인
+- 신촌/양평 동명이역은 분리, `총신대입구(이수)` ↔ `이수`는 통합
+- first-party static station coordinates 우선; 누락 역만 기존 station resolver와 30-day cache 사용
+- OpenStreetMap raster tile background + attribution
+- current-location/GPS permission 추가 없음
+- Android hardware back에서 footprint/visit/settings overlay를 우선 닫음
+
+Verification:
+- Web Phase 2 PR #7 CI `35346526225` — **success**
+- Web source merge `2484cc7b323ec27a8049d165d027ae19894249b4`
+- Web deployment commit `ee493bdc4a6e875696d3c4984d352e644d30af53`
+- Android Phase 2 source head `a42458fd229322f10914d8f023a0b89286dd484c`
+- fixed `android-dev-latest` tag advanced to the Phase 2 build after shared tests / native Web build / Capacitor sync / Gradle assemble / release publish
+
 Next planned phases:
-2. footprint map
 3. unvisited-first/exclude random modes
 4. simple visit statistics
 
