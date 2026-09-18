@@ -75,8 +75,8 @@ Current surfaced prominence counts after the 2026-09-18 re-audit:
 - Diamond 4
 - Gold 25
 - Silver 100
-- Standard 290
-- total unique surfaced attractions 419
+- Standard 291
+- total unique surfaced attractions 420
 
 Diamond fixed 4: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
 
@@ -88,10 +88,10 @@ Curated attractions are shared across line variants of the **same physical inter
 - known same-name non-interchanges stay separate: 2호선 신촌 vs 경의중앙선 신촌, 5호선 양평 vs 경의중앙선 양평
 - differently named physical interchange alias is explicit: 4호선 `총신대입구(이수)` ↔ 7호선 `이수`
 - physical-interchange fix baseline: 800 line/station outcomes = 391 with 0 attractions / 307 with 1 / 102 with 2
-- final multi-pass zero-coverage re-audit: **262 with 0 / 432 with 1 / 106 with 2**
+- final multi-pass zero-coverage re-audit: **262 with 0 / 431 with 1 / 107 with 2**
 - overall draw-outcome attraction coverage: **67.3%**
 - physical missing-station groups reduced from **346 to 237**
-- unique surfaced attractions increased from **330 to 419**
+- unique surfaced attractions increased from **330 to 420**
 - no forced fill: planned/unbuilt, generic neighborhood-only, or bus-dependent/far candidates remain uncurated
 
 
