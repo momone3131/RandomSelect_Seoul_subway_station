@@ -81,10 +81,30 @@ export interface AttractionRecommendation {
   nightscape?: boolean;
 }
 
+export interface AttractionSnapshot {
+  id: string;
+  name: string;
+}
+
 export interface DrawHistoryItem {
   id: string;
   lineId: string;
   stationName: string;
   stationOrdinal: number;
   foodId?: string;
+  attractionOptions?: AttractionSnapshot[];
+}
+
+export interface VisitRecord {
+  id: string;
+  sourceHistoryId?: string;
+  lineId: string;
+  stationName: string;
+  stationOrdinal: number;
+  drawnFoodId?: string;
+  foodId?: string;
+  shownAttractions: AttractionSnapshot[];
+  attractions: AttractionSnapshot[];
+  visitedAt?: string;
+  createdAt: number;
 }
