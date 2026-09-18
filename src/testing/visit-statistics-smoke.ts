@@ -22,13 +22,15 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
   const station = line.stations.find((item) => item.name === '총신대입구(이수)')!;
   const sample: VisitRecord = {
     id: 'statistics-smoke-only', lineId: line.id, stationName: station.name,
-    stationOrdinal: station.ordinal, shownAttractions: [], attractions: [],
+    stationOrdinal: station.ordinal, shownAttractions: [], attractions: [{ id: 'gyeongbokgung-palace', name: '경복궁' }],
     visitedAt: '2026-09-18', createdAt: 1,
   };
   view.open([sample, { ...sample, id: 'statistics-smoke-revisit', visitedAt: undefined }]);
   const dialog = document.getElementById('visit_statistics_dialog')!;
   if (document.getElementById('visit_statistics_station_count')?.textContent !== '1'
     || document.querySelectorAll('.visit-statistics-line').length !== SUBWAY_LINES.length
+    || document.querySelectorAll('.visit-statistics-tier-card').length !== 4
+    || !dialog.textContent?.includes('다이아몬드') || !dialog.textContent.includes('1곳')
     || !dialog.textContent?.includes('2회') || !dialog.textContent.includes('방문일 미입력 1건')
     || !app?.inert) {
     throw new Error('Visit statistics count, line rows, date or modal isolation failed.');
