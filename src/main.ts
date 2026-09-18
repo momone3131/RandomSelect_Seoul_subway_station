@@ -429,10 +429,14 @@ async function copyResult(): Promise<void> {
 }
 
 byId<HTMLButtonElement>('draw_btn').addEventListener('click', () => { void runMainDraw(); });
-byId<HTMLButtonElement>('current_course_visit_btn').addEventListener('click', () => {
+byId<HTMLButtonElement>('hero_visit_btn').addEventListener('click', () => {
   const item = currentCourseHistoryItem();
   if (!item) return;
-  if (store.getSnapshot().visits.some((visit) => visit.sourceHistoryId === item.id)) return;
+  const existing = store.getSnapshot().visits.find((visit) => visit.sourceHistoryId === item.id);
+  if (existing) {
+    openFootprintMap();
+    return;
+  }
   openVisitFromHistory(item);
 });
 restaurantRequest.button.addEventListener('click', () => { void requestRestaurants(); });
@@ -585,9 +589,9 @@ async function runBrowserSelfTest(): Promise<void> {
     if (!beforeRestaurants.currentLine || !beforeRestaurants.currentStation || !beforeRestaurants.currentFood) {
       throw new Error('Self-test did not complete line/station/food draw.');
     }
-    const currentCourseVisitButton = document.getElementById('current_course_visit_btn') as HTMLButtonElement | null;
-    if (!currentCourseVisitButton || currentCourseVisitButton.hidden || currentCourseVisitButton.textContent !== '이 코스로 가기') {
-      throw new Error('Completed course did not expose the current-course visit action.');
+    const heroVisitButton = document.getElementById('hero_visit_btn') as HTMLButtonElement | null;
+    if (!heroVisitButton || heroVisitButton.hidden || heroVisitButton.textContent !== '등록') {
+      throw new Error('Completed course did not expose the hero registration action.');
     }
     document.body.dataset.selftestCurrentCourseVisit = 'true';
 
