@@ -45,3 +45,12 @@ The food and attraction checkboxes start unchecked. Multiple attractions can be 
 4. simple personal visit statistics
 
 Detailed roadmap: `docs/VISIT_HISTORY_PLAN.md`.
+
+
+## Verification
+
+- Web CI `35339108030` — success
+- Web Release `35339108075` — success
+- Pages deployment — success
+- Android CI `35339228627` — success
+- Android latest development APK republished successfully
