@@ -1,54 +1,47 @@
-# Latest Change — Multi-pass zero-coverage attraction re-audit
+# Latest Change — Durable visit history Phase 1
 
 Date: 2026-09-18
 
 ## Product decision
 
-Re-audit every station with zero curated attractions using actual nearby visit value, not only formal tourism lists.
+Random draw history and real-world visit history are now separate concepts.
 
-Research combines municipal/cultural-tourism sources, map/transit proximity, traditional markets, sizeable parks/waterfronts, museums/cultural venues, specialized streets, worthwhile campus facilities and real trail/viewpoint access.
+A station appearing in recent history does not mean the user visited it. The user explicitly chooses `다녀왔어요`.
 
-## Final result
+## Visit selection contract
 
-Baseline after physical-interchange consistency fix:
-- 800 line/station outcomes: 391 zero / 307 one / 102 two
-- 346 physical station groups with no attraction
-- 330 unique surfaced attractions
+Mandatory:
+- drawn station
 
-After the multi-pass re-audit:
-- **262 zero / 431 one / 107 two**
-- **67.3% attraction coverage**
-- **237 physical station groups remain uncurated**
-- **420 unique surfaced attractions**
-- prominence: Diamond 4 / Gold 25 / Silver 100 / Standard 291
+Optional, user-confirmed only:
+- the drawn food/alcohol category
+- any of the 0–2 curated attractions that were shown for that draw
+- visit date
 
-Representative additions include 민주화운동기념관, 서울시립 사진미술관, 서울로봇인공지능과학관, 물향기수목원, 홍유릉, 대성리 국민관광지, 원인재, 양천향교, 겸재정선미술관, 서울성북미디어문화마루, 마포농수산물시장, 김포 장릉, 성남아트센터 and multiple local markets/cultural streets.
+The food and attraction checkboxes start unchecked. Multiple attractions can be selected. Google Places restaurant recommendations are not stored as visit choices.
 
-## Guardrails
+## Persistence
 
-- station names are not evidence by themselves
-- no forced 1–2 place fill
-- exact/self-contained map targets are required
-- planned/unbuilt destinations stay excluded
-- substantial onward bus transfer or clearly too-distant destinations stay excluded
-- weak apartment parks/generic resident facilities stay excluded
-- same destination reuses an existing attraction ID
-- physical interchange equivalence is applied before curation merge
+- recent draw history: `next_stop_history_v1`, max12
+- durable visits: `random_seoul_visits_v1`
+- clearing recent history leaves visits untouched
+- new draw records snapshot shown attraction IDs/names so later curation changes do not silently rewrite the original visit choices
+- legacy history without a snapshot falls back to current station curation
 
-Examples intentionally rejected/kept empty after research include 검단호수공원, 세종대왕릉역, 신둔도예촌, and 오남호수공원 from 오남역. The temporary 신답→답십리 고미술상가 mapping was removed because official access evidence points to 답십리역 rather than 신답역.
+## UI
 
-## Implementation
+- recent history card: `다녀왔어요`
+- already saved: `방문 기록 수정`
+- separate `다녀온 곳` list
+- visit records can be edited/deleted
+- date defaults to today for a new visit but may be cleared
+- station-only visit is valid
 
-- `src/data/curated-attractions-local.ts`
-- `src/data/curated-attraction-tiers.ts`
-- `tests/curated-attractions.test.ts`
-- documentation synchronized with final coverage counts
+## Long-term roadmap
 
+1. durable visit records — current phase
+2. footprint map
+3. unvisited-first / visited-excluded random options
+4. simple personal visit statistics
 
-## Follow-up — Hwajeong
-
-화정역 curation was expanded from one to two places after checking the official Goyang tourism data:
-- 화정 문화의거리
-- 고양어린이박물관 (경기도 고양시 덕양구 화중로 26)
-
-The museum is about 0.57 km from the culture street and is kept as a Standard attraction.
+Detailed roadmap: `docs/VISIT_HISTORY_PLAN.md`.
