@@ -66,9 +66,9 @@ function ensureVisitSection(): HTMLElement {
   append(head, title, actions);
   section.appendChild(head);
 
-  const drawShell = document.getElementById('draw_shell');
-  if (!drawShell) throw new Error('Missing draw shell.');
-  drawShell.insertAdjacentElement('afterend', section);
+  const mapActions = document.getElementById('map_actions');
+  if (!mapActions) throw new Error('Missing map actions.');
+  mapActions.insertAdjacentElement('afterend', section);
   return section;
 }
 
