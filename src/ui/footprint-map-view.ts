@@ -1,4 +1,6 @@
 import { getFootprintMapAnchor, FOOTPRINT_MAP_VIEWBOX } from '../data/footprint-map-anchors';
+import { isNightscapeAttraction } from '../data/curated-attraction-features';
+import { attractionTierForId } from '../data/curated-attraction-tiers';
 import { FOOD_BY_ID } from '../data/food-categories';
 import { SUBWAY_LINE_BY_ID } from '../data/subway-lines';
 import { groupVisitsByPhysicalStation, type VisitFootprintStation } from '../domain/visit-footprint';
@@ -117,12 +119,36 @@ function formatDate(value: string | undefined): string {
   return value ? value.replace(/-/g, '.') : '날짜 미기록';
 }
 
-function visitDetailText(visit: VisitRecord): string {
-  const details: string[] = [];
+function visitedAttractionChip(id: string, name: string): HTMLElement {
+  const tier = attractionTierForId(id);
+  const nightscape = isNightscapeAttraction(id);
+  const chip = make(
+    'span',
+    `footprint-attraction-chip footprint-attraction-tier-${tier}${nightscape ? ' footprint-attraction-nightscape' : ''}`,
+    name,
+  );
+  chip.dataset.attractionTier = tier;
+  if (nightscape) chip.dataset.attractionNightscape = 'true';
+  return chip;
+}
+
+function visitHighlights(visit: VisitRecord): HTMLElement {
+  const highlights = make('div', 'footprint-visit-highlights');
   const food = visit.foodId ? FOOD_BY_ID.get(visit.foodId) : undefined;
-  if (food) details.push(`${food.emoji} ${food.name}`);
-  if (visit.attractions.length) details.push(...visit.attractions.map((item) => item.name));
-  return details.length ? details.join(' · ') : '역 방문만 기록';
+
+  if (food) {
+    highlights.appendChild(make('span', 'footprint-food-chip', `${food.emoji} ${food.name}`));
+  }
+
+  for (const attraction of visit.attractions) {
+    highlights.appendChild(visitedAttractionChip(attraction.id, attraction.name));
+  }
+
+  if (!food && !visit.attractions.length) {
+    highlights.appendChild(make('span', 'footprint-visit-only', '역 방문만 기록'));
+  }
+
+  return highlights;
 }
 
 function pointerPoint(event: PointerEvent, viewport: HTMLElement): PointerPoint {
@@ -525,7 +551,7 @@ export class FootprintMapView {
       rowHead.appendChild(make('strong', '', formatDate(visit.visitedAt)));
       rowHead.appendChild(make('span', '', line?.name ?? visit.lineId));
 
-      const body = make('p', '', visitDetailText(visit));
+      const highlights = visitHighlights(visit);
       const actions = make('div', 'footprint-visit-actions');
       const edit = make('button', 'history-visit-btn', '수정') as HTMLButtonElement;
       edit.type = 'button';
@@ -537,7 +563,7 @@ export class FootprintMapView {
         if (nextVisits) this.refreshVisits(nextVisits);
       });
       append(actions, edit, remove);
-      append(row, rowHead, body, actions);
+      append(row, rowHead, highlights, actions);
       history.appendChild(row);
     }
     fragment.appendChild(history);
