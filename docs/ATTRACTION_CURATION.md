@@ -46,11 +46,29 @@ Last updated: 2026-09-18
 
 Source of truth: `src/data/station-equivalence.ts`.
 
+## Zero-coverage research method
+
+명소 0개 역을 재검토할 때 관광지도/관광공사 목록만 보지 않습니다.
+
+- 지자체 문화관광/공공시설 자료
+- 지도상 실제 역 접근성
+- 전통시장·특화거리·대형 상권
+- 규모 있는 공원·수변·생태공간
+- 박물관·미술관·공연/전시시설
+- 방문 가치가 있는 캠퍼스 시설
+- 실제 등산로/전망 포인트의 대중교통 접근점
+
+을 함께 확인합니다.
+
+반대로 **역 이름만으로 장소 존재를 추정하지 않습니다.** 계획·미조성 시설, 버스 추가 이동이 필수인 원거리 목적지, 일반 주거지 소공원/주민시설은 0개로 남길 수 있습니다.
+
+2026-09-18 전수 재조사에서는 45개의 신규 고유 목적지를 추가하고 기존 강한 명소 ID 8개를 다른 인접 역에 재사용했습니다. 800개 line/station 추첨 결과의 0개 명소 케이스는 391→319, physical missing groups는 346→288로 감소했습니다.
+
 ## Prominence tier — exclusive axis
 
 모든 노출 명소는 정확히 하나의 `diamond / gold / silver / standard` tier를 갖습니다. **등급명은 UI에 글자로 표시하지 않습니다.**
 
-Current counts: Diamond 4 / Gold 25 / Silver 88 / remaining Standard.
+Current surfaced counts: Diamond 4 / Gold 25 / Silver 96 / Standard 250 (375 unique attractions).
 
 ### Diamond
 
