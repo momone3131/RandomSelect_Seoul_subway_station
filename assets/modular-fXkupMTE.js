@@ -173,8 +173,8 @@ body{background:var(--bg)}
 .footprint-visit-row-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px}
 .footprint-visit-row-head span{color:#6a766f}
 .footprint-visit-row p{margin:5px 0 0;color:#475a51;font-size:11px;line-height:1.45}
-.footprint-visit-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:9px}
-.footprint-visit-actions .history-visit-btn{min-height:32px;margin:0;padding:5px 9px}
+.footprint-visit-actions{display:flex;justify-content:stretch;gap:6px;margin-top:9px}
+.footprint-visit-actions .history-visit-btn{flex:1 1 0;width:auto;min-width:0;min-height:32px;margin:0;padding:5px 9px}
 
 @media(max-width:720px){
  .footprint-modal{max-height:96vh}
