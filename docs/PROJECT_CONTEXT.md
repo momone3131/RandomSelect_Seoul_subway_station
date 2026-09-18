@@ -76,10 +76,10 @@ Diamond fixed: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌�
 Missing stations were re-researched using map/transit proximity plus municipal tourism/cultural sources, including markets, parks, waterfronts, museums, specialized streets and trailheads rather than tourism lists alone.
 
 Current coverage after audit:
-- 800 line/station outcomes: 262 zero / 432 one / 106 two
+- 800 line/station outcomes: 262 zero / 431 one / 107 two
 - 67.3% of draw outcomes have at least one curated attraction
 - 237 physical station groups remain uncurated
-- 419 unique surfaced attractions: Diamond 4 / Gold 25 / Silver 100 / Standard 290
+- 420 unique surfaced attractions: Diamond 4 / Gold 25 / Silver 100 / Standard 291
 
 Planned/unbuilt, generic neighborhood-only, or too-distant/onward-transit candidates remain intentionally excluded.
 
