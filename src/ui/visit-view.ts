@@ -1,8 +1,7 @@
 import { getCuratedAttractions } from '../data/curated-attractions';
 import { FOOD_BY_ID } from '../data/food-categories';
 import { SUBWAY_LINE_BY_ID } from '../data/subway-lines';
-import type { AttractionSnapshot, DrawHistoryItem, SubwayLine, VisitRecord } from '../domain/types';
-import { readableInk } from './color';
+import type { AttractionSnapshot, DrawHistoryItem, VisitRecord } from '../domain/types';
 import { append, byId, make, replaceContent } from './dom';
 
 export interface VisitFormSubmission {
@@ -19,17 +18,7 @@ export interface VisitFormSubmission {
 }
 
 export interface VisitListCallbacks {
-  onEdit(visit: VisitRecord): void;
-  onDelete(visit: VisitRecord): void;
   onOpenMap(): void;
-}
-
-function lineBadge(line: SubwayLine): HTMLElement {
-  const badge = make('span', `mini-badge${line.badge.length > 1 ? ' wide' : ''}`, line.badge);
-  badge.style.setProperty('--line', line.color);
-  badge.style.setProperty('--line-ink', readableInk(line.color));
-  badge.setAttribute('aria-hidden', 'true');
-  return badge;
 }
 
 function todayLocal(): string {
@@ -51,29 +40,26 @@ function ensureVisitSection(): HTMLElement {
   let section = document.getElementById('visit_history');
   if (section) return section;
 
-  section = make('section', 'history visit-history');
+  section = make('section', 'history visit-history visit-hub');
   section.id = 'visit_history';
+  section.hidden = true;
   section.setAttribute('aria-labelledby', 'visit_history_title');
 
-  const head = make('div', 'section-head');
+  const head = make('div', 'section-head visit-hub-head');
   const title = make('h2');
   title.id = 'visit_history_title';
-  title.append('다녀온 곳 ');
+  title.append('발자취 ');
   const count = make('span', 'count-bubble', '0');
   count.id = 'visit_count';
   title.appendChild(count);
-  const mapButton = make('button', 'history-visit-btn visit-map-btn', '발자취 노선도') as HTMLButtonElement;
+
+  const mapButton = make('button', 'history-visit-btn visit-map-btn', '발자취 노선도 보기') as HTMLButtonElement;
   mapButton.id = 'footprint_map_btn';
   mapButton.type = 'button';
-  mapButton.hidden = true;
-  head.appendChild(title);
-  head.appendChild(mapButton);
 
-  const list = make('div', 'history-list visit-list');
-  list.id = 'visit_list';
-  list.appendChild(make('div', 'history-empty', '방문한 역을 기록하면 추첨 기록을 지워도 여기에 계속 남아요.'));
+  append(head, title, mapButton);
+  section.appendChild(head);
 
-  append(section, head, list);
   const history = document.querySelector<HTMLElement>('section.history');
   if (!history) throw new Error('Missing draw history section.');
   history.insertAdjacentElement('afterend', section);
@@ -271,50 +257,10 @@ export class VisitModalView {
 }
 
 export function renderVisits(visits: readonly VisitRecord[], callbacks: VisitListCallbacks): void {
-  ensureVisitSection();
+  const section = ensureVisitSection();
+  section.hidden = visits.length === 0;
   byId<HTMLElement>('visit_count').textContent = String(visits.length);
+
   const mapButton = byId<HTMLButtonElement>('footprint_map_btn');
-  mapButton.hidden = visits.length === 0;
   mapButton.onclick = visits.length ? callbacks.onOpenMap : null;
-  const fragment = document.createDocumentFragment();
-
-  if (!visits.length) {
-    fragment.appendChild(make('div', 'history-empty', '방문한 역을 기록하면 추첨 기록을 지워도 여기에 계속 남아요.'));
-    replaceContent(byId<HTMLElement>('visit_list'), fragment);
-    return;
-  }
-
-  for (const visit of visits) {
-    const line = SUBWAY_LINE_BY_ID.get(visit.lineId);
-    if (!line) continue;
-    const food = visit.foodId ? FOOD_BY_ID.get(visit.foodId) : undefined;
-
-    const card = make('div', 'history-item visit-item');
-    const copy = make('div', 'history-copy');
-    const name = make('div', 'history-name', visit.stationName);
-    const date = visit.visitedAt ? visit.visitedAt.replace(/-/g, '.') : '날짜 미기록';
-    const meta = make('div', 'history-meta', `${line.name} · ${date}`);
-    append(copy, name, meta);
-
-    const details = make('div', 'visit-details');
-    const detailParts: string[] = [];
-    if (food) detailParts.push(`${food.emoji} ${food.name}`);
-    if (visit.attractions.length) detailParts.push(...visit.attractions.map((item) => item.name));
-    details.textContent = detailParts.length ? detailParts.join(' · ') : '역 방문만 기록';
-    copy.appendChild(details);
-
-    const actions = make('div', 'visit-card-actions');
-    const edit = make('button', 'history-visit-btn', '수정') as HTMLButtonElement;
-    edit.type = 'button';
-    edit.addEventListener('click', () => callbacks.onEdit(visit));
-    const remove = make('button', 'history-visit-btn danger', '삭제') as HTMLButtonElement;
-    remove.type = 'button';
-    remove.addEventListener('click', () => callbacks.onDelete(visit));
-    append(actions, edit, remove);
-
-    append(card, lineBadge(line), copy, actions);
-    fragment.appendChild(card);
-  }
-
-  replaceContent(byId<HTMLElement>('visit_list'), fragment);
 }

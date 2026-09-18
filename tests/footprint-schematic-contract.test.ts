@@ -14,10 +14,36 @@ describe('visit footprint full-network map contract', () => {
     expect(footprintView).not.toContain('StationLocationService');
   });
 
+  it('renders visited markers in screen space so fit-all markers remain visible', () => {
+    expect(footprintView).toContain("viewport.appendChild(markerLayer)");
+    expect(footprintView).toContain("marker.dataset.anchorX");
+    expect(footprintView).toContain("this.panX + anchorX * this.scale");
+    expect(styles).toContain('.footprint-marker-layer{position:absolute');
+    expect(styles).toContain('.footprint-visit-marker{position:absolute');
+    expect(styles).not.toContain('--marker-inverse-scale');
+  });
+
   it('keeps visited markers in place when selection changes', () => {
     expect(footprintView).toContain('this.updateMarkerSelection();');
     expect(footprintView).toContain('this.renderDetails();');
     expect(footprintView).not.toContain('this.renderMarkers();\n        this.renderDetails();');
+  });
+
+  it('keeps a horizontally scrollable compact visit strip and opens detail only after selection', () => {
+    expect(footprintView).toContain("'footprint_visit_strip'");
+    expect(footprintView).toContain('renderVisitStrip()');
+    expect(footprintView).toContain('detail.hidden = true');
+    expect(footprintView).toContain('detail.hidden = false');
+    expect(styles).toContain('.footprint-visit-strip{display:flex');
+    expect(styles).toContain('overflow-x:auto');
+    expect(styles).toContain('touch-action:pan-x');
+  });
+
+  it('supports edit/delete actions inside selected footprint detail', () => {
+    expect(footprintView).toContain("make('button', 'history-visit-btn', '수정')");
+    expect(footprintView).toContain("make('button', 'history-visit-btn danger', '삭제')");
+    expect(footprintView).toContain('this.callbacks?.onEdit(visit)');
+    expect(footprintView).toContain('this.callbacks?.onDelete(visit)');
   });
 
   it('supports pan, pinch/wheel zoom and an explicit fit-all control', () => {

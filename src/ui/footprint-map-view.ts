@@ -11,6 +11,11 @@ interface PointerPoint {
   y: number;
 }
 
+export interface FootprintMapCallbacks {
+  onEdit(visit: VisitRecord): void;
+  onDelete(visit: VisitRecord): readonly VisitRecord[] | undefined;
+}
+
 const REFERENCE_MAP_URL = './footprint-seoul-subway-reference.svg';
 const ZOOM_FACTOR = 1.35;
 const MAX_FIT_MULTIPLIER = 9;
@@ -65,11 +70,13 @@ function ensureFootprintModal(): void {
   const extensionLayer = make('div', 'footprint-extension-layer');
   extensionLayer.id = 'footprint_extension_layer';
   stage.appendChild(extensionLayer);
+  viewport.appendChild(stage);
 
+  // Markers live outside the scaled SVG stage. Their screen size therefore stays readable
+  // at both fit-all and high zoom while their position follows the map transform.
   const markerLayer = make('div', 'footprint-marker-layer');
   markerLayer.id = 'footprint_marker_layer';
-  stage.appendChild(markerLayer);
-  viewport.appendChild(stage);
+  viewport.appendChild(markerLayer);
 
   const controls = make('div', 'footprint-zoom-controls');
   const zoomIn = make('button', '', '+') as HTMLButtonElement;
@@ -89,11 +96,21 @@ function ensureFootprintModal(): void {
   const source = make('div', 'footprint-reference-source', 'Reference · Public domain subway diagram');
   append(mapWrap, viewport, controls, source);
 
+  const visitBrowser = make('section', 'footprint-visit-browser');
+  const browserHead = make('div', 'footprint-browser-head');
+  browserHead.appendChild(make('strong', '', '방문 기록'));
+  browserHead.appendChild(make('span', '', '옆으로 밀어서 둘러보고, 누르면 상세 기록이 열려요.'));
+  const strip = make('div', 'footprint-visit-strip');
+  strip.id = 'footprint_visit_strip';
+  strip.setAttribute('aria-label', '방문 역 기록 목록');
+  append(visitBrowser, browserHead, strip);
+
   const detail = make('section', 'footprint-detail');
   detail.id = 'footprint_detail';
+  detail.hidden = true;
   detail.setAttribute('aria-live', 'polite');
 
-  append(body, status, mapWrap, detail);
+  append(body, status, mapWrap, visitBrowser, detail);
   append(dialog, head, body);
   overlay.appendChild(dialog);
   document.body.appendChild(overlay);
@@ -127,6 +144,7 @@ function midpoint(left: PointerPoint, right: PointerPoint): PointerPoint {
 export class FootprintMapView {
   private groups: VisitFootprintStation[] = [];
   private selectedGroupId?: string;
+  private callbacks?: FootprintMapCallbacks;
 
   private scale = 1;
   private fitScale = 1;
@@ -168,19 +186,15 @@ export class FootprintMapView {
     return !byId<HTMLElement>('footprint_overlay').hidden;
   }
 
-  async open(visits: readonly VisitRecord[]): Promise<void> {
+  async open(visits: readonly VisitRecord[], callbacks: FootprintMapCallbacks): Promise<void> {
+    this.callbacks = callbacks;
     this.groups = groupVisitsByPhysicalStation(visits);
-    this.selectedGroupId = this.groups[0]?.id;
-
-    byId<HTMLElement>('footprint_summary').textContent =
-      `방문 역 ${this.groups.length}곳 · 방문 기록 ${visits.length}개`;
-    byId<HTMLElement>('footprint_map_status').textContent =
-      this.groups.length
-        ? '방문한 역이 노선도 위에 표시돼요 · 드래그/확대 가능'
-        : '저장된 방문 기록이 없어요.';
+    this.selectedGroupId = undefined;
+    this.updateSummary(visits.length);
 
     byId<HTMLElement>('footprint_overlay').hidden = false;
     this.renderMarkers();
+    this.renderVisitStrip();
     this.renderDetails();
 
     window.requestAnimationFrame(() => {
@@ -194,7 +208,17 @@ export class FootprintMapView {
     this.lastSinglePointer = undefined;
     this.pinchDistance = undefined;
     this.pinchCenter = undefined;
+    this.callbacks = undefined;
     byId<HTMLElement>('footprint_overlay').hidden = true;
+  }
+
+  private updateSummary(visitCount: number): void {
+    byId<HTMLElement>('footprint_summary').textContent =
+      `방문 역 ${this.groups.length}곳 · 방문 기록 ${visitCount}개`;
+    byId<HTMLElement>('footprint_map_status').textContent =
+      this.groups.length
+        ? '밝은 원이 방문한 역이에요 · 축소해도 표시되며 드래그/확대할 수 있어요.'
+        : '저장된 방문 기록이 없어요.';
   }
 
   private bindMapInteractions(): void {
@@ -249,11 +273,7 @@ export class FootprintMapView {
         const [first, second] = Array.from(this.pointers.values());
         const nextDistance = distance(first, second);
         const nextCenter = midpoint(first, second);
-        if (
-          this.pinchDistance
-          && this.pinchCenter
-          && this.pinchDistance > 0
-        ) {
+        if (this.pinchDistance && this.pinchCenter && this.pinchDistance > 0) {
           const logicalX = (this.pinchCenter.x - this.panX) / this.scale;
           const logicalY = (this.pinchCenter.y - this.panY) / this.scale;
           const nextScale = this.clampScale(this.scale * (nextDistance / this.pinchDistance));
@@ -336,9 +356,12 @@ export class FootprintMapView {
     const stage = byId<HTMLElement>('footprint_reference_stage');
     stage.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
 
-    const inverse = this.scale > 0 ? 1 / this.scale : 1;
-    for (const marker of stage.querySelectorAll<HTMLElement>('.footprint-visit-marker')) {
-      marker.style.setProperty('--marker-inverse-scale', String(inverse));
+    for (const marker of byId<HTMLElement>('footprint_marker_layer').querySelectorAll<HTMLElement>('.footprint-visit-marker')) {
+      const anchorX = Number(marker.dataset.anchorX);
+      const anchorY = Number(marker.dataset.anchorY);
+      if (!Number.isFinite(anchorX) || !Number.isFinite(anchorY)) continue;
+      marker.style.left = `${this.panX + anchorX * this.scale}px`;
+      marker.style.top = `${this.panY + anchorY * this.scale}px`;
     }
   }
 
@@ -360,25 +383,22 @@ export class FootprintMapView {
       ) as HTMLButtonElement;
       marker.type = 'button';
       marker.dataset.footprintKey = group.id;
-      marker.style.left = `${anchor.x}px`;
-      marker.style.top = `${anchor.y}px`;
+      marker.dataset.anchorX = String(anchor.x);
+      marker.dataset.anchorY = String(anchor.y);
       marker.setAttribute('aria-pressed', group.id === this.selectedGroupId ? 'true' : 'false');
       marker.setAttribute('aria-label', `${group.stationName}역, ${group.visits.length}회 방문`);
       marker.title = `${group.stationName}역 · ${group.visits.length}회 방문`;
 
-      const core = make('span', 'footprint-visit-marker-core', '✓');
-      marker.appendChild(core);
+      marker.appendChild(make('span', 'footprint-visit-marker-core', '●'));
       if (group.visits.length > 1) {
         marker.appendChild(make('span', 'footprint-visit-count', String(group.visits.length)));
       }
 
       marker.addEventListener('click', (event) => {
         event.stopPropagation();
-        this.selectedGroupId = group.id;
-        this.updateMarkerSelection();
-        this.renderDetails();
+        this.selectGroup(group.id, true);
       });
-      markerLayer.appendChild(marker);
+      markerFragment.appendChild(marker);
 
       if (anchor.source === 'synthetic-terminal-extension') {
         const terminal = getFootprintMapAnchor('gj', '탑석');
@@ -401,6 +421,46 @@ export class FootprintMapView {
 
     replaceContent(markerLayer, markerFragment);
     replaceContent(extensionLayer, extensionFragment);
+    this.applyTransform();
+  }
+
+  private renderVisitStrip(): void {
+    const strip = byId<HTMLElement>('footprint_visit_strip');
+    const fragment = document.createDocumentFragment();
+
+    if (!this.groups.length) {
+      fragment.appendChild(make('div', 'footprint-strip-empty', '아직 저장된 방문 기록이 없어요.'));
+      replaceContent(strip, fragment);
+      return;
+    }
+
+    for (const group of this.groups) {
+      const summary = make(
+        'button',
+        `footprint-visit-summary${group.id === this.selectedGroupId ? ' selected' : ''}`,
+        `${group.stationName}역 · ${formatDate(group.latestVisitedAt)}`,
+      ) as HTMLButtonElement;
+      summary.type = 'button';
+      summary.dataset.footprintKey = group.id;
+      summary.setAttribute('aria-pressed', group.id === this.selectedGroupId ? 'true' : 'false');
+      summary.addEventListener('click', () => this.selectGroup(group.id, false));
+      fragment.appendChild(summary);
+    }
+
+    replaceContent(strip, fragment);
+  }
+
+  private selectGroup(groupId: string, scrollStrip: boolean): void {
+    this.selectedGroupId = groupId;
+    this.updateMarkerSelection();
+    this.updateStripSelection();
+    this.renderDetails();
+
+    if (scrollStrip) {
+      const selected = byId<HTMLElement>('footprint_visit_strip')
+        .querySelector<HTMLElement>('[data-footprint-key].selected');
+      selected?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   }
 
   private updateMarkerSelection(): void {
@@ -412,15 +472,40 @@ export class FootprintMapView {
     }
   }
 
+  private updateStripSelection(): void {
+    const strip = byId<HTMLElement>('footprint_visit_strip');
+    for (const summary of strip.querySelectorAll<HTMLButtonElement>('[data-footprint-key]')) {
+      const selected = summary.dataset.footprintKey === this.selectedGroupId;
+      summary.classList.toggle('selected', selected);
+      summary.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    }
+  }
+
+  private refreshVisits(visits: readonly VisitRecord[]): void {
+    const previousSelection = this.selectedGroupId;
+    this.groups = groupVisitsByPhysicalStation(visits);
+    this.selectedGroupId = previousSelection && this.groups.some((group) => group.id === previousSelection)
+      ? previousSelection
+      : undefined;
+    this.updateSummary(visits.length);
+    this.renderMarkers();
+    this.renderVisitStrip();
+    this.renderDetails();
+  }
+
   private renderDetails(): void {
     const detail = byId<HTMLElement>('footprint_detail');
-    const group = this.groups.find((item) => item.id === this.selectedGroupId) ?? this.groups[0];
+    const group = this.selectedGroupId
+      ? this.groups.find((item) => item.id === this.selectedGroupId)
+      : undefined;
+
     if (!group) {
+      detail.hidden = true;
       replaceContent(detail, document.createDocumentFragment());
       return;
     }
 
-    this.selectedGroupId = group.id;
+    detail.hidden = false;
     const fragment = document.createDocumentFragment();
     const head = make('div', 'footprint-detail-head');
     const titleWrap = make('div');
@@ -449,8 +534,20 @@ export class FootprintMapView {
       const rowHead = make('div', 'footprint-visit-row-head');
       rowHead.appendChild(make('strong', '', formatDate(visit.visitedAt)));
       rowHead.appendChild(make('span', '', line?.name ?? visit.lineId));
+
       const body = make('p', '', visitDetailText(visit));
-      append(row, rowHead, body);
+      const actions = make('div', 'footprint-visit-actions');
+      const edit = make('button', 'history-visit-btn', '수정') as HTMLButtonElement;
+      edit.type = 'button';
+      edit.addEventListener('click', () => this.callbacks?.onEdit(visit));
+      const remove = make('button', 'history-visit-btn danger', '삭제') as HTMLButtonElement;
+      remove.type = 'button';
+      remove.addEventListener('click', () => {
+        const nextVisits = this.callbacks?.onDelete(visit);
+        if (nextVisits) this.refreshVisits(nextVisits);
+      });
+      append(actions, edit, remove);
+      append(row, rowHead, body, actions);
       history.appendChild(row);
     }
     fragment.appendChild(history);

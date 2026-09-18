@@ -158,13 +158,13 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - recent draw history remains max12 and disposable
 - new durable key: `random_seoul_visits_v1`
-- history card CTA: `다녀왔어요` / saved state `방문 기록 수정`
+- history card CTA: 신규 `다녀왔어요` / 저장 후 disabled `발자취에 등록됨`
 - station is mandatory
 - drawn food category is optional and unchecked by default
 - shown attractions are optional and multi-select, unchecked by default
 - Google restaurant recommendation is not included
 - optional visit date; new record defaults to today and can be cleared
-- durable visit list supports edit/delete
+- main 화면의 durable visit card 목록은 제거; 조회/수정/삭제는 발자취 노선도에서 수행
 - clearing recent draw history explicitly leaves visits intact
 - new draw-history items snapshot shown attraction IDs/names for later visit editing
 
@@ -181,7 +181,7 @@ Roadmap source: `VISIT_HISTORY_PLAN.md`.
 
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-- `다녀온 곳`에 방문 기록이 하나 이상 있으면 `발자취 노선도` CTA 노출
+- main에는 방문 기록이 하나 이상 있으면 compact `발자취 노선도 보기` CTA + count만 노출
 - 한 노선씩 나열하지 않고 **수도권 전체 노선도 한 장**을 reference surface로 사용
 - bundled public-domain SVG + generated static anchor table; footprint open 시 외부 지도 네트워크 호출 없음
 - **24개 노선 / 800개 line×station mappings = 800/800 verified**
@@ -189,9 +189,13 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - 환승역 line variants는 같은 marker, 신촌/양평 동명이역은 서로 다른 anchor
 - `총신대입구(이수)` ↔ `이수`는 동일 anchor
 - 의정부경전철 차량기지 임시승강장만 reference 밖 synthetic dashed terminal extension
-- marker detail에서 방문일, 당시 노선, 실제 방문 음식/명소 history 확인
-- marker 선택 시 full map을 재렌더하지 않아 기존 모바일 tap/reposition 문제 제거
+- 방문 marker는 SVG scale과 분리된 screen-space overlay라 전체보기/확대 모두에서 고정 크기로 식별 가능
+- 노선도 아래 `역명 · 최근 방문일` horizontal strip을 드래그/스크롤해 방문역 탐색
+- 초기에는 상세를 숨기고 marker/strip 선택 시에만 방문일·당시 노선·실제 방문 음식/명소 history 표시
+- selected detail에서 개별 방문기록 수정/삭제 가능; strip은 상세가 열린 상태에서도 계속 스크롤 가능
+- marker/strip 선택 시 full map이나 marker DOM을 재렌더하지 않아 기존 모바일 tap/reposition 문제 제거
 - drag / wheel zoom / pinch zoom / fit-all 지원
+- 신규 방문 저장 toast는 `발자취 노선도에서 확인할 수 있어요`로 안내
 - GPS/current-location permission 추가 없음
 
 Reference/audit source: `FOOTPRINT_MAP_REFERENCE.md`.
