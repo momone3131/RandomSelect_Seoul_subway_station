@@ -1,6 +1,6 @@
 # Random Seoul — Project Context / Handoff
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
 
 새 채팅/개발 세션은 **live GitHub → STATUS → ARCHITECTURE/PROJECT_PLAN → 이 문서** 순으로 최신성을 확인합니다.
 
@@ -55,6 +55,13 @@ Merge priority:
 **base → station adjustments → extra → local → night-viewpoints → ID dedupe → max2 → tier/feature attachment**
 
 The `night-viewpoints` layer is last so it can fill a spare slot without pushing out an established stronger recommendation.
+
+Physical interchange handling:
+- same physical station shares one curated result across all line variants
+- same-name non-interchanges `신촌` and `양평` remain separate
+- `총신대입구(이수)` / `이수` is an explicit alias interchange
+- source: `src/data/station-equivalence.ts`
+
 
 Current prominence:
 - Diamond 4
