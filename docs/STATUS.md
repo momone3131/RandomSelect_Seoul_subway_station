@@ -168,3 +168,23 @@ Android uses the same shared curation/tier/test contract as Web.
 ### Hwajeong follow-up
 - 화정역 now returns 화정 문화의거리 + 고양어린이박물관.
 - 고양어린이박물관 remains Standard prominence.
+
+
+## Durable visit history — Phase 1
+
+- recent draw history remains max12 and disposable
+- durable visit key: `random_seoul_visits_v1`
+- recent history card can create/edit a `다녀왔어요` record
+- station is mandatory
+- drawn food category is optional/user-confirmed; Google restaurant result is not stored
+- shown attractions are optional multi-select/user-confirmed
+- visit date is optional; new record defaults to today and can be cleared
+- visits have separate edit/delete UI
+- clearing recent draw history leaves visits intact
+- shared Web/Android source snapshots the attraction candidates shown at draw time
+
+Roadmap: `docs/VISIT_HISTORY_PLAN.md`
+1. durable visits
+2. footprint map
+3. unvisited-first / visited-excluded random
+4. simple visit statistics
