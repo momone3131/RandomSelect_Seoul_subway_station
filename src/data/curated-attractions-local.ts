@@ -240,6 +240,26 @@ const GROUPS: readonly { stations: readonly string[]; attractions: readonly Spec
   { stations: ['l1:역곡'], attractions: [['yeokgok-sangsang-market', '역곡상상시장', '문화관광형시장', '역곡상상시장 경기도 부천시 원미구 부일로749번길']] },
   { stations: ['l1:송내'], attractions: [['boksagol-culture-center', '복사골문화센터', '복합문화공간', '복사골문화센터 경기도 부천시 원미구 장말로 107']] },
 
+
+  // 2026-09-18 zero-coverage audit, third pass.
+  { stations: ['l1:창동', 'l4:창동'], attractions: [['seoul-photo-museum', '서울시립 사진미술관', '미술관', '서울시립 사진미술관 서울 도봉구 마들로13길 68'], ['seoul-robot-ai-museum', '서울로봇인공지능과학관', '과학·체험', '서울로봇인공지능과학관 서울 도봉구 마들로13길 56']] },
+  { stations: ['l4:숙대입구'], attractions: [['sookmyung-moonshin-museum', '숙명여자대학교 문신미술관', '미술관·캠퍼스', '숙명여자대학교 문신미술관 서울 용산구 청파로47길 100']] },
+
+  { stations: ['l5:송정', 'l9:공항시장'], attractions: [['airport-market', '공항시장', '전통시장', '공항시장 서울 강서구 개화동로31길 39']] },
+  { stations: ['l9:신방화'], attractions: [['bangsin-market', '방신전통시장', '전통시장', '방신전통시장 서울 강서구 방화동로16길 31']] },
+  { stations: ['l5:마곡'], attractions: [['lg-art-center-seoul', 'LG아트센터 서울', '공연·문화', 'LG아트센터 서울 서울 강서구 마곡중앙로 136']] },
+  { stations: ['l5:상일동'], attractions: [['godeok-traditional-market', '고덕전통시장', '전통시장', '고덕전통시장 서울 강동구 고덕로83길 36']] },
+  { stations: ['l2:까치산', 'l5:까치산'], attractions: [['kkachisan-market', '까치산시장', '전통시장', '까치산시장 서울 강서구 화곡동 663-15']] },
+
+  { stations: ['l6:새절', 'l6:증산'], attractions: [['eungam-daerim-market', '응암동 대림시장', '전통시장·먹거리', '대림시장 서울 은평구 응암로4길 22']] },
+  { stations: ['l6:상월곡'], attractions: [['karts-seokgwan-campus', '한국예술종합학교 석관동캠퍼스', '예술·캠퍼스', '한국예술종합학교 석관동캠퍼스 서울 성북구 화랑로32길 146-37']] },
+
+  { stations: ['l7:중곡'], attractions: [['junggok-jeil-market', '중곡제일시장', '전통시장', '중곡제일시장 서울 광진구 중곡동 229-5']] },
+  { stations: ['l7:남성'], attractions: [['namseong-station-market', '남성역골목시장', '전통시장', '남성역골목시장 서울 동작구 사당로16가길 19']] },
+  { stations: ['l7:남구로'], attractions: [['namguro-market', '남구로시장', '전통시장·다문화', '남구로시장 서울 구로구 구로동로26길 58']] },
+
+  { stations: ['l8:송파'], attractions: [['seokchon-market-local', '석촌시장', '전통시장', '석촌시장 서울 송파구 송파대로37길 40']] },
+
 ];
 
 const MAP = new Map<string, AttractionRecommendation[]>();
