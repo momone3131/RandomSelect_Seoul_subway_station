@@ -76,6 +76,9 @@ jobs:
       - name: Build native Web assets
         run: npm run build:native
 
+      - name: Verify footprint reference asset
+        run: test -f dist-app/footprint-seoul-subway-reference.svg
+
       - name: Sync Capacitor Android
         run: npx cap sync android
 
