@@ -132,6 +132,18 @@ function bindResultHaptics(): void {
 async function bindAndroidBackButton(): Promise<void> {
   if (getRuntimePlatform() !== 'android') return;
   await App.addListener('backButton', ({ canGoBack }) => {
+    const footprintOverlay = byId<HTMLElement>('footprint_overlay');
+    if (footprintOverlay && !footprintOverlay.hidden) {
+      byId<HTMLButtonElement>('close_footprint')?.click();
+      return;
+    }
+
+    const visitOverlay = byId<HTMLElement>('visit_overlay');
+    if (visitOverlay && !visitOverlay.hidden) {
+      byId<HTMLButtonElement>('close_visit')?.click();
+      return;
+    }
+
     const overlay = byId<HTMLElement>('settings_overlay');
     if (overlay && !overlay.hidden) {
       byId<HTMLButtonElement>('close_settings')?.click();
