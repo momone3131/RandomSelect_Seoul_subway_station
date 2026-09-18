@@ -46,10 +46,15 @@ export function renderHistory(
     const visitButton = make(
       'button',
       `history-visit-btn${existingVisit ? ' saved' : ''}`,
-      existingVisit ? '방문 기록 수정' : '다녀왔어요',
+      existingVisit ? '발자취에 등록됨' : '다녀왔어요',
     ) as HTMLButtonElement;
     visitButton.type = 'button';
-    visitButton.addEventListener('click', () => onVisit(item, existingVisit));
+    if (existingVisit) {
+      visitButton.disabled = true;
+      visitButton.setAttribute('aria-label', `${item.stationName}역은 발자취 노선도에 등록되어 있습니다.`);
+    } else {
+      visitButton.addEventListener('click', () => onVisit(item));
+    }
     append(card, lineBadge(line), text, visitButton);
     fragment.appendChild(card);
   }
