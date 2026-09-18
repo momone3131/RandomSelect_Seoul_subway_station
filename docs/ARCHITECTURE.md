@@ -125,12 +125,26 @@ Current 12 IDs:
 ## 7. Storage / platform boundary
 
 - Web localStorage / Android WebView-compatible shared state
-- preferences/history persisted
+- preferences / recent draw history / durable visit history persisted
 - live recommendation result not kept as long-term own DB
 - missing station center may use Google fallback with 30-day cache
 - no current-location/GPS permission required
 
-## 8. Build / deployment
+## 8. Durable visit records
+
+Draw history and visit history are different data domains.
+
+- `next_stop_history_v1`: recent draw history, max12, disposable
+- `random_seoul_visits_v1`: durable user-confirmed visit history
+- clearing draw history never mutates visits
+- `DrawHistoryItem.attractionOptions` snapshots the 0–2 attractions shown at station draw time
+- `VisitRecord` stores station identity, optional visit date, drawn food candidate, shown-attraction candidates and the user-confirmed visited subset
+- Google Places restaurant results are intentionally excluded from visit records
+- `visit-view.ts` owns the visit picker and durable visit list
+
+This shared TypeScript contract is the planned source for later footprint-map, unvisited-aware random and visit statistics features.
+
+## 9. Build / deployment
 
 Web: tests → Vite build → browser smoke → verified root promotion → Pages.
 
