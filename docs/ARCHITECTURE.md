@@ -4,205 +4,172 @@ Last updated: 2026-09-18
 
 ## 1. Architecture goals
 
-Random Seoul은 Web / Android / iOS가 같은 제품 로직을 공유하도록 설계합니다.
+Random Seoul은 Web / Android / iOS가 동일한 제품 로직을 공유하도록 설계합니다.
 
-핵심 원칙:
+- draw/static data/state/ranking = platform-independent TypeScript
+- native code stays thin
+- live provider lookup only after explicit user request
+- attractions and food taxonomy are first-party static data
 
-- 추첨/데이터/상태/식당 랭킹은 플랫폼 독립적인 TypeScript
-- Web/Android/iOS 차이는 adapter/service 경계 뒤로 숨김
-- Android Java/Kotlin과 iOS Swift는 가능한 한 얇게 유지
-- Web은 앱 출시 후에도 정식 타깃으로 유지
-- 식당 추천은 실시간 Google Places 후보를 shared TypeScript에서 필터링/랭킹
-- 대표 명소와 가능한 역 좌표는 자체 정적 데이터로 소유해 불필요한 Google 호출을 줄임
-
-## 2. Repository structure
+## 2. Repository structure highlights
 
 ```text
-Random Seoul
-├─ src/
-│  ├─ data/
-│  │  ├─ subway-lines.ts
-│  │  ├─ food-categories.ts
-│  │  ├─ curated-attractions.ts
-│  │  └─ station-coordinates.ts
-│  ├─ domain/
-│  │  ├─ types.ts
-│  │  ├─ draw-engine.ts
-│  │  ├─ station-resolver.ts
-│  │  └─ restaurant-ranking.ts
-│  ├─ services/
-│  │  ├─ places/
-│  │  ├─ maps/
-│  │  └─ storage/
-│  ├─ state/
-│  ├─ ui/
-│  ├─ platform/
-│  └─ main.ts
-├─ native/
-├─ tests/
-├─ android/
-├─ ios/
-├─ index.html
-├─ modular.html
-├─ vite.config.ts
-├─ capacitor.config.ts
-└─ .github/workflows/
+src/
+├─ application/
+│  └─ random-seoul-controller.ts
+├─ data/
+│  ├─ subway-lines.ts
+│  ├─ food-categories.ts
+│  ├─ food-category-features.ts
+│  ├─ curated-attractions.ts
+│  ├─ curated-attractions-base.ts
+│  ├─ curated-attractions-adjustments.ts
+│  ├─ curated-attractions-extra.ts
+│  ├─ curated-attractions-local.ts
+│  ├─ curated-attractions-night-viewpoints.ts
+│  ├─ curated-attraction-tiers.ts
+│  ├─ curated-attraction-features.ts
+│  ├─ station-equivalence.ts
+│  └─ station-coordinates.ts
+├─ domain/
+├─ services/
+├─ state/
+└─ ui/
 ```
 
-## 3. Shared place model and provider boundary
+## 3. Draw flow
 
-`PlaceCandidate`는 Google Places 등 외부 provider에서 받은 식당 후보를 shared core로 넘기는 공통 모델입니다.
+`line → station → food/alcohol category`
 
-구현체:
+Station draw immediately attaches static curated attractions. Category draw does **not** call Google Places.
 
-- Web: Google Maps JavaScript Places
-- Android: Capacitor bridge → Places SDK for Android
-- iOS: later native Places bridge
+After the explicit recommendation CTA:
+1. resolve station center
+2. issue category-specific Google Places query
+3. type-gate candidates
+4. hard 2 km filter
+5. shared ranking
+6. TOP3 render
+7. smooth scroll after result settles
 
-플랫폼 SDK는 후보 데이터를 반환하는 역할만 맡고 식당 순위는 결정하지 않습니다.
+## 4. Food taxonomy / alcohol feature
 
-## 4. Restaurant ranking ownership
+`food-categories.ts` owns 42 draw categories.
 
-`restaurant-ranking.ts`가 공통 식당 랭킹을 단독 소유합니다.
+`food-category-features.ts` marks exactly six IDs as alcohol-primary:
+- `b_izakaya`
+- `b_wine`
+- `b_cocktail`
+- `b_craft_beer`
+- `b_traditional`
+- `b_whisky`
 
-현재 규칙:
+This is a feature flag, not a second food hierarchy. Ordinary food categories are not alcohol-primary merely because the venue may serve drinks.
 
-1. 역과의 직선거리 2 km 초과 후보 제거
-2. 별점 Bayesian 보정
-3. 평가 수 `log(1 + n)` 변환
-4. Google 검색 순위 relevance signal
-5. 거리 signal
-6. TOP 3 반환
+`SettingsModalView` owns the dynamic alcohol preset:
+- any alcohol selected → `주류 제외`
+- zero alcohol selected → `주류 포함`
 
-가중치:
+The preset mutates draft selection only; `적용` persists it through the existing selected-food IDs contract.
 
-- Bayesian rating 55%
-- review volume 25%
-- relevance 15%
-- distance 5%
+Persistence migration in `app-persistence.ts` treats an exact legacy full-36 selection as old “all selected” and expands it to current full-42. Any deliberately narrowed saved selection is preserved.
 
-식당 결과는 Google에서 실시간 조회하며 TOP 3 결과/별점/리뷰수를 자체 추천 DB로 영구 저장하지 않습니다.
+`RandomSeoulController.isFoodCandidate()` uses:
+- normal food set for meal categories
+- alcohol-oriented type set for alcohol categories: `bar`, `night_club`, with `restaurant`/`food` fallback for venues such as izakaya and traditional liquor pubs
 
-## 5. Curated nearby attractions
+Ranking remains shared and unchanged: hard 2 km, max20 candidates, rating 55%, review volume 25%, relevance 15%, distance 5%, TOP3.
 
-역 주변 볼거리는 더 이상 Google Places 검색/리뷰 수 threshold로 선정하지 않습니다.
+UI context carries `isAlcohol` so recommendation title/CTA/empty copy can say `술집` while normal categories keep `식당`. Result-copy wording uses `가자!` for alcohol and `먹자!` for meal categories.
 
-`src/data/curated-attractions.ts`가 **역별 대표 명소 0~2곳**을 직접 소유합니다.
+## 5. Curated attraction merge
 
-규칙:
+Before curation layers are merged, `station-equivalence.ts` expands a draw station to all line variants of the same physical interchange. The expansion is canonical and line-independent, so 왕십리/연신내/도봉산/etc. cannot return different attraction sets merely because a different line was drawn.
 
-- 유명도와 대표성이 충분히 높은 장소만 수동/검증된 데이터로 등록
-- 애매한 역은 억지로 추천하지 않고 `[]`
-- 한 역당 최대 2곳
-- 역 추첨 직후 동기적으로 표시되어 네트워크 대기 없음
-- 음식 재추첨과 무관
-- 명소 Google Places Text Search 없음
-- 명소 카드의 지도 버튼은 일반 Google Maps 검색 링크일 뿐 Places 데이터 저장소가 아님
+Same-name stations that are not physical interchanges are explicitly excluded from automatic equivalence: 신촌 and 양평. The differently named 이수 interchange is explicitly paired as `l4:총신대입구(이수)` ↔ `l7:이수`.
 
-따라서 과거 `attraction-ranking.ts`의 최소 리뷰 수/점수 기준은 제거되었습니다. 품질 gate는 **큐레이션 DB에 등록되어 있느냐** 자체가 담당합니다.
+Exact order:
+1. physical interchange equivalence
+2. base
+3. station adjustments
+4. extra
+5. local
+6. dedicated night-viewpoints
+7. ID dedupe
+8. max2
+9. prominence tier attachment
+10. orthogonal feature attachment
 
-## 6. Station center strategy
+The night-viewpoint layer is last so it only fills available capacity.
 
-식당 검색의 위치 bias/거리 계산에는 역 중심 좌표가 필요합니다.
+### Prominence
+- Diamond 4
+- Gold 25
+- Silver 88
+- remaining Standard
 
-`src/data/station-coordinates.ts`를 먼저 조회합니다.
+### Nightscape
+Nightscape is orthogonal to tier and means an elevated city-light viewpoint, not simply a place that looks good at night.
 
-1. 정적 좌표가 있으면 즉시 사용 → Google station-resolution 호출 없음
-2. 정적 좌표가 없는 신규/미수록 역만 기존 Google 역 검색 사용
-3. fallback으로 얻은 Google 좌표는 기존 정책대로 30일 캐시
+Current 12 IDs:
+`n-seoul-tower`, `naksan-park`, `eungbongsan-palgakjeong`, `dalmaji-bong-park`, `maebongsan-palgakjeong`, `yongwangsan-skywalk`, `samsung-haemaji-park`, `yongmasan-skywalk`, `yongyangbongjeojeong-park`, `lotte-world-tower`, `namhansanseong-west-gate-viewpoint`, `suwon-hwaseong-seojangdae`.
 
-정적 좌표는 서울특별시/TOPIS의 `서울시 역사마스터 정보`와 같은 공공 역 마스터 데이터를 기준으로 관리합니다. 해당 서울 열린데이터는 공공누리 제1유형(출처표시, 상업적 이용 및 변경 가능)입니다.
+## 6. UI composition
 
-현재 정적 테이블은 대표 명소가 있는 역과 주요 환승/사용 역부터 적용하며, 미수록 역은 기능 단절 없이 live fallback으로 동작합니다.
+- attraction tier owns outer border/effect
+- Nightscape owns card interior/background
+- no tier/nightscape text badge
+- same-result signature guard prevents repeated reveal
+- reduced-motion disables tier motion
 
-## 7. State ownership
+## 7. Storage / platform boundary
 
-`AppState`는 현재 line/station/food와 함께 다음 결과를 보유합니다.
+- Web localStorage / Android WebView-compatible shared state
+- preferences / recent draw history / durable visit history persisted
+- live recommendation result not kept as long-term own DB
+- missing station center may use Google fallback with 30-day cache
+- no current-location/GPS permission required
 
-- `attractions`: 현재 역의 0~2개 자체 큐레이션 볼거리
-- `recommendations`: 현재 음식의 Google 기반 식당 TOP 3
-- `history`: 최근 추첨 기록
+## 8. Durable visit records
 
-UI는 상태를 표시하고 사용자 event를 전달하며, 추첨/식당 랭킹 규칙 자체를 소유하지 않습니다.
+Draw history and visit history are different data domains.
 
-## 8. Storage boundary
+- `next_stop_history_v1`: recent draw history, max12, disposable
+- `random_seoul_visits_v1`: durable user-confirmed visit history
+- clearing draw history never mutates visits
+- `DrawHistoryItem.attractionOptions` snapshots the 0–2 attractions shown at station draw time
+- `VisitRecord` stores station identity, optional visit date, drawn food candidate, shown-attraction candidates and the user-confirmed visited subset
+- Google Places restaurant results are intentionally excluded from visit records
+- `visit-view.ts` owns the visit picker plus compact main-screen footprint entry; durable visit list/edit/delete presentation lives inside `footprint-map-view.ts`
 
-- Web: localStorage
-- Android/iOS: 현재 호환성 우선으로 WebView localStorage를 사용하며 native-backed storage는 필요 시 후속 전환
+This shared TypeScript contract is the source for the footprint map and remains the planned source for unvisited-aware random and visit statistics.
 
-기존 Web localStorage key를 유지해 설정/기록 마이그레이션을 깨지 않습니다.
+## 9. Visit footprint full-network map
 
-Google 식당 결과는 장기 캐시하지 않습니다. Google fallback 역 좌표 캐시는 기존 30일 정책을 유지합니다.
+Phase 2 stays on top of the existing durable `VisitRecord` collection.
 
-## 9. Platform services
+- `public/footprint-seoul-subway-reference.svg`: bundled public-domain full-network reference diagram
+- `footprint-map-anchors.ts`: typed `lineId:stationName → SVG anchor` table, exactly 800 entries
+- `generate-footprint-map-anchors.mjs`: deterministic extractor from reference SVG station labels
+- `station-equivalence.ts`: canonical physical-station identity used to collapse interchange line variants
+- `visit-footprint.ts`: groups multiple records and line variants into one physical visit station
+- `footprint-map-view.ts`: full-map pan/zoom surface, screen-space visit marker overlay, horizontal visit summary strip, selected-station detail and edit/delete actions
+- station markers use the reference SVG's own label geometry; geographic latitude/longitude is not involved
+- visited markers are rendered in a non-scaled viewport overlay and re-positioned from anchor×map-transform, keeping their screen size visible at fit-all and zoomed views
+- marker/strip selection updates CSS/ARIA state + detail only; it does not rebuild or reposition the map
+- no physical station is auto-selected on open; detail stays hidden until explicit selection
+- modal is a capped flex column: header is non-scrolling, body is the only vertical scroll surface
+- explicit selection toggles `detail-open`; the map viewport contracts and refits once so detail does not push the close control off-screen
+- detail header composes line badge(s), station name and visit count on one compact row; long per-station visit history scrolls inside a bounded history region
+- no current-location/GPS input, station resolver, Google map lookup or OSM tile request is used by the footprint screen
+- Android native back handling closes footprint/visit/settings overlays before app navigation/exit
 
-플랫폼 차이는 adapter/plugin 뒤로 둡니다.
+Automated reference audit requires 800/800 mappings, interchange anchor equality, non-interchange separation, one documented synthetic terminal exception, and bounded adjacent-station geometry.
 
-- haptics
-- share
-- back handling
-- map launch/deep link
-- native place search
-- persistent storage
+Recent draw history is registration-only after a visit is saved; subsequent durable record management occurs inside the footprint UI. The footprint map does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
 
-## 10. API key strategy
+## 10. Build / deployment
 
-키는 플랫폼별로 분리합니다.
+Web: tests → Vite build → browser smoke → verified root promotion → Pages.
 
-- Web key: GitHub Pages HTTP referrer 제한
-- Android key: package name + signing certificate SHA 제한
-- iOS key: bundle identifier 제한
-
-공통 TypeScript에 production key를 하드코딩하지 않습니다.
-
-## 11. Build and deployment targets
-
-### Web
-
-Maintained source entry는 `modular.html`입니다.
-
-`npm run build` → Vite `dist/modular.html` + hashed JS assets를 생성합니다. `web-release.yml`이 tests → build → browser smoke를 통과한 artifact를 GitHub Pages root로 승격합니다.
-
-### Android
-
-Vite native build → Capacitor sync → Gradle build → APK/AAB.
-
-### iOS
-
-Vite native build → Capacitor sync → Xcode/cloud build.
-
-## 12. Architecture decision maintenance
-
-다음 변경은 구현과 같은 PR/change에서 문서화합니다.
-
-- product flow
-- ranking/filter thresholds
-- Places provider/API
-- curated attraction/station-coordinate data policy
-- app identifier
-- storage provider
-- framework/platform dependency
-- Web support/deployment strategy
-
-
-## Physical interchange station equivalence
-
-`src/data/station-equivalence.ts` canonicalizes real interchange station line variants before curated-attraction layers are merged. Same physical stations therefore share one attraction result across lines. Same-name non-interchanges `신촌` and `양평` remain separate, while `총신대입구(이수)` and `이수` are explicitly linked.
-
-
-## Durable visit footprint full-network map
-
-The footprint UI shares the same full-network reference asset and anchor table with Web.
-
-- reference map stays in the scaled stage
-- durable visit markers live in a separate viewport overlay and are positioned with `pan + anchor × scale`, preserving readable screen size at all zoom levels
-- horizontal visit summary strip is independent from map pan/zoom and stays scrollable while detail is open
-- no station is auto-selected on open; detail is explicit-selection only
-- selected detail owns per-record edit/delete
-- recent history owns only first registration; durable management is footprint-only
-- Android native build copies the reference through Vite's public asset pipeline
-- no Android map SDK, Places lookup, GPS or location permission is used by this footprint screen
-- native Android back handling closes footprint/visit/settings overlays before app navigation/exit
-
-Mapping/audit provenance lives in `docs/FOOTPRINT_MAP_REFERENCE.md`.
-
+Android: shared tests → native Web build → Capacitor sync → Gradle debug APK → artifact → fixed `android-dev-latest` Release.
