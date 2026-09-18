@@ -5,6 +5,7 @@ import { getCuratedAttractions } from '../src/data/curated-attractions';
 import { EXTRA_CURATED_STATION_KEYS } from '../src/data/curated-attractions-extra';
 import { LOCAL_CURATED_STATION_KEYS } from '../src/data/curated-attractions-local';
 import { NIGHT_VIEWPOINT_STATION_KEYS } from '../src/data/curated-attractions-night-viewpoints';
+import { getEquivalentStationReferences } from '../src/data/station-equivalence';
 import { SUBWAY_LINES } from '../src/data/subway-lines';
 
 describe('curated attractions', () => {
@@ -272,6 +273,51 @@ describe('curated attractions', () => {
         }
       }
     }
+  });
+
+  it('shares curated attractions across physical interchange line variants', () => {
+    for (const [stationName, lineIds] of [
+      ['왕십리', ['l2', 'l5', 'gc', 'sb']],
+      ['연신내', ['l3', 'l6', 'gtx']],
+      ['도봉산', ['l1', 'l7']],
+      ['인천', ['l1', 'sb']],
+    ] as const) {
+      const expected = getCuratedAttractions(lineIds[0], stationName).map((item) => item.id);
+      for (const lineId of lineIds.slice(1)) {
+        expect(getCuratedAttractions(lineId, stationName).map((item) => item.id)).toEqual(expected);
+      }
+    }
+
+    const stationsByName = new Map<string, string[]>();
+    for (const line of SUBWAY_LINES) {
+      for (const station of line.stations) {
+        const lineIds = stationsByName.get(station.name) ?? [];
+        lineIds.push(line.id);
+        stationsByName.set(station.name, lineIds);
+      }
+    }
+
+    for (const [stationName, lineIds] of stationsByName) {
+      if (lineIds.length < 2 || stationName === '신촌' || stationName === '양평') continue;
+      const expected = getCuratedAttractions(lineIds[0], stationName).map((item) => item.id);
+      for (const lineId of lineIds.slice(1)) {
+        expect(getCuratedAttractions(lineId, stationName).map((item) => item.id)).toEqual(expected);
+      }
+    }
+  });
+
+  it('distinguishes same-name non-interchanges and models the Isu alias interchange explicitly', () => {
+    expect(getEquivalentStationReferences('l5', '양평')).toEqual([{ lineId: 'l5', stationName: '양평' }]);
+    expect(getEquivalentStationReferences('gc', '양평')).toEqual([{ lineId: 'gc', stationName: '양평' }]);
+    expect(getCuratedAttractions('l5', '양평')).toEqual([]);
+    expect(getCuratedAttractions('gc', '양평').map((item) => item.name)).toEqual(['양평물맑은시장']);
+
+    const isuGroup = [
+      { lineId: 'l4', stationName: '총신대입구(이수)' },
+      { lineId: 'l7', stationName: '이수' },
+    ];
+    expect(getEquivalentStationReferences('l4', '총신대입구(이수)')).toEqual(isuGroup);
+    expect(getEquivalentStationReferences('l7', '이수')).toEqual(isuGroup);
   });
 
   it('still allows genuinely weak locations to remain uncurated', () => {
