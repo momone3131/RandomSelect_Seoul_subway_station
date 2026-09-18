@@ -111,14 +111,15 @@ Phase 1:
 
 Phase 2:
 - `다녀온 곳 → 발자취 노선도`
-- `VisitRecord` groups by physical station; multiple line variants/visits share one physical visit state
-- 신촌/양평 same-name non-interchanges remain separate
-- 총신대입구(이수) ↔ 이수 is one pin
-- every subway line/station is shown as a schematic rail + node; visited nodes are larger/filled
-- node detail shows visit count and date/line/confirmed food/confirmed attraction history
-- node selection changes only selection/detail state, not the schematic DOM
-- no map tiles, station-coordinate resolver, GPS/current-location permission or footprint network lookup
-- Android back closes footprint/visit overlays before app navigation/exit
+- bundled public-domain **수도권 전체 노선도 한 장** 위에 방문 physical station marker overlay
+- 24 lines / 800 line×station reference anchors, 800/800 automated audit
+- physical interchange variants share an anchor; 신촌/양평 non-interchanges remain separate
+- 총신대입구(이수) ↔ 이수 shares one physical anchor
+- marker detail shows visit count and date/line/confirmed food/confirmed attraction history
+- pan / wheel zoom / pinch zoom / fit-all
+- station selection changes only marker state/detail, not the map DOM
+- no map provider/tile lookup, station-coordinate resolver, GPS/current-location permission
+- one documented synthetic exception: 의정부경전철 차량기지 임시승강장
 
 Next: Phase 3 unvisited-aware/excluded random → Phase 4 simple visit statistics.
 
@@ -144,6 +145,7 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 - `ARCHITECTURE.md`: data flow/modules
 - `PROJECT_PLAN.md`: product intent
 - `VISIT_HISTORY_PLAN.md`: visit persistence / footprint roadmap
+- `FOOTPRINT_MAP_REFERENCE.md`: full-network reference provenance / 800-anchor audit
 - `ATTRACTION_CURATION.md`: attraction rules
 - `ATTRACTION_TIER_AUDIT.md`: prominence audit
 
