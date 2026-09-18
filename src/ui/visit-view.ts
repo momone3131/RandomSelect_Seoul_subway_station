@@ -155,7 +155,7 @@ export class VisitModalView {
   }
 
   openFromHistory(item: DrawHistoryItem, existing?: VisitRecord): void {
-    const shownAttractions = existing?.shownAttractions.length
+    const shownAttractions = existing
       ? existing.shownAttractions.map((option) => ({ ...option }))
       : fallbackAttractions(item);
     const drawnFoodId = existing?.drawnFoodId ?? item.foodId;
