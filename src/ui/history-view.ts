@@ -46,7 +46,7 @@ export function renderHistory(
     const visitButton = make(
       'button',
       `history-visit-btn${existingVisit ? ' saved' : ''}`,
-      existingVisit ? '발자취에 등록됨' : '다녀왔어요',
+      existingVisit ? '발자취에 등록됨' : '발자취 등록하기',
     ) as HTMLButtonElement;
     visitButton.type = 'button';
     if (existingVisit) {

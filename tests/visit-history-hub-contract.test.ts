@@ -9,7 +9,7 @@ const shell = readFileSync(new URL('../src/ui/shell.html', import.meta.url), 'ut
 
 describe('durable visit history hub contract', () => {
   it('allows initial registration from recent history but routes later management to footprints', () => {
-    expect(historyView).toContain("existingVisit ? '발자취에 등록됨' : '다녀왔어요'");
+    expect(historyView).toContain("existingVisit ? '발자취에 등록됨' : '발자취 등록하기'");
     expect(historyView).toContain('visitButton.disabled = true');
     expect(historyView).not.toContain("existingVisit ? '방문 기록 수정'");
   });

@@ -13,7 +13,8 @@ Date: 2026-09-19
 그 오른쪽에 작은 상태 버튼 하나만 표시합니다.
 
 - 미등록: `등록`
-  - 누르면 최근 기록의 `다녀왔어요`와 동일한 visit picker를 엶
+  - 테두리/배경 없는 낮은 강조의 보조 action
+  - 누르면 최근 기록의 `발자취 등록하기`와 동일한 visit picker를 엶
 - 등록 완료: `발자취`
   - 누르면 해당 방문을 포함한 발자취 노선도를 바로 엶
 
@@ -32,8 +33,8 @@ Date: 2026-09-19
 
 ## Preserved behavior
 
-- 최근 외출 코스의 `다녀왔어요` 진입은 그대로 유지
-- current-course `등록`과 recent-history `다녀왔어요`는 같은 `VisitRecord` / source-history contract 사용
+- 최근 외출 코스의 `발자취 등록하기` 진입은 그대로 유지
+- current-course `등록`과 recent-history `발자취 등록하기`는 같은 `VisitRecord` / source-history contract 사용
 - 같은 코스의 중복 등록 방지
 - 방문 기록 수정/삭제는 발자취 노선도 상세에서 수행
 - 방문 통계의 환승역/명소 등급 집계 규칙 unchanged

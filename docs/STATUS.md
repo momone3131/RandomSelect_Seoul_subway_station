@@ -64,10 +64,10 @@ Alcohol recommendation search:
 - attraction prominence tier text hidden
 - main `바로 뽑기` checkbox removed; production draw always uses the normal reveal animation
 - completed course restores the original single `새 코스` primary action
-- completed headline `이 코스로 가자!` gets one compact state action on its right:
+- completed headline `이 코스로 가자!` gets one compact borderless/transparent state action on its right:
   - `등록` before visit save
   - `발자취` after visit save; opens footprint map directly
-- recent-history `다녀왔어요` remains as a second registration entry
+- recent-history `발자취 등록하기` remains as a second registration entry
 - no separate 발자취 card/module on main
 - `발자취 노선도` + `방문 통계` are quiet utility buttons directly below the station-list control
 
@@ -170,7 +170,7 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - recent draw history remains max12 and disposable
 - new durable key: `random_seoul_visits_v1`
-- history card CTA: 신규 `다녀왔어요` / 저장 후 disabled `발자취에 등록됨`
+- history card CTA: 신규 `발자취 등록하기` / 저장 후 disabled `발자취에 등록됨`
 - station is mandatory
 - drawn food category is optional and unchecked by default
 - shown attractions are optional and multi-select, unchecked by default

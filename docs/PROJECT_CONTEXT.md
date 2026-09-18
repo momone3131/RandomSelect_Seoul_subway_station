@@ -102,7 +102,7 @@ Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase
 
 Phase 1:
 - visits are persisted separately from recent draw history
-- first registration is available from both recent-history `다녀왔어요` and completed-course hero `등록`
+- first registration is available from both recent-history `발자취 등록하기` and completed-course hero `등록`
 - completed-course hero action sits to the right of `이 코스로 가자!`; after save it becomes `발자취` and opens the footprint map
 - station is always saved
 - drawn food is user-confirmed optional
@@ -127,7 +127,7 @@ Phase 2:
 - screenshot-driven polish: detail no longer flex-grows into blank space; modal sizes to content with viewport cap and has more comfortable iPhone top spacing
 - pan / wheel zoom / pinch zoom / fit-all
 - station selection changes only marker/strip state + detail, not the map DOM
-- recent history is only for first `다녀왔어요` registration; saved item becomes `발자취에 등록됨`
+- recent history is only for first `발자취 등록하기` registration; saved item becomes `발자취에 등록됨`
 - no map provider/tile lookup, station-coordinate resolver, GPS/current-location permission
 - one documented synthetic exception: 의정부경전철 차량기지 임시승강장
 
@@ -166,7 +166,7 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 - fixed `android-dev-latest` APK republished, size `11,525,705` bytes
 
 ### Visit/statistics invariants
-- recent-history `다녀왔어요` remains
+- recent-history `발자취 등록하기` remains
 - hero `등록` reuses the same VisitRecord/source-history contract
 - same source course is not duplicated
 - physical interchange equality / 신촌·양평 separation / 이수 alias preserved
