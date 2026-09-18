@@ -344,6 +344,38 @@ describe('curated attractions', () => {
     ]);
   });
 
+  it('adds second-pass researched destinations around still-empty stations', () => {
+    expect(getCuratedAttractions('l2', '서초')).toEqual([
+      expect.objectContaining({ id: 'national-library-of-korea', tier: 'silver' }),
+    ]);
+    expect(getCuratedAttractions('l3', '화정').map((item) => item.name)).toEqual(['화정 문화의거리']);
+    expect(getCuratedAttractions('l5', '명일').map((item) => item.name)).toEqual(['명일전통시장']);
+    expect(getCuratedAttractions('l8', '암사역사공원').map((item) => item.name)).toEqual(['암사역사공원']);
+    expect(getCuratedAttractions('ic2', '석바위시장').map((item) => item.name)).toEqual(['석바위시장']);
+    expect(getCuratedAttractions('gc', '가좌')[0]).toEqual(
+      expect.objectContaining({ id: 'gyeongui-line-forest-park', tier: 'silver' }),
+    );
+    expect(getCuratedAttractions('gc', '한국항공대').map((item) => item.name)).toEqual([
+      '한국항공대학교 항공우주박물관',
+    ]);
+    expect(getCuratedAttractions('sb', '기흥')[0]).toEqual(
+      expect.objectContaining({ id: 'nam-june-paik-art-center', tier: 'silver' }),
+    );
+    expect(getCuratedAttractions('sb', '인천논현').map((item) => item.name)).toEqual(['늘솔길공원']);
+    expect(getCuratedAttractions('ui', '솔샘').map((item) => item.name)).toEqual([
+      '북한산둘레길 흰구름길',
+    ]);
+    expect(getCuratedAttractions('gj', '의정부시청').map((item) => item.name)).toEqual([
+      '의정부예술의전당',
+    ]);
+    expect(getCuratedAttractions('ev', '삼가').map((item) => item.name)).toEqual(['용인미르스타디움']);
+    expect(getCuratedAttractions('gm', '구래').map((item) => item.name)).toEqual([
+      '김포독립운동기념관',
+    ]);
+    expect(getCuratedAttractions('l1', '역곡').map((item) => item.name)).toEqual(['역곡상상시장']);
+    expect(getCuratedAttractions('l1', '송내').map((item) => item.name)).toEqual(['복사골문화센터']);
+  });
+
   it('reuses strong nearby destinations instead of creating duplicate attraction identities', () => {
     expect(getCuratedAttractions('l2', '을지로4가')[0]).toEqual(
       expect.objectContaining({ id: 'gwangjang-market', tier: 'gold' }),
