@@ -139,6 +139,8 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 - visited markers remain screen-sized at fit-all/zoom
 - horizontal visit strip + explicit detail selection + footprint-only edit/delete verified in deployed bundle
 - main durable cards removed; recent-history saved state is registration-only
+- Android fixed `android-dev-latest` now matches the visit-hub footprint view, visit/main UI, styles and contract tests
+- native Vite uses the shared `public/` directory so the full-network SVG ships in Android
 
 ### Mapping verification
 - app outcomes: 800
