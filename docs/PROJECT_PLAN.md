@@ -1,6 +1,6 @@
 # Random Seoul — Project Plan
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
 
 이 문서는 Random Seoul의 제품 방향과 변경 불가 원칙을 기록합니다. 최신 구현/검증 상태는 `STATUS.md`, 구조는 `ARCHITECTURE.md`를 우선 확인합니다.
 
@@ -79,6 +79,7 @@ Both share:
 - no forced fill
 - 랜덤 결과 바로 아래 compact surface로 우선 노출
 - 작은 놀이터·평범한 근린시설 제외
+- 동일한 실제 환승역은 어느 노선에서 뽑혀도 동일한 curated attraction 결과 유지; 동명이역은 분리
 
 Prominence tier:
 - Diamond / Gold / Silver / Standard
