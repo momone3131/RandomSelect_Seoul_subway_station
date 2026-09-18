@@ -127,7 +127,7 @@ Current status: **Phase 1 + Phase 2 implemented / verified on Web + Android**.
 기본 개발 순서:
 
 1. **방문 기록 분리 저장** — 완료
-2. **발자취 지도** — 완료; physical station 단위 pin / 방문 세부기록
+2. **발자취 지도** — 완료; 전체 노선도 screen-space 방문 marker + horizontal 방문기록 strip + 선택 상세/수정/삭제
 3. **안 가본 역 우선·제외 랜덤** — 다음 단계; 기본 완전 랜덤은 유지
 4. **간단한 방문 통계** — 이후; 고유 방문 역/노선별 진행도 등
 
@@ -140,6 +140,8 @@ Phase 1 규칙:
 - 명소 후보는 당시 화면에 노출된 명소만; 복수 선택 가능
 - 역 방문만 단독 저장 가능
 - 방문일은 선택사항
+- 최초 등록만 최근 추첨 카드에서 수행; 등록 이후 조회/수정/삭제는 발자취 노선도에서 수행
+- main 화면에는 durable visit 상세 목록을 중복 노출하지 않음
 
 ## 10. Documentation change control
 
