@@ -24,7 +24,17 @@
 .visit-statistics-card strong{display:block;font-size:23px;font-weight:900;letter-spacing:-.6px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .visit-statistics-card small{display:block;margin-top:7px;font-size:11px;line-height:1.5;color:#63705f}
 .visit-statistics-card.is-date strong{font-size:18px;line-height:1.5;letter-spacing:-.4px}
-.visit-statistics-lines-title{margin:0 0 8px;font-size:16px;font-weight:900}
+.visit-statistics-tier-title,.visit-statistics-lines-title{margin:0 0 8px;font-size:16px;font-weight:900}
+.visit-statistics-tier-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 22px}
+.visit-statistics-tier-card{--tier-fill:linear-gradient(#f5f4f0,#f5f4f0);--tier-rim:linear-gradient(#d3d7d0,#d3d7d0);min-width:0;padding:12px 10px;border:2px solid transparent;border-radius:13px;background:var(--tier-fill) padding-box,var(--tier-rim) border-box}
+.visit-statistics-tier-card strong{display:block;margin-top:5px;font-size:19px;line-height:1.2;font-weight:900;font-variant-numeric:tabular-nums}
+.visit-statistics-tier-card small{display:block;margin-top:5px;color:#677269;font-size:10px;line-height:1.35}
+.visit-statistics-tier-name{display:block;color:#5a655d;font-size:10px;font-weight:850;white-space:nowrap}
+.visit-statistics-tier-diamond{--tier-rim:linear-gradient(118deg,#43cfd8,#eaffff 18%,#7ecfff 32%,#fff 45%,#c6b2ff 61%,#61e2d9 76%,#f9ffff)}
+.visit-statistics-tier-gold{--tier-rim:linear-gradient(110deg,#8f6500,#d6a620 20%,#fff3ad 38%,#b67a00 55%,#f7d867 75%,#fff8cf)}
+.visit-statistics-tier-silver{--tier-rim:linear-gradient(110deg,#727a80,#b8c0c5 20%,#f6f9fa 38%,#8d969c 55%,#dce2e5 76%,#fff)}
+.visit-statistics-tier-standard{--tier-rim:linear-gradient(#cbd3cb,#cbd3cb)}
+.visit-statistics-lines-title{margin-top:0}
 .visit-statistics-lines{list-style:none;padding:0;margin:0}
 .visit-statistics-line{padding:12px 0;border-bottom:1px solid #eceee8}
 .visit-statistics-line-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
@@ -48,4 +58,5 @@
   #visit_statistics_body{padding:16px 18px 20px;scrollbar-gutter:auto}
   .visit-statistics-hero{padding:17px}
   .visit-statistics-card{padding:14px 12px}
+  .visit-statistics-tier-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 }
