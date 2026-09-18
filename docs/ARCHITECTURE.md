@@ -140,7 +140,7 @@ Draw history and visit history are different data domains.
 - `DrawHistoryItem.attractionOptions` snapshots the 0–2 attractions shown at station draw time
 - `VisitRecord` stores station identity, optional visit date, drawn food candidate, shown-attraction candidates and the user-confirmed visited subset
 - Google Places restaurant results are intentionally excluded from visit records
-- `visit-view.ts` owns the visit picker and durable visit list
+- `visit-view.ts` owns the visit picker plus compact main-screen footprint entry; durable visit list/edit/delete presentation lives inside `footprint-map-view.ts`
 
 This shared TypeScript contract is the source for the footprint map and remains the planned source for unvisited-aware random and visit statistics.
 
@@ -153,15 +153,17 @@ Phase 2 stays on top of the existing durable `VisitRecord` collection.
 - `generate-footprint-map-anchors.mjs`: deterministic extractor from reference SVG station labels
 - `station-equivalence.ts`: canonical physical-station identity used to collapse interchange line variants
 - `visit-footprint.ts`: groups multiple records and line variants into one physical visit station
-- `footprint-map-view.ts`: full-map pan/zoom surface, visit marker overlay and per-station visit history
+- `footprint-map-view.ts`: full-map pan/zoom surface, screen-space visit marker overlay, horizontal visit summary strip, selected-station detail and edit/delete actions
 - station markers use the reference SVG's own label geometry; geographic latitude/longitude is not involved
-- visited marker selection updates CSS/ARIA state + detail only; it does not rebuild or reposition the map
+- visited markers are rendered in a non-scaled viewport overlay and re-positioned from anchor×map-transform, keeping their screen size visible at fit-all and zoomed views
+- marker/strip selection updates CSS/ARIA state + detail only; it does not rebuild or reposition the map
+- no physical station is auto-selected on open; detail stays hidden until explicit selection
 - no current-location/GPS input, station resolver, Google map lookup or OSM tile request is used by the footprint screen
 - Android native back handling closes footprint/visit/settings overlays before app navigation/exit
 
 Automated reference audit requires 800/800 mappings, interchange anchor equality, non-interchange separation, one documented synthetic terminal exception, and bounded adjacent-station geometry.
 
-The footprint map does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
+Recent draw history is registration-only after a visit is saved; subsequent durable record management occurs inside the footprint UI. The footprint map does not alter the `VisitRecord` storage schema and does not create or persist any map-provider/location database.
 
 ## 10. Build / deployment
 
