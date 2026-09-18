@@ -4,12 +4,13 @@ import { AppStore } from './state/app-state';
 import { GoogleWebPlaceSearchService } from './services/places/google-web';
 import { PlaceSearchUnavailableError, type PlaceSearchService } from './services/places/place-search';
 import { StationLocationService } from './services/places/station-location';
-import { loadPersistedInitialState, saveHistory, savePreferences } from './services/storage/app-persistence';
+import { loadPersistedInitialState, saveHistory, savePreferences, saveVisits } from './services/storage/app-persistence';
 import { WebStorageService } from './services/storage/web-storage';
 import { googleMapsSearchUrl, naverMapSearchUrl } from './services/maps/web-map-links';
 import { animateDrawStage, revealDrawStage, type AnimatedDrawStage } from './ui/draw-animation';
 import { renderDrawView } from './ui/draw-view';
 import { renderHistory } from './ui/history-view';
+import { renderVisits, VisitModalView } from './ui/visit-view';
 import { renderAttractions, resetAttractionView } from './ui/attraction-view';
 import {
   renderRestaurantError,
@@ -71,6 +72,7 @@ const controller = new RandomSeoulController(
   selfTestMode ? () => 1_000_000 : Date.now,
 );
 const settingsView = new SettingsModalView();
+const visitModal = new VisitModalView();
 
 let busy = false;
 let toastTimer: number | undefined;
@@ -197,15 +199,36 @@ function updateStatusCopy(): void {
   helper.textContent = '추천 명소를 보고, 원하면 주변 추천 장소를 찾아보세요.';
 }
 
+function openVisitFromHistory(item: Parameters<typeof renderHistory>[0][number]): void {
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  const existing = store.getSnapshot().visits.find((visit) => visit.sourceHistoryId === item.id);
+  visitModal.openFromHistory(item, existing);
+  renderState();
+}
+
+function openVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): void {
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
+  visitModal.openVisit(visit);
+  renderState();
+}
+
+function deleteVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): void {
+  if (!window.confirm(`${visit.stationName}역 방문 기록을 삭제할까요?`)) return;
+  controller.deleteVisit(visit.id);
+  notify('방문 기록을 삭제했어요.');
+}
+
 function renderState(): void {
   const state = store.getSnapshot();
-  renderDrawView(state, { busy, modalOpen: settingsView.isOpen });
-  renderHistory(state.history);
+  renderDrawView(state, { busy, modalOpen: settingsView.isOpen || visitModal.isOpen });
+  renderHistory(state.history, state.visits, openVisitFromHistory);
+  renderVisits(state.visits, { onEdit: openVisitRecord, onDelete: deleteVisitRecord });
   if (state.currentStation) renderAttractions(state.currentStation.name, state.attractions);
   else resetAttractionView();
   updateStatusCopy();
   savePreferences(storage, state.preferences);
   saveHistory(storage, state.history);
+  saveVisits(storage, state.visits);
   syncRestaurantDiscoveryState();
 }
 
@@ -220,7 +243,7 @@ async function performDraw(
   action: () => Promise<unknown> | unknown,
   animationStage?: AnimatedDrawStage,
 ): Promise<void> {
-  if (busy || restaurantLookupBusy || settingsView.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
   busy = true;
   renderState();
 
@@ -244,7 +267,7 @@ async function performDraw(
 }
 
 async function requestRestaurants(scrollToResults = true): Promise<void> {
-  if (busy || restaurantLookupBusy || restaurantLookupComplete || settingsView.isOpen) return;
+  if (busy || restaurantLookupBusy || restaurantLookupComplete || settingsView.isOpen || visitModal.isOpen) return;
   const key = currentRestaurantKey();
   const context = currentRestaurantContext();
   if (!key || !context) return;
@@ -379,12 +402,12 @@ byId<HTMLButtonElement>('google_map_btn').addEventListener('click', () => {
 });
 
 byId<HTMLButtonElement>('settings_btn').addEventListener('click', () => {
-  if (restaurantLookupBusy) return;
+  if (restaurantLookupBusy || visitModal.isOpen) return;
   settingsView.open('line', store.getSnapshot().preferences.selectedLineIds);
   renderState();
 });
 byId<HTMLButtonElement>('food_settings_btn').addEventListener('click', () => {
-  if (restaurantLookupBusy) return;
+  if (restaurantLookupBusy || visitModal.isOpen) return;
   settingsView.open('food', store.getSnapshot().preferences.selectedFoodIds);
   renderState();
 });
@@ -416,12 +439,43 @@ byId<HTMLElement>('settings_overlay').addEventListener('click', (event) => {
   }
 });
 
+byId<HTMLButtonElement>('close_visit').addEventListener('click', () => {
+  visitModal.close();
+  renderState();
+});
+byId<HTMLButtonElement>('cancel_visit').addEventListener('click', () => {
+  visitModal.close();
+  renderState();
+});
+byId<HTMLButtonElement>('save_visit').addEventListener('click', () => {
+  const submission = visitModal.getSubmission();
+  if (!submission) return;
+  controller.saveVisit(submission);
+  visitModal.close();
+  renderState();
+  notify('방문 기록을 저장했어요.');
+});
+byId<HTMLElement>('visit_overlay').addEventListener('click', (event) => {
+  if (event.target === event.currentTarget) {
+    visitModal.close();
+    renderState();
+  }
+});
+
 byId<HTMLButtonElement>('clear_history').addEventListener('click', () => {
   controller.clearHistory();
-  notify('추첨 기록을 지웠어요.');
+  notify('최근 추첨 기록만 지웠어요. 방문 기록은 유지돼요.');
 });
 
 document.addEventListener('keydown', (event) => {
+  if (visitModal.isOpen) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      visitModal.close();
+      renderState();
+    }
+    return;
+  }
   if (settingsView.isOpen) {
     if (event.key === 'Escape') {
       event.preventDefault();
