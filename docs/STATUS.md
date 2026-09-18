@@ -152,6 +152,29 @@ App id: `io.github.momone3131.randomseoul`
 Direct download:
 `https://github.com/momone3131/RandomSelect_Seoul_subway_station/releases/download/android-dev-latest/random-seoul-latest.apk`
 
+## Durable visit history — Phase 1
+
+Status: **IMPLEMENTED / final Web+Android verification pending**
+
+- recent draw history remains max12 and disposable
+- new durable key: `random_seoul_visits_v1`
+- history card CTA: `다녀왔어요` / saved state `방문 기록 수정`
+- station is mandatory
+- drawn food category is optional and unchecked by default
+- shown attractions are optional and multi-select, unchecked by default
+- Google restaurant recommendation is not included
+- optional visit date; new record defaults to today and can be cleared
+- durable visit list supports edit/delete
+- clearing recent draw history explicitly leaves visits intact
+- new draw-history items snapshot shown attraction IDs/names for later visit editing
+
+Roadmap source: `VISIT_HISTORY_PLAN.md`.
+
+Next planned phases:
+2. footprint map
+3. unvisited-first/exclude random modes
+4. simple visit statistics
+
 ## Build / CI gates
 
 Web: tests → Vite build → headless browser smoke → verified root promotion → Pages.
@@ -163,6 +186,7 @@ Android: shared tests → native Web build → Capacitor sync → Gradle `assemb
 - `PROJECT_CONTEXT.md`: fast recovery
 - `STATUS.md`: current facts / verification
 - `PROJECT_PLAN.md`: product intent / policy
+- `VISIT_HISTORY_PLAN.md`: long-term visit loop roadmap
 - `ARCHITECTURE.md`: technical/data flow
 - `ATTRACTION_CURATION.md`: attraction selection/map/tier/feature policy
 - `ATTRACTION_TIER_AUDIT.md`: prominence audit evidence
