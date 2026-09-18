@@ -119,7 +119,7 @@ Phase 2:
 - horizontal `역명 · 최근 방문일` strip remains scrollable under the map
 - no detail is shown on open; marker or strip selection opens visit count/date/line/confirmed food/attraction detail
 - selected detail owns per-record edit/delete; main page no longer shows durable visit cards
-- selected detail uses a viewport-safe `detail-open` layout: line badge + station + visit count share one row, map height contracts/refits, header/close stays visible
+- footprint panel has one stable size before/after selection: map height never changes, detail space is reserved from open, idle copy is `역을 누르면 상세·수정`, and header/close stays visible
 - pan / wheel zoom / pinch zoom / fit-all
 - station selection changes only marker/strip state + detail, not the map DOM
 - recent history is only for first `다녀왔어요` registration; saved item becomes `발자취에 등록됨`

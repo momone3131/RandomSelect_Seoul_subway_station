@@ -49,8 +49,6 @@ function ensureFootprintModal(): void {
   append(head, titleWrap, close);
 
   const body = make('div', 'footprint-body');
-  const status = make('div', 'footprint-map-status', '드래그해서 이동 · 확대해서 역 이름 확인');
-  status.id = 'footprint_map_status';
 
   const mapWrap = make('div', 'footprint-map-wrap');
   const viewport = make('div', 'footprint-map-viewport');
@@ -99,7 +97,6 @@ function ensureFootprintModal(): void {
   const visitBrowser = make('section', 'footprint-visit-browser');
   const browserHead = make('div', 'footprint-browser-head');
   browserHead.appendChild(make('strong', '', '방문 기록'));
-  browserHead.appendChild(make('span', '', '옆으로 밀어서 둘러보고, 누르면 상세 기록이 열려요.'));
   const strip = make('div', 'footprint-visit-strip');
   strip.id = 'footprint_visit_strip';
   strip.setAttribute('aria-label', '방문 역 기록 목록');
@@ -107,10 +104,10 @@ function ensureFootprintModal(): void {
 
   const detail = make('section', 'footprint-detail');
   detail.id = 'footprint_detail';
-  detail.hidden = true;
   detail.setAttribute('aria-live', 'polite');
+  detail.appendChild(make('div', 'footprint-detail-placeholder', '역을 누르면 상세·수정'));
 
-  append(body, status, mapWrap, visitBrowser, detail);
+  append(body, mapWrap, visitBrowser, detail);
   append(dialog, head, body);
   overlay.appendChild(dialog);
   document.body.appendChild(overlay);
@@ -215,10 +212,6 @@ export class FootprintMapView {
   private updateSummary(visitCount: number): void {
     byId<HTMLElement>('footprint_summary').textContent =
       `방문 역 ${this.groups.length}곳 · 방문 기록 ${visitCount}개`;
-    byId<HTMLElement>('footprint_map_status').textContent =
-      this.groups.length
-        ? '밝은 원이 방문한 역이에요 · 축소해도 표시되며 드래그/확대할 수 있어요.'
-        : '저장된 방문 기록이 없어요.';
   }
 
   private bindMapInteractions(): void {
@@ -493,15 +486,6 @@ export class FootprintMapView {
     this.renderDetails();
   }
 
-  private syncDetailLayout(open: boolean): void {
-    const dialog = byId<HTMLElement>('footprint_dialog');
-    const wasOpen = dialog.classList.contains('detail-open');
-    dialog.classList.toggle('detail-open', open);
-    if (wasOpen !== open) {
-      window.requestAnimationFrame(() => this.fitAll());
-    }
-  }
-
   private renderDetails(): void {
     const detail = byId<HTMLElement>('footprint_detail');
     const group = this.selectedGroupId
@@ -509,14 +493,12 @@ export class FootprintMapView {
       : undefined;
 
     if (!group) {
-      detail.hidden = true;
-      this.syncDetailLayout(false);
-      replaceContent(detail, document.createDocumentFragment());
+      const placeholder = document.createDocumentFragment();
+      placeholder.appendChild(make('div', 'footprint-detail-placeholder', '역을 누르면 상세·수정'));
+      replaceContent(detail, placeholder);
       return;
     }
 
-    detail.hidden = false;
-    this.syncDetailLayout(true);
     const fragment = document.createDocumentFragment();
     const head = make('div', 'footprint-detail-head');
     const title = make('div', 'footprint-detail-title');
