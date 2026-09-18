@@ -104,6 +104,10 @@ Orthogonal Nightscape feature:
 ## 7. Visual / interaction direction
 
 - result/action 중심, 설명 copy 최소화
+- main `바로 뽑기` checkbox는 제거; 정상 reveal animation을 기본/유일 product behavior로 유지
+- 코스 완성 시 `이 코스로 가기`를 `새 코스` 바로 왼쪽에 같은 row로 노출
+- `이 코스로 가기`는 최근 기록 `다녀왔어요`와 동일한 visit picker를 사용
+- 발자취 hub는 `추천 명소` 및 `복사 · 네이버지도 · 구글지도` 다음, live 추천 식당/술집 결과보다 위에 둠
 - passive neutral palette 유지
 - active draw lime + completed station actual line color 유지
 - Diamond gemstone, Gold/Silver metallic
@@ -136,6 +140,8 @@ Current status: **Phase 1 + Phase 2 complete; Phase 3 dropped; Phase 4 implement
 상세 source of truth: `docs/VISIT_HISTORY_PLAN.md`.
 
 Phase 1 규칙:
+- 최초 방문 등록 진입은 최근 추첨 카드의 `다녀왔어요`와 현재 완성 코스의 `이 코스로 가기` 두 곳에서 가능
+- 저장 후 두 진입점 모두 `발자취에 등록됨` 상태를 따르며 동일 source record 중복 등록 금지
 - 최근 추첨 기록 삭제는 실제 방문 기록을 삭제하지 않음
 - 음식/명소는 뽑혔다는 이유만으로 자동 방문 처리하지 않음
 - 음식 후보는 당시 추첨 종목 하나만; Google 추천 식당은 저장 후보가 아님

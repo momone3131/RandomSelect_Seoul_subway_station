@@ -62,6 +62,11 @@ Alcohol recommendation search:
 - completed station: selected line-color subway-sign style
 - visual progress strip hidden
 - attraction prominence tier text hidden
+- main `바로 뽑기` checkbox removed; production draw always uses the normal reveal animation
+- completed course shows `이 코스로 가기 | 새 코스` in one row
+- `이 코스로 가기` opens the same visit picker as recent-history `다녀왔어요`
+- after visit save, that action becomes disabled `발자취에 등록됨`
+- 발자취 hub sits directly below `복사 · 네이버지도 · 구글지도`, above live restaurant/술집 results
 
 ## Attraction coverage
 
@@ -125,33 +130,32 @@ Current 12:
 
 DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체는 일반 추천/기존 tier는 유지하지만 Nightscape에서는 제외합니다.
 
-## Latest verified Web — Phase 4 visit statistics
+## Latest verified Web — promoted visit UX
 
-- Phase 4 PR #16 CI `35367289293` — **success**
-- source merge `e15b8b6108d6c3664174a53f3a3e918a44a5276f`
-- main CI `35367506018` — **success**
-- Web Release `35367506047` — **success**
-- deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`
-- public bundle: `assets/modular-Ct4Elvwv.js`
-- browser smoke includes the Phase 4 statistics marker
-- regression coverage explicitly verifies a 1호선 신도림 visit counts on both 1호선 and 2호선 progress
-- confirmed attraction statistics include Diamond / Gold / Silver / Standard unique-place and revisit-inclusive counts
+- PR #17 CI `35368693765` — **success**
+- PR #18 CI `35368949986` — **success**
+- final source merge `7bdfcc2f65e35be10bf006005545884b5c298e6a`
+- main CI `35369033009` — **success**
+- Web Release `35369033238` — **success**
+- deployment commit `e633c7b3bb63ffb5d24ba2e23a94fdb4bc556460`
+- public bundle: `assets/modular--Htlab0P.js`
+- deployed bundle verified for `이 코스로 가기`, `발자취에 등록됨`, footprint/statistics entry, and absence of `바로 뽑기`
+- footprint hub final DOM position: immediately after `map_actions`, so Places result expansion cannot push it below recommendation results
 
-## Latest verified Android — Phase 4 visit statistics
+## Latest verified Android — promoted visit UX
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- source head: `a5a9b78bf83c1929f32de521b53d4a28771d5539`
-- Android CI `35367476033` — **success**
+- source head: `de2e21cb463adc088fa60164bb6d5c1fad44ed82`
+- Android CI `35369057004` — **success**
 - shared tests — success
 - native Web build / Capacitor sync — success
 - Gradle debug APK assembly — success
-- Android hardware back closes visit statistics before footprint / visit / settings overlays
 - fixed latest-development APK republished successfully
 - APK `random-seoul-latest.apk`
-- size: `11,525,425` bytes
+- size: `11,526,053` bytes
 - asset updated: 2026-09-19 KST
 
 Direct download:
