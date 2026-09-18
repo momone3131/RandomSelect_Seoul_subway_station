@@ -38,38 +38,27 @@ function fallbackAttractions(item: DrawHistoryItem): AttractionSnapshot[] {
 }
 
 function ensureVisitSection(): HTMLElement {
-  let section = document.getElementById('visit_history');
-  if (section) return section;
+  let tools = document.getElementById('visit_tools');
+  if (tools) return tools;
 
-  section = make('section', 'history visit-history visit-hub');
-  section.id = 'visit_history';
-  section.hidden = true;
-  section.setAttribute('aria-labelledby', 'visit_history_title');
+  tools = make('div', 'visit-tools');
+  tools.id = 'visit_tools';
+  tools.setAttribute('aria-label', '발자취 도구');
 
-  const head = make('div', 'section-head visit-hub-head');
-  const title = make('h2');
-  title.id = 'visit_history_title';
-  title.append('발자취 ');
-  const count = make('span', 'count-bubble', '0');
-  count.id = 'visit_count';
-  title.appendChild(count);
-
-  const mapButton = make('button', 'history-visit-btn visit-map-btn', '발자취 노선도 보기') as HTMLButtonElement;
+  const mapButton = make('button', 'visit-tool-btn', '발자취 노선도') as HTMLButtonElement;
   mapButton.id = 'footprint_map_btn';
   mapButton.type = 'button';
 
-  const statisticsButton = make('button', 'history-visit-btn visit-statistics-btn', '방문 통계');
+  const statisticsButton = make('button', 'visit-tool-btn', '방문 통계') as HTMLButtonElement;
   statisticsButton.id = 'visit_statistics_btn';
   statisticsButton.type = 'button';
-  const actions = make('div', 'visit-hub-actions');
-  append(actions, mapButton, statisticsButton);
-  append(head, title, actions);
-  section.appendChild(head);
 
-  const mapActions = document.getElementById('map_actions');
-  if (!mapActions) throw new Error('Missing map actions.');
-  mapActions.insertAdjacentElement('afterend', section);
-  return section;
+  append(tools, mapButton, statisticsButton);
+
+  const stationDetail = document.getElementById('station_detail');
+  if (!stationDetail) throw new Error('Missing station detail.');
+  stationDetail.insertAdjacentElement('afterend', tools);
+  return tools;
 }
 
 function ensureVisitModal(): void {
@@ -263,11 +252,13 @@ export class VisitModalView {
 }
 
 export function renderVisits(visits: readonly VisitRecord[], callbacks: VisitListCallbacks): void {
-  const section = ensureVisitSection();
-  section.hidden = visits.length === 0;
-  byId<HTMLElement>('visit_count').textContent = String(visits.length);
+  ensureVisitSection();
 
   const mapButton = byId<HTMLButtonElement>('footprint_map_btn');
+  mapButton.disabled = visits.length === 0;
   mapButton.onclick = visits.length ? callbacks.onOpenMap : null;
-  byId<HTMLButtonElement>('visit_statistics_btn').onclick = callbacks.onOpenStatistics;
+
+  const statisticsButton = byId<HTMLButtonElement>('visit_statistics_btn');
+  statisticsButton.disabled = false;
+  statisticsButton.onclick = callbacks.onOpenStatistics;
 }
