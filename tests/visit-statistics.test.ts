@@ -127,7 +127,8 @@ describe('durable visit statistics', () => {
     const view = readFileSync(new URL('../src/ui/visit-view.ts', import.meta.url), 'utf8');
     const calculator = readFileSync(new URL('../src/domain/visit-statistics.ts', import.meta.url), 'utf8');
     expect(view).toContain('visit_statistics_btn');
-    expect(view).toContain('visit-hub-actions');
+    expect(view).toContain("make('div', 'visit-tools')");
+    expect(view).toContain("stationDetail.insertAdjacentElement('afterend', tools)");
     expect(main).toContain('onOpenStatistics: openVisitStatistics');
     expect(main).toContain('visitStatistics.refresh(state.visits)');
     expect(calculator).not.toMatch(/localStorage|saveVisits|Math\.random|selectedLineIds/);
