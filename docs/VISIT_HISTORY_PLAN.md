@@ -10,7 +10,7 @@ Last updated: 2026-09-19
 
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-최근 추첨 카드의 `다녀왔어요`에서 실제 방문 기록을 만듭니다.
+최근 추첨 카드의 `다녀왔어요` 또는 현재 코스가 완성된 직후의 `이 코스로 가기`에서 동일한 방문 기록 picker를 엽니다.
 
 Record rules:
 - **역은 필수**: 당시 뽑힌 노선/역을 항상 방문 기록에 저장
@@ -19,8 +19,9 @@ Record rules:
 - 명소는 복수 선택 가능
 - 추천 식당 Google Places 결과는 방문 기록 후보에 포함하지 않음
 - 방문일은 선택사항이며 신규 기록 화면에서는 오늘 날짜를 기본값으로 제공하고 사용자가 지울 수 있음
-- 최초 등록은 최근 추첨 카드의 `다녀왔어요`에서만 수행
-- 등록 완료 뒤 최근 추첨 카드에서는 `발자취에 등록됨` 상태만 표시하고 수정 진입은 제공하지 않음
+- 최초 등록은 최근 추첨 카드의 `다녀왔어요` 또는 완성 코스의 `이 코스로 가기`에서 수행
+- 두 진입점 모두 같은 source history item을 사용하므로 동일 코스를 중복 등록하지 않음
+- 등록 완료 뒤 해당 코스는 `발자취에 등록됨` 상태만 표시하고 수정 진입은 제공하지 않음
 - 이후 조회/수정/삭제는 `발자취 노선도` 안의 durable visit history에서 수행
 
 Persistence:
@@ -57,7 +58,7 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 Anchor source/generation/audit 상세: `docs/FOOTPRINT_MAP_REFERENCE.md`.
 
-Main 화면에는 durable visit card 목록을 노출하지 않고 방문 기록 수 + `발자취 노선도 보기` 진입만 제공합니다. Phase 2는 `VisitRecord` persistence schema를 변경하지 않으며 별도 방문 DB를 만들지 않습니다.
+Main 화면에는 durable visit card 목록을 노출하지 않고, `추천 명소`와 `복사 · 네이버지도 · 구글지도` 바로 다음에 compact `발자취` hub를 둡니다. Hub에는 방문 기록 수 + `발자취 노선도 보기` + `방문 통계` 진입을 제공하며 live 추천 식당/술집 결과보다 위에 유지합니다. Phase 2는 `VisitRecord` persistence schema를 변경하지 않으며 별도 방문 DB를 만들지 않습니다.
 
 ## Phase 3 — Unvisited-aware random
 
@@ -78,7 +79,7 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 복잡한 소셜/랭킹 게임화 대신 개인 탐험 진행도를 가볍게 보여줍니다.
 
 Entry:
-- 메인 `발자취` 영역에서 `발자취 노선도 보기` 옆에 별도 `방문 통계` 버튼 제공
+- 메인 `발자취` 영역은 `복사 · 네이버지도 · 구글지도` 바로 아래, live 추천 식당/술집 결과보다 위에 위치하며 `발자취 노선도 보기` 옆에 별도 `방문 통계` 버튼 제공
 - 노선도와 통계는 서로 독립된 화면이며, 통계를 보기 위해 노선도를 먼저 열 필요 없음
 
 Metrics:
