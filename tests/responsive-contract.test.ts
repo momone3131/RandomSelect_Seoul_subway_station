@@ -184,6 +184,9 @@ describe('Random Seoul responsive visual contract', () => {
   it('keeps the hero visit action compact and the visit utilities visually quiet', () => {
     expect(styles).toContain('.hero-title-row{display:flex');
     expect(styles).toContain('.hero-visit-btn{');
+    expect(styles).toContain('padding:4px 6px;');
+    expect(styles).toContain('border:0;');
+    expect(styles).toContain('background:transparent;');
     expect(styles).toContain('.visit-tools{');
     expect(styles).toContain('.visit-tool-btn{');
     expect(styles).not.toContain('.done-actions{');
