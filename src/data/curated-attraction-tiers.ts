@@ -139,7 +139,6 @@ const SILVER_IDS = new Set<string>([
   'seongnam-arts-center',
   'gimpo-jangneung',
   'national-library-of-korea',
-  'dapsimni-antique-shopping-center',
   'seoul-photo-museum',
   'seoul-robot-ai-museum',
   'lg-art-center-seoul',
