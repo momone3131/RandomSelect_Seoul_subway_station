@@ -8,7 +8,7 @@ Last updated: 2026-09-18
 
 ## Phase 1 — Durable visit records
 
-Status: **IMPLEMENTED / verification in progress**
+Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 최근 추첨 카드의 `다녀왔어요`에서 실제 방문 기록을 만듭니다.
 
