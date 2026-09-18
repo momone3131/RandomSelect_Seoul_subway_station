@@ -71,11 +71,12 @@ Merge priority:
 
 **base → station adjustments → extra → local → dedicated night-viewpoint layer → ID dedupe → max2 → tier/feature attachment**
 
-Current prominence counts:
+Current surfaced prominence counts after the 2026-09-18 re-audit:
 - Diamond 4
 - Gold 25
-- Silver 88
-- remaining Standard
+- Silver 96
+- Standard 250
+- total unique surfaced attractions 375
 
 Diamond fixed 4: 경복궁 / 국립중앙박물관 / 롯데월드타워 / 북촌한옥마을.
 
@@ -86,9 +87,20 @@ Curated attractions are shared across line variants of the **same physical inter
 - same-name physical interchanges resolve to one canonical result regardless of which line produced the draw
 - known same-name non-interchanges stay separate: 2호선 신촌 vs 경의중앙선 신촌, 5호선 양평 vs 경의중앙선 양평
 - differently named physical interchange alias is explicit: 4호선 `총신대입구(이수)` ↔ 7호선 `이수`
-- current draw-unit coverage after the fix: 800 line/station outcomes = 391 with 0 attractions / 307 with 1 / 102 with 2
-- the fix fills 30 previously empty line/station variants without adding weaker attractions
+- physical-interchange fix baseline: 800 line/station outcomes = 391 with 0 attractions / 307 with 1 / 102 with 2
+- 2026-09-18 zero-coverage re-audit: 319 with 0 / 377 with 1 / 104 with 2, overall attraction coverage 60.1%
+- physical missing-station groups reduced from 346 to 288
+- 45 new unique destinations were added; strong existing attraction IDs are reused where the same destination serves another nearby station
+- no forced fill: planned/unbuilt, generic neighborhood-only, or bus-dependent/far candidates remain uncurated
 
+
+## Zero-coverage attraction re-audit — 2026-09-18
+
+The audit did not rely only on tourism-map listings. Missing stations were rechecked against municipal/cultural-tourism pages, transit-access notes, markets, large parks/waterfronts, museums/cultural venues, campuses, specialized streets and hiking/viewpoint access.
+
+Examples newly covered include 남영→민주화운동기념관, 오산대→물향기수목원, 금곡→홍유릉, 대성리→대성리 국민관광지, 원인재→원인재, 양천향교→양천향교/겸재정선미술관, 사우→김포 장릉, 발곡→의정부음악도서관.
+
+Station names alone are never enough evidence. Examples intentionally still uncurated after research include 검단호수공원(park not yet a usable destination), 세종대왕릉역(royal tomb requires onward transit), and 신둔도예촌(nearby pottery route is too dispersed for the current near-station rule).
 
 ## Nightscape — strict elevated-view definition
 
