@@ -1,56 +1,69 @@
-# Latest Change — Durable visit history Phase 1
+# Latest Change — Visit History Phase 4
 
-Date: 2026-09-18
+Date: 2026-09-19
 
 ## Product decision
 
-Random draw history and real-world visit history are now separate concepts.
+Visit History Phase 2 is complete. Phase 3 unvisited-aware / visited-excluded random modes are intentionally skipped.
 
-A station appearing in recent history does not mean the user visited it. The user explicitly chooses `다녀왔어요`.
+Random selection remains independent from visit history. If a previously visited station is drawn again, the user decides whether to keep it or use the existing redraw action.
 
-## Visit selection contract
+## Phase 4 entry
 
-Mandatory:
-- drawn station
+The main `발자취` section now exposes two sibling actions:
 
-Optional, user-confirmed only:
-- the drawn food/alcohol category
-- any of the 0–2 curated attractions that were shown for that draw
-- visit date
+- `발자취 노선도 보기`
+- `방문 통계`
 
-The food and attraction checkboxes start unchecked. Multiple attractions can be selected. Google Places restaurant recommendations are not stored as visit choices.
+Statistics are a separate screen; opening the footprint map is not required first.
 
-## Persistence
+## Statistics contract
 
-- recent draw history: `next_stop_history_v1`, max12
-- durable visits: `random_seoul_visits_v1`
-- clearing recent history leaves visits untouched
-- new draw records snapshot shown attraction IDs/names so later curation changes do not silently rewrite the original visit choices
-- legacy history without a snapshot falls back to current station curation
+All statistics are derived read-only from durable `VisitRecord` data. No new statistics storage key or visit-schema migration was added.
 
-## UI
+Displayed metrics:
 
-- recent history card: `다녀왔어요`
-- already saved: `방문 기록 수정`
-- separate `다녀온 곳` list
-- visit records can be edited/deleted
-- date defaults to today for a new visit but may be cleared
-- station-only visit is valid
+- unique visited physical stations / all physical stations + progress percentage
+- per-line visited station counts and percentages
+- total durable visit records
+- latest user-entered visit date + undated record count
+- confirmed food/alcohol unique categories + confirmation count
+- confirmed attraction unique places + revisit-inclusive count
+- confirmed attraction prominence breakdown: Diamond / Gold / Silver / Standard, each with unique-place count and revisit-inclusive count
 
-## Long-term roadmap
+Only user-confirmed food and attraction choices count. Merely shown draw candidates do not.
 
-1. durable visit records — current phase
-2. footprint map
-3. unvisited-first / visited-excluded random options
-4. simple personal visit statistics
+## Interchange rule
 
-Detailed roadmap: `docs/VISIT_HISTORY_PLAN.md`.
+Overall coverage counts one physical interchange once.
 
+Per-line progress credits that visited physical station to **every line that belongs to the interchange**, regardless of which line produced the original draw.
+
+Example: a visit saved from **1호선 신도림** counts:
+
+- overall physical-station progress: 1 visited station
+- 1호선 progress: 신도림 +1
+- 2호선 progress: 신도림 +1
+
+Revisiting 신도림 does not add another station to either line's coverage.
+
+The same canonical station-equivalence rules as the footprint map are reused: 신촌/양평 same-name non-interchanges stay separate and 총신대입구(이수) ↔ 이수 stays unified.
 
 ## Verification
 
-- Web CI `35339108030` — success
-- Web Release `35339108075` — success
-- Pages deployment — success
-- Android CI `35339228627` — success
-- Android latest development APK republished successfully
+Web:
+- Phase 4 PR #16 CI `35367289293` — success
+- main merge `e15b8b6108d6c3664174a53f3a3e918a44a5276f`
+- main CI `35367506018` — success
+- Web Release `35367506047` — success
+- deployment commit `e92f0e22d33661363dde31c4c88aec904975484c`
+- deployed bundle `assets/modular-Ct4Elvwv.js`
+
+Android:
+- branch `feature/random-seoul-android`
+- Phase 4 synced head `a5a9b78bf83c1929f32de521b53d4a28771d5539`
+- Android CI `35367476033` — success
+- shared tests, native Web build, Capacitor sync, Gradle APK assembly and fixed latest-development release all passed
+- `random-seoul-latest.apk` updated 2026-09-19 KST, size `11,525,425` bytes
+
+Detailed roadmap: `docs/VISIT_HISTORY_PLAN.md`.
