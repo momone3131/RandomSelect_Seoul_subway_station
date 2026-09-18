@@ -207,7 +207,7 @@ function openVisitFromHistory(item: Parameters<typeof renderHistory>[0][number])
 }
 
 function openVisitRecord(visit: Parameters<typeof renderVisits>[0][number]): void {
-  if (busy || restaurantLookupBusy || settingsView.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
   visitModal.openVisit(visit);
   renderState();
 }
@@ -243,7 +243,7 @@ async function performDraw(
   action: () => Promise<unknown> | unknown,
   animationStage?: AnimatedDrawStage,
 ): Promise<void> {
-  if (busy || restaurantLookupBusy || settingsView.isOpen) return;
+  if (busy || restaurantLookupBusy || settingsView.isOpen || visitModal.isOpen) return;
   busy = true;
   renderState();
 
