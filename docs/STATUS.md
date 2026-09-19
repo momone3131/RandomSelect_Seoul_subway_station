@@ -134,32 +134,30 @@ Current 12:
 
 DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체는 일반 추천/기존 tier는 유지하지만 Nightscape에서는 제외합니다.
 
-## Latest verified Web — simplified main visit UX
+## Latest verified Web — statistics image export
 
-- PR #20 CI `35371137305` — **success**
-- source merge `411c67d53d34e28ce0d161d41dead99ec563b38c`
-- main CI `35371239332` — **success**
-- Web Release `35371239392` — **success**
-- deployment commit `9c4bbb70fcde5f6ca5dc2b7ac27df9dfe5379411`
-- Pages `35371297273` — **success**
-- public bundle: `assets/modular-CaV-K9e8.js`
-- deployed bundle verified for `등록`, `발자취`, `새 코스`, `추천 식당 보기`, `발자취 노선도`, `방문 통계`
-- old completed-course `이 코스로 가기` button row and old `발자취 노선도 보기` module copy are absent
+- PR #24 final CI `35420011134` — **success**
+- source merge `259110cc363a0fac223d363b733873fddc69fdd1`
+- main CI `35420042578` — **success**
+- Web Release `35420042627` — **success**
+- deployment commit `39c1af0f4feb6ef63018a9e339bf85fdb201b021`
+- public bundle: `assets/modular-BBtFqxHC.js`
+- bundle verified for statistics `이미지 저장`, full-height export clone, dated PNG filename and Web/native save split
 
-## Latest verified Android — simplified main visit UX
+## Latest verified Android — statistics image export
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- source head: `4a568e6caf9325c72f85bead1ea9f6b1de105b8a`
-- Android CI `35371313423` — **success**
-- shared tests — success
-- native Web build / Capacitor sync — success
+- source head: `49fc6fca089b52600a1bdc3b65875196752588d3`
+- Android CI `35420098838` — **success**
+- shared tests / native Web build / Capacitor sync — success
+- native `RandomSeoulPlatform.saveImage` Java compile — success
 - Gradle debug APK assembly — success
 - fixed latest-development APK republished successfully
 - APK `random-seoul-latest.apk`
-- size: `11,525,705` bytes
+- size: `11,536,165` bytes
 - asset updated: 2026-09-19 KST
 
 Direct download:
@@ -256,6 +254,7 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - current prominence breakdown: Diamond / Gold / Silver / Standard unique visited places + revisit-inclusive counts
 - no new visit/statistics persistence schema; all metrics derive from `VisitRecord` and update after edits/deletes
 - independent viewport-safe modal, sibling main button, Escape/backdrop/focus restoration support
+- header `이미지 저장` exports the existing full statistics UI as one long PNG; Web downloads it and Android saves it to Pictures/Random Seoul via native MediaStore bridge
 
 Verification:
 - explicit 신도림 cross-line regression test — passed on Web and Android CI
