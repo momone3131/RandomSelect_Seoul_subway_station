@@ -62,14 +62,14 @@ export function prepareVisitStatisticsExport(dialog: HTMLElement): PreparedVisit
   const bounds = dialog.getBoundingClientRect();
   if (bounds.width <= 0) throw new Error('방문 통계 화면 크기를 확인하지 못했어요.');
 
-  const exportWidth = Math.ceil(bounds.width);
+  const exportWidth = 720;
   const host = document.createElement('div');
   host.className = 'visit-statistics-export-host';
   host.dataset.statisticsExportHost = 'true';
   host.style.width = `${exportWidth}px`;
 
   const clone = dialog.cloneNode(true) as HTMLElement;
-  clone.classList.add('visit-statistics-export');
+  clone.classList.add('visit-statistics-export', 'visit-statistics-export-compact');
   clone.dataset.statisticsExportClone = 'true';
   clone.setAttribute('aria-hidden', 'true');
   clone.removeAttribute('role');
@@ -77,6 +77,8 @@ export function prepareVisitStatisticsExport(dialog: HTMLElement): PreparedVisit
   clone.removeAttribute('aria-labelledby');
   clone.tabIndex = -1;
   clone.style.width = `${exportWidth}px`;
+  const rules = clone.querySelector<HTMLDetailsElement>('.visit-statistics-rules');
+  if (rules) rules.open = false;
 
   host.appendChild(clone);
   document.body.appendChild(host);

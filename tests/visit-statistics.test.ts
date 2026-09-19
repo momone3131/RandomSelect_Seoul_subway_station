@@ -143,8 +143,10 @@ describe('durable visit statistics', () => {
     expect(view).toContain('createImageBlob');
     expect(view).toContain('renderVisitStatisticsImage(this.dialog)');
     expect(exporter).toContain("import { toBlob } from 'html-to-image'");
-    expect(exporter).toContain("clone.classList.add('visit-statistics-export')");
+    expect(exporter).toContain("const exportWidth = 720");
+    expect(exporter).toContain("clone.classList.add('visit-statistics-export', 'visit-statistics-export-compact')");
     expect(exporter).toContain("host.className = 'visit-statistics-export-host'");
+    expect(exporter).toContain("rules.open = false");
     expect(exporter).toContain('host.appendChild(clone)');
     expect(exporter).toContain("target: 'native-gallery'");
     expect(exporter).toContain("anchor.download = fileName");
@@ -156,6 +158,11 @@ describe('durable visit statistics', () => {
     expect(styles).toContain('max-height:none!important');
     expect(styles).not.toContain('left:-10000px!important');
     expect(styles).toContain('.visit-statistics-export-exclude');
+    expect(styles).toContain('#visit_statistics_dialog.visit-statistics-export-compact{');
+    expect(styles).toContain('width:720px!important');
+    expect(styles).toContain('grid-template-columns:repeat(4,minmax(0,1fr))');
+    expect(styles).toContain('#visit_statistics_dialog.visit-statistics-export-compact .visit-statistics-lines{');
+    expect(styles).toContain('grid-template-columns:repeat(2,minmax(0,1fr))');
     expect(pkg).toContain('"html-to-image": "1.11.13"');
   });
 
