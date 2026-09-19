@@ -70,7 +70,7 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
     const exportLines = prepared.clone.querySelector<HTMLElement>('.visit-statistics-lines');
     const columnCount = (element: HTMLElement | null): number =>
       element
-        ? getComputedStyle(element).gridTemplateColumns.split(/\\s+/).filter(Boolean).length
+        ? getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length
         : 0;
 
     if (!exportBody || !liveMetricGrid
