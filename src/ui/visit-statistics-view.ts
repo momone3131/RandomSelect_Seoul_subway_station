@@ -20,6 +20,16 @@ function progress(value: number): HTMLElement {
 
 const TIER_LABELS = { diamond: '다이아몬드', gold: '골드', silver: '실버', standard: '스탠다드' } as const;
 
+function defaultMessage(message: string): void {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  window.setTimeout(() => {
+    if (toast.textContent === message) toast.classList.remove('show');
+  }, 2_600);
+}
+
 function metric(title: string, value: string, detail: string, date = false): HTMLElement {
   const card = make('div', `visit-statistics-card${date ? ' is-date' : ''}`);
   append(card, make('h3', '', title), make('strong', '', value), make('small', '', detail));
@@ -38,7 +48,7 @@ export class VisitStatisticsView {
 
   constructor(
     private readonly onClose: () => void = () => undefined,
-    private readonly onMessage: (message: string) => void = () => undefined,
+    private readonly onMessage: (message: string) => void = defaultMessage,
   ) {
     this.overlay.id = 'visit_statistics_overlay';
     this.overlay.hidden = true;
