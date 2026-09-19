@@ -78,6 +78,8 @@ jobs:
             --virtual-time-budget=8000 \
             --dump-dom \
             'http://127.0.0.1:4173/modular.html?selftest=1' > /tmp/random-seoul-dom.html
+          echo 'Main smoke state:'
+          grep -o 'data-selftest[^>]*' /tmp/random-seoul-dom.html || true
           grep -q 'data-app-ready="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest="passed"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-dom.html
