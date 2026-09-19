@@ -148,21 +148,22 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Statistics image export — Web
-- PR #24 CI `35420011134` — success
-- source merge `259110cc363a0fac223d363b733873fddc69fdd1`
-- main CI `35420042578` / Web Release `35420042627` — success
-- deployment commit `39c1af0f4feb6ef63018a9e339bf85fdb201b021`
-- bundle `assets/modular-BBtFqxHC.js`
-- statistics `이미지 저장` exports a long PNG matching the current statistics modal; Web uses download
-- visit statistics header includes `이미지 저장`; export reuses the existing statistics UI and removes scroll clipping so all lines fit in one PNG
+### Statistics image export / blank-image fix — Web
+- PR #27 CI `35423948838` — success
+- source merge `12ba3c25209326536d8efff4d6c1d2ac3fdcac24`
+- main CI `35423993757` / Web Release `35423993692` — success
+- deployment commit `7bafe6157f92fead723d4b7712b4940beb9fa925`
+- bundle `assets/modular-oFZhZMoJ.js`
+- statistics `이미지 저장` exports the existing full-height statistics UI
+- blank-image fix: capture target stays at viewport origin; only its parent host is sent behind the app, preventing html-to-image from serializing the content outside the PNG canvas
 
-### Statistics image export — Android
+### Statistics image export / blank-image fix — Android
 - branch `feature/random-seoul-android`, PR #3
-- source head `49fc6fca089b52600a1bdc3b65875196752588d3`
-- Android CI `35420098838` — success
-- native save bridge writes PNG to `Pictures/Random Seoul` through MediaStore on Android 10+
-- fixed `android-dev-latest` APK republished, size `11,536,165` bytes
+- source head `7dd3b9803770ed80e98c7bc3579fc77e50fa4222`
+- Android CI `35424081669` — success
+- native save bridge remains `Pictures/Random Seoul` on Android 10+
+- shared export layout includes the blank-image fix
+- fixed `android-dev-latest` APK republished, size `11,536,769` bytes
 
 ### Visit/statistics invariants
 - recent-history `발자취 등록하기` remains
