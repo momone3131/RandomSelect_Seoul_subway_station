@@ -88,7 +88,7 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
       || columnCount(exportLines) !== 2
       || columnCount(liveMetricGrid) !== 2
       || (exportControls && getComputedStyle(exportControls).display !== 'none')) {
-      throw new Error('Statistics compact export layout is clipped, shifted or missing content.');
+      throw new Error(`Statistics compact export layout failed: width=${cloneBounds.width}, metric=${columnCount(exportMetricGrid)}, tier=${columnCount(exportTierGrid)}, lines=${columnCount(exportLines)}, live=${columnCount(liveMetricGrid)}, overflow=${exportBody ? getComputedStyle(exportBody).overflowY : 'missing'}, scroll=${exportBody?.scrollHeight}/${exportBody?.clientHeight}, position=${getComputedStyle(prepared.clone).position}, controls=${exportControls ? getComputedStyle(exportControls).display : 'missing'}.`);
     }
   } finally {
     prepared.cleanup();
