@@ -133,4 +133,23 @@ describe('durable visit statistics', () => {
     expect(main).toContain('visitStatistics.refresh(state.visits)');
     expect(calculator).not.toMatch(/localStorage|saveVisits|Math\.random|selectedLineIds/);
   });
+  it('exports the full statistics dialog as a PNG without viewport clipping', () => {
+    const view = readFileSync(new URL('../src/ui/visit-statistics-view.ts', import.meta.url), 'utf8');
+    const exporter = readFileSync(new URL('../src/ui/visit-statistics-export.ts', import.meta.url), 'utf8');
+    const styles = readFileSync(new URL('../src/ui/visit-statistics.css', import.meta.url), 'utf8');
+    const pkg = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
+    expect(view).toContain("save_visit_statistics_image");
+    expect(view).toContain("'이미지 저장'");
+    expect(view).toContain('createImageBlob');
+    expect(view).toContain('renderVisitStatisticsImage(this.dialog)');
+    expect(exporter).toContain("import { toBlob } from 'html-to-image'");
+    expect(exporter).toContain("clone.classList.add('visit-statistics-export')");
+    expect(exporter).toContain("target: 'native-gallery'");
+    expect(exporter).toContain("anchor.download = fileName");
+    expect(styles).toContain('#visit_statistics_dialog.visit-statistics-export');
+    expect(styles).toContain('max-height:none!important');
+    expect(styles).toContain('.visit-statistics-export-exclude');
+    expect(pkg).toContain('"html-to-image": "1.11.13"');
+  });
+
 });
