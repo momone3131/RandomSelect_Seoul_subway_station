@@ -2,8 +2,48 @@ import { SUBWAY_LINES } from '../data/subway-lines';
 import type { VisitRecord } from '../domain/types';
 import type { VisitStatisticsView } from '../ui/visit-statistics-view';
 
+async function assertPngHasVisibleContent(blob: Blob): Promise<void> {
+  if (blob.type !== 'image/png' || blob.size < 1_000) {
+    throw new Error('Statistics export did not produce a valid PNG.');
+  }
+
+  const bitmap = await createImageBitmap(blob);
+  try {
+    if (bitmap.width < 200 || bitmap.height < 500) {
+      throw new Error(`Statistics PNG dimensions are implausible: ${bitmap.width}×${bitmap.height}.`);
+    }
+
+    const sampleWidth = Math.min(160, bitmap.width);
+    const sampleHeight = Math.min(640, Math.max(320, Math.round(bitmap.height * sampleWidth / bitmap.width)));
+    const canvas = document.createElement('canvas');
+    canvas.width = sampleWidth;
+    canvas.height = sampleHeight;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('Statistics PNG smoke could not create a 2D canvas.');
+
+    context.drawImage(bitmap, 0, 0, sampleWidth, sampleHeight);
+    const pixels = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
+    const background = [pixels[0], pixels[1], pixels[2]];
+    let distinct = 0;
+    const total = sampleWidth * sampleHeight;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const delta = Math.abs(pixels[i] - background[0])
+        + Math.abs(pixels[i + 1] - background[1])
+        + Math.abs(pixels[i + 2] - background[2]);
+      if (delta > 24) distinct += 1;
+    }
+
+    if (distinct / total < 0.02) {
+      throw new Error('Statistics PNG is effectively blank.');
+    }
+  } finally {
+    bitmap.close();
+  }
+}
+
 /** Browser-only checks inside the existing isolated ?selftest=1 CI run. No writes. */
-export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
+export async function runVisitStatisticsSmoke(view: VisitStatisticsView): Promise<void> {
   const app = document.getElementById('app');
   const originallyInert = app?.inert ?? false;
   const originalOverflow = document.body.style.overflow;
@@ -55,6 +95,14 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
   if (saveHit !== saveImage && !saveImage.contains(saveHit)) {
     throw new Error('Statistics image save action is visually covered.');
   }
+
+  const exported = await view.createImageBlob();
+  await assertPngHasVisibleContent(exported);
+  if (document.querySelector('[data-statistics-export-host="true"]')
+    || document.querySelector('[data-statistics-export-clone="true"]')) {
+    throw new Error('Statistics export leaked its temporary DOM.');
+  }
+
   saveImage.focus();
   saveImage.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
   if (document.activeElement?.tagName !== 'SUMMARY') throw new Error('Statistics focus trap failed.');
