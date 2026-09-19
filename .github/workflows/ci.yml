@@ -75,15 +75,18 @@ jobs:
             --headless=new \
             --no-sandbox \
             --disable-gpu \
-            --virtual-time-budget=4000 \
+            --virtual-time-budget=8000 \
             --dump-dom \
             'http://127.0.0.1:4173/modular.html?selftest=1' > /tmp/random-seoul-dom.html
+          echo 'Main smoke state:'
+          grep -o 'data-selftest[^>]*' /tmp/random-seoul-dom.html || true
           grep -q 'data-app-ready="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest="passed"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-recommendations="3"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-cards="3"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-cycle-reset="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-visit-statistics="true"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-statistics-image="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-current-course-visit="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-layout-alignment="true"' /tmp/random-seoul-dom.html
           grep -q 'RANDOM SEOUL' /tmp/random-seoul-dom.html
