@@ -57,7 +57,6 @@ export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<B
   if (bounds.width <= 0) throw new Error('방문 통계 화면 크기를 확인하지 못했어요.');
 
   const clone = dialog.cloneNode(true) as HTMLElement;
-  clone.id = 'visit_statistics_export';
   clone.classList.add('visit-statistics-export');
   clone.dataset.statisticsExportClone = 'true';
   clone.setAttribute('aria-hidden', 'true');
