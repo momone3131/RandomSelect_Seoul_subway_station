@@ -52,7 +52,13 @@ async function blobBase64(blob: Blob): Promise<string> {
   return dataUrl.slice(comma + 1);
 }
 
-export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<Blob> {
+export interface PreparedVisitStatisticsExport {
+  host: HTMLElement;
+  clone: HTMLElement;
+  cleanup(): void;
+}
+
+export function prepareVisitStatisticsExport(dialog: HTMLElement): PreparedVisitStatisticsExport {
   const bounds = dialog.getBoundingClientRect();
   if (bounds.width <= 0) throw new Error('방문 통계 화면 크기를 확인하지 못했어요.');
 
@@ -74,13 +80,23 @@ export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<B
 
   host.appendChild(clone);
   document.body.appendChild(host);
+
+  return {
+    host,
+    clone,
+    cleanup: () => host.remove(),
+  };
+}
+
+export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<Blob> {
+  const prepared = prepareVisitStatisticsExport(dialog);
   try {
     await document.fonts?.ready;
     await nextFrame();
     await nextFrame();
 
     const pixelRatio = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-    const blob = await toBlob(clone, {
+    const blob = await toBlob(prepared.clone, {
       backgroundColor: '#fffdfa',
       cacheBust: true,
       pixelRatio,
@@ -88,7 +104,7 @@ export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<B
     if (!blob) throw new Error('방문 통계 이미지를 만들지 못했어요.');
     return blob;
   } finally {
-    host.remove();
+    prepared.cleanup();
   }
 }
 
