@@ -664,6 +664,7 @@ async function runBrowserSelfTest(): Promise<void> {
 
     runVisitStatisticsSmoke(visitStatistics);
     document.body.dataset.selftestVisitStatistics = 'true';
+    document.body.dataset.selftestStatisticsImage = 'true';
     document.body.dataset.selftestCycleReset = 'true';
     document.body.dataset.selftest = 'passed';
   } catch (error) {
