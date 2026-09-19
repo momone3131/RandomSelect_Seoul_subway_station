@@ -59,22 +59,36 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
     throw new Error('Statistics image save action is visually covered.');
   }
 
+  const liveMetricGrid = dialog.querySelector<HTMLElement>('.visit-statistics-grid');
   const prepared = prepareVisitStatisticsExport(dialog);
   try {
     const cloneBounds = prepared.clone.getBoundingClientRect();
     const exportBody = prepared.clone.querySelector<HTMLElement>('#visit_statistics_body');
     const exportControls = prepared.clone.querySelector<HTMLElement>('.visit-statistics-export-exclude');
-    if (!exportBody
+    const exportMetricGrid = prepared.clone.querySelector<HTMLElement>('.visit-statistics-grid');
+    const exportTierGrid = prepared.clone.querySelector<HTMLElement>('.visit-statistics-tier-grid');
+    const exportLines = prepared.clone.querySelector<HTMLElement>('.visit-statistics-lines');
+    const columnCount = (element: HTMLElement | null): number =>
+      element
+        ? getComputedStyle(element).gridTemplateColumns.split(/\\s+/).filter(Boolean).length
+        : 0;
+
+    if (!exportBody || !liveMetricGrid
       || cloneBounds.left < -1 || cloneBounds.top < -1
-      || Math.abs(cloneBounds.width - dialogBounds.width) > 2
+      || Math.abs(cloneBounds.width - 720) > 2
       || prepared.clone.querySelectorAll('.visit-statistics-line').length !== SUBWAY_LINES.length
       || !prepared.clone.textContent?.includes('방문 통계')
       || !prepared.clone.textContent?.includes('다이아몬드')
+      || !prepared.clone.classList.contains('visit-statistics-export-compact')
       || getComputedStyle(prepared.clone).position !== 'static'
       || getComputedStyle(exportBody).overflowY !== 'visible'
       || exportBody.scrollHeight > exportBody.clientHeight + 2
+      || columnCount(exportMetricGrid) !== 4
+      || columnCount(exportTierGrid) !== 4
+      || columnCount(exportLines) !== 2
+      || columnCount(liveMetricGrid) !== 2
       || (exportControls && getComputedStyle(exportControls).display !== 'none')) {
-      throw new Error('Statistics export layout is clipped, shifted or missing content.');
+      throw new Error('Statistics compact export layout is clipped, shifted or missing content.');
     }
   } finally {
     prepared.cleanup();
