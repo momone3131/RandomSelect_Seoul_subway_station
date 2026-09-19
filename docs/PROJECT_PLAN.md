@@ -106,9 +106,10 @@ Orthogonal Nightscape feature:
 - result/action 중심, 설명 copy 최소화
 - main `바로 뽑기` checkbox는 제거; 정상 reveal animation을 기본/유일 product behavior로 유지
 - 코스 완성 시 기존 `새 코스` primary action은 단독 위치를 유지
-- 상단 `이 코스로 가자!` 오른쪽에 테두리 없는 낮은 강조의 작은 상태 action을 노출: 미등록 `등록`, 등록 완료 `발자취`
+- 상단 `이 코스로 가자!` 오른쪽에 `새 코스`와 동일한 lime + dark-border + press-shadow 언어를 축소 적용한 작은 상태 action을 노출: 미등록 `등록`, 등록 완료 `발자취`
 - `등록`은 최근 기록 `발자취 등록하기`와 동일한 visit picker를 사용하고, 저장 후 `발자취`는 footprint map을 직접 엶
 - 별도 발자취 카드/module은 만들지 않으며 `발자취 노선도` / `방문 통계` 두 유틸리티만 역 목록 바로 아래에 낮은 강조로 배치
+- 완료 상태 main CTA는 `새 코스`를 geometry 기준으로 삼아 `추천 식당/술집 보기`와 같은 좌우 inset(14px), 같은 높이(52px), 같은 좌우 edge를 유지하고 두 CTA 사이는 8px로 통일
 - passive neutral palette 유지
 - active draw lime + completed station actual line color 유지
 - Diamond gemstone, Gold/Silver metallic
@@ -134,7 +135,7 @@ Current status: **Phase 1 + Phase 2 complete; Phase 3 dropped; Phase 4 implement
 1. **방문 기록 분리 저장** — 완료
 2. **발자취 지도** — 완료; 전체 노선도 screen-space 방문 marker + horizontal 방문기록 strip + 선택 상세/수정/삭제
 3. **안 가본 역 우선·제외 랜덤** — 사용자 결정으로 제외(2026-09-19). 보류가 아니며 구현하지 않음. 같은 역이 나오면 사용자가 재방문/재추첨을 선택하고 방문 기록은 추첨 확률/후보를 바꾸지 않음.
-4. **간단한 방문 통계** — 구현. 메인 발자취 영역의 `발자취 노선도 보기` 옆에 `방문 통계` 버튼으로 독립 진입.
+4. **간단한 방문 통계** — 구현. 역 목록 바로 아래 quiet utility row에서 `발자취 노선도` 옆 `방문 통계` 버튼으로 독립 진입.
 
 통계는 고유 방문 역/전체 역, 노선별 진행도, 총 방문 횟수, 최근 입력 방문일, 체크한 음식·주류/명소 및 명소 등급별 집계를 표시합니다. 환승역은 전체에서 하나로, 각 소속 노선 진행도에서는 한 역씩 반영하며 열차 탑승 여부를 의미하지 않습니다. 기존 `VisitRecord`에서 계산하고 별도 통계 저장소는 만들지 않습니다.
 
@@ -149,7 +150,7 @@ Phase 1 규칙:
 - 명소 후보는 당시 화면에 노출된 명소만; 복수 선택 가능
 - 역 방문만 단독 저장 가능
 - 방문일은 선택사항
-- 최초 등록만 최근 추첨 카드에서 수행; 등록 이후 조회/수정/삭제는 발자취 노선도에서 수행
+- 최초 등록은 최근 추첨 카드 또는 현재 완성 코스 상단 `등록`에서 수행; 등록 이후 조회/수정/삭제는 발자취 노선도에서 수행
 - main 화면에는 durable visit 상세 목록을 중복 노출하지 않음
 
 ## 10. Documentation change control
