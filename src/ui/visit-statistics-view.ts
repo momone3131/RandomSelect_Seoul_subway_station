@@ -66,10 +66,12 @@ export class VisitStatisticsView {
     this.saveButton.addEventListener('click', () => { void this.saveImage(); });
     this.closeButton.id = 'close_visit_statistics';
     this.closeButton.type = 'button';
-    this.closeButton.classList.add('visit-statistics-export-exclude');
     this.closeButton.setAttribute('aria-label', '방문 통계 닫기');
     this.closeButton.addEventListener('click', () => this.close());
-    append(head, title, this.closeButton, this.saveButton);
+
+    const headActions = make('div', 'visit-statistics-head-actions visit-statistics-export-exclude');
+    append(headActions, this.saveButton, this.closeButton);
+    append(head, title, headActions);
     this.body.id = 'visit_statistics_body';
     this.body.tabIndex = 0;
     this.body.setAttribute('aria-label', '방문 통계 상세');
