@@ -117,10 +117,11 @@ Current 12 IDs:
 ## 6. UI composition
 
 - completed course keeps the original single `새 코스` primary action
-- hero headline gets a compact borderless/transparent visit-state action only when a source draw record exists:
+- hero headline gets a compact visit-state action only when a source draw record exists; it reuses the `새 코스` lime/dark-border/press-shadow visual language at reduced dimensions:
   - `등록` → existing visit picker
   - saved `발자취` → footprint map
 - no separate main footprint module/card; `visit-view.ts` inserts quiet `발자취 노선도` + `방문 통계` controls directly after the station-list control
+- main completed CTA geometry uses a shared 14px horizontal inset + 52px control height; browser smoke compares rendered `추천 식당/술집 보기` and `새 코스` rectangles and also verifies station-list/visit-tools edge alignment
 - attraction tier owns outer border/effect
 - Nightscape owns card interior/background
 - no tier/nightscape text badge
