@@ -1,83 +1,69 @@
-# Latest Change — Visit statistics image export blank-image fix
+# Latest Change — Compact visit statistics export
 
 Date: 2026-09-19
 
 ## Product behavior
 
-방문 통계 modal 상단에 `이미지 저장` action을 추가했습니다.
+방문 통계 화면 자체는 기존 UI를 그대로 유지합니다.
 
-저장 이미지는 별도 공유용 디자인을 다시 만드는 방식이 아니라 **현재 방문 통계 화면의 DOM/CSS를 그대로 복제**해 생성합니다.
+`이미지 저장`을 눌렀을 때만 export clone에 별도 compact layout을 적용해, 기존의 긴 세로 PNG를 더 짧고 공유하기 좋은 형태로 저장합니다.
 
-- 현재 통계의 hero / 4개 metric card / 명소 등급 / 노선별 진행도 / 집계 기준 구조 유지
-- modal viewport max-height / scroll clipping만 export clone에서 해제
-- 닫기 / 이미지 저장 control은 저장 이미지에서 제외
-- 현재 dialog width 유지
-- 최대 2x pixel ratio PNG
-- file name: `random-seoul-visit-statistics-YYYY-MM-DD.png`
+Saved-image-only layout:
+- export canvas width: **720px**
+- 전체 방문 hero: 기존 스타일 유지 + padding/font 약간 축소
+- 총 방문 기록 / 최근 방문일 / 먹어본 음식·주류 / 다녀온 명소: **1행 4열**
+- Diamond / Gold / Silver / Standard: **1행 4열**
+- 24개 노선별 방문 진행도: **2열**
+- export 전용 section/card gap과 padding을 소폭 축소
+- `집계 기준` details는 저장 이미지에서 닫힌 상태로 고정
+- `이미지 저장` / 닫기 control은 저장 이미지에서 제외
+- live statistics modal의 폭/스크롤/모바일 배치는 변경하지 않음
 
-따라서 화면에서는 기존처럼 스크롤 가능한 통계 modal이고, 저장 시에는 스크롤 전체 내용이 한 장의 긴 PNG로 만들어집니다.
+이렇게 해서 저장 이미지는 현재 통계 디자인 언어를 유지하면서 세로 길이를 크게 줄입니다.
 
-## Blank-image bug fix
+## Image generation
 
-iPhone Web 실사용에서 저장 PNG가 긴 종이색 배경만 나오고 통계 내용이 보이지 않는 문제가 확인되었습니다.
-
-원인:
-- export용 통계 dialog 자체에 큰 음수 left 좌표를 주어 화면 밖에 배치
-- `html-to-image`가 그 root 위치를 그대로 직렬화하면서 실제 통계 내용도 PNG canvas 밖으로 밀림
-- canvas 배경색만 남아 blank-looking PNG가 생성됨
-
-수정:
-- 캡처 대상 dialog는 `position:static` + viewport origin 좌표를 유지
-- 별도 parent export host만 app 뒤의 negative z-index에 둠
-- dialog의 전체 높이/내용은 그대로 렌더하고 `visit_statistics_body`의 scroll clipping만 해제
-- 저장/닫기 control은 export에서 계속 제외
-- export 완료 후 임시 host/clone은 즉시 제거
-
-## Platform behavior
+- `visit-statistics-export.ts`가 현재 통계 dialog를 clone
+- 캡처 대상 dialog는 viewport origin에서 정상 layout
+- parent export host만 app 뒤쪽 negative z-index에 배치
+- export body의 viewport max-height / scroll clipping 제거
+- `html-to-image`로 최대 2x pixel ratio PNG 생성
+- filename: `random-seoul-visit-statistics-YYYY-MM-DD.png`
 
 Web:
-- 브라우저 PNG download
-- 별도 서버 업로드 없음
+- PNG browser download
 
 Android:
-- shared TypeScript에서 동일 PNG를 생성
-- `RandomSeoulPlatform.saveImage` native bridge로 device storage에 저장
+- 동일 PNG를 `RandomSeoulPlatform.saveImage` native bridge로 저장
 - Android 10+: `Pictures/Random Seoul` via MediaStore
-- older Android: app-specific Pictures/Random Seoul fallback + media scan
-- storage/GPS permission 추가 없음
-
-## UI
-
-- 통계 header 오른쪽에 compact `이미지 저장`
-- 저장 중에는 `저장 중…`
-- 성공/실패는 기존 toast surface로 안내
-- 저장 결과에는 close/save buttons가 포함되지 않음
-- 통계 데이터/집계 방식/VisitRecord schema 변화 없음
+- older Android: app-specific Pictures fallback + media scan
+- 추가 storage/GPS permission 없음
 
 ## Verification
 
 Web:
-- PR #27 final CI `35423948838` — success
-- source merge `12ba3c25209326536d8efff4d6c1d2ac3fdcac24`
-- main CI `35423993757` — success
-- Web Release `35423993692` — success
-- deployment commit `7bafe6157f92fead723d4b7712b4940beb9fa925`
-- Pages `35424023058` — success
-- deployed bundle `assets/modular-oFZhZMoJ.js` + `assets/modular-DeBIqKyu.css`
-- deployed bundle directly verified: export host present, captured dialog static/origin-based, old `left:-10000px` rule absent
-- browser smoke verifies the prepared export contains every line row, expected text, full-height unclipped body, origin coordinates, hidden controls and cleanup
+- PR #29 final CI `35425218471` — success
+- source merge `feef6eed043d881f39d3d8446ecfd50a50133f33`
+- main CI `35425264337` — success
+- Web Release `35425264330` — success
+- deployment commit `98c9468974295d63e4b33ff5e90d43a21cc6c402`
+- Pages `35425287239` — success
+- deployed bundle: `assets/modular-CuQ0RdaE.js` + `assets/modular-8Qj5uNTE.css`
+- deployed bundle checked for compact export class, 720px width, 4-column summary and 2-column line layout
 
 Android:
 - branch `feature/random-seoul-android`
-- source head `7dd3b9803770ed80e98c7bc3579fc77e50fa4222`
-- Android CI `35424081669` — success
-- shared tests / native Web build / Capacitor sync / Gradle APK / fixed release all passed
-- latest APK `random-seoul-latest.apk` — `11,536,769` bytes
+- source head `a7aa21724f19ebe56f7dd2a4831206bdce12928a`
+- Android CI `35425286104` — success
+- shared tests / native Web build / Capacitor sync / APK assembly / fixed release all passed
+- latest APK `random-seoul-latest.apk` — `11,537,461` bytes
+- asset updated 2026-09-19 KST
 
 ## Preserved behavior
 
-- main random flow unchanged
+- live 방문 통계 modal unchanged
+- 방문 통계 aggregation rules unchanged
 - `등록 / 발자취`, recent-history `발자취 등록하기`, footprint map unchanged
-- visit statistics aggregation rules unchanged
 - no new persistence key
-- no account / cloud backup policy introduced yet
+- no GPS/location permission change
+- account/cloud backup direction remains undecided
