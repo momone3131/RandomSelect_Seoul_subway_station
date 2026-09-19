@@ -85,6 +85,7 @@ jobs:
           grep -q 'data-selftest-cycle-reset="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-visit-statistics="true"' /tmp/random-seoul-dom.html
           grep -q 'data-selftest-current-course-visit="true"' /tmp/random-seoul-dom.html
+          grep -q 'data-selftest-layout-alignment="true"' /tmp/random-seoul-dom.html
           grep -q 'RANDOM SEOUL' /tmp/random-seoul-dom.html
           curl --silent --fail http://127.0.0.1:4173/footprint-seoul-subway-reference.svg > /dev/null
           test -f dist/footprint-seoul-subway-reference.svg
@@ -101,6 +102,9 @@ jobs:
           grep -o 'data-responsive[^>]*' /tmp/random-seoul-mobile-dom.html || true
           grep -q 'data-responsive="passed"' /tmp/random-seoul-mobile-dom.html
           grep -q 'data-responsive-columns="1"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-main-actions-aligned="true"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-utilities-aligned="true"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-hero-primary="true"' /tmp/random-seoul-mobile-dom.html
 
       - name: Upload Web release build
         uses: actions/upload-artifact@v4

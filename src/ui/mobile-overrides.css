@@ -210,3 +210,87 @@ body{background:var(--bg)}
   .visit-tools{gap:6px;margin-top:7px}
   .visit-tool-btn{min-height:38px;padding:6px 8px;font-size:10px}
 }
+
+
+/* Main alignment pass — one action rhythm and shared horizontal anchors. */
+:root{
+  --main-action-inset:14px;
+  --main-action-height:52px;
+  --main-action-radius:10px;
+}
+
+/* 새 코스 defines the main CTA width; discovery CTA follows the same inset/height. */
+.action-zone{
+  padding-left:var(--main-action-inset);
+  padding-right:var(--main-action-inset);
+}
+.draw-shell[data-stage="done"] .action-zone{
+  padding-top:0;
+}
+.restaurant-request{
+  padding-left:var(--main-action-inset)!important;
+  padding-right:var(--main-action-inset)!important;
+  padding-bottom:8px!important;
+}
+.draw-shell[data-stage="done"] .draw-btn,
+.restaurant-request-btn{
+  min-height:var(--main-action-height)!important;
+  height:var(--main-action-height);
+  border-radius:var(--main-action-radius);
+}
+
+/* Hero visit action uses the same visual language as 새 코스, scaled down for the headline. */
+.hero-visit-btn{
+  min-height:36px;
+  padding:5px 10px;
+  border:2px solid var(--dark);
+  border-radius:8px;
+  background:var(--lime);
+  color:var(--dark);
+  font-size:11px;
+  font-weight:850;
+  box-shadow:0 2px 0 #a7b66e;
+}
+.hero-visit-btn.saved{
+  border-color:var(--dark);
+  background:var(--lime);
+  color:var(--dark);
+  box-shadow:0 2px 0 #a7b66e;
+}
+.hero-visit-btn:not(:disabled):hover{
+  background:#cbee62;
+  color:var(--dark);
+  box-shadow:0 3px 8px rgba(157,186,98,.20);
+}
+.hero-visit-btn:not(:disabled):active{
+  transform:translateY(1px);
+  box-shadow:0 1px 0 #90a85c;
+}
+
+/* Keep the utility row optically attached to the station-list panel. */
+.visit-tools{
+  margin-top:8px;
+}
+.station-detail + .visit-tools{
+  width:100%;
+}
+
+@media(max-width:720px){
+  .restaurant-request{
+    padding-left:var(--main-action-inset)!important;
+    padding-right:var(--main-action-inset)!important;
+  }
+}
+
+@media(max-width:430px){
+  .restaurant-request{
+    padding-left:var(--main-action-inset)!important;
+    padding-right:var(--main-action-inset)!important;
+  }
+  .hero-title-row{gap:9px}
+  .hero-visit-btn{
+    min-height:34px;
+    padding:4px 9px;
+    font-size:10px;
+  }
+}

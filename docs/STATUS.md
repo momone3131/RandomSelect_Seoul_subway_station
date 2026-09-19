@@ -64,12 +64,13 @@ Alcohol recommendation search:
 - attraction prominence tier text hidden
 - main `바로 뽑기` checkbox removed; production draw always uses the normal reveal animation
 - completed course restores the original single `새 코스` primary action
-- completed headline `이 코스로 가자!` gets one compact borderless/transparent state action on its right:
+- completed headline `이 코스로 가자!` gets one compact state action on its right using the same lime + dark-border + press-shadow visual language as `새 코스`:
   - `등록` before visit save
   - `발자취` after visit save; opens footprint map directly
 - recent-history `발자취 등록하기` remains as a second registration entry
 - no separate 발자취 card/module on main
 - `발자취 노선도` + `방문 통계` are quiet utility buttons directly below the station-list control
+- completed main CTA geometry is normalized around `새 코스`: recommendation CTA and `새 코스` share the same 14px side inset, 52px height, width and edge alignment; their vertical gap is 8px
 
 ## Attraction coverage
 
@@ -193,7 +194,7 @@ Roadmap source: `VISIT_HISTORY_PLAN.md`.
 
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
-- main에는 방문 기록이 하나 이상 있으면 compact `발자취 노선도 보기` CTA + count만 노출
+- main에는 별도 발자취 module/count를 두지 않고 역 목록 아래에 `발자취 노선도` + `방문 통계` utility row만 노출; 발자취 노선도는 방문 기록이 없으면 disabled
 - 한 노선씩 나열하지 않고 **수도권 전체 노선도 한 장**을 reference surface로 사용
 - bundled public-domain SVG + generated static anchor table; footprint open 시 외부 지도 네트워크 호출 없음
 - **24개 노선 / 800개 line×station mappings = 800/800 verified**
@@ -245,7 +246,7 @@ Verification:
 Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 
 - Phase 3 unvisited-first / visited-exclusion draw modes are intentionally skipped; random selection remains unchanged by visit history
-- main 발자취 hub adds `방문 통계` beside `발자취 노선도 보기`
+- station-list 아래의 quiet utility row가 `발자취 노선도`와 `방문 통계`를 sibling action으로 제공
 - overall progress: unique visited physical station / all physical stations
 - per-line progress: visited physical interchange counts on **every member line**, not only the line stored on the visit record
   - explicit regression example: 1호선 신도림 visit increments both 1호선 and 2호선 coverage by one station
