@@ -149,8 +149,9 @@ describe('durable visit statistics', () => {
     expect(exporter).toContain("target: 'native-gallery'");
     expect(exporter).toContain("anchor.download = fileName");
     expect(styles).toContain('.visit-statistics-export-host');
-    expect(styles).toContain('transform:translateX(-200vw)!important');
     expect(styles).toContain('#visit_statistics_dialog.visit-statistics-export');
+    expect(styles).toContain('transform:none!important');
+    expect(styles).toContain('z-index:-2147483647!important');
     expect(styles).toContain('position:static!important');
     expect(styles).toContain('max-height:none!important');
     expect(styles).not.toContain('left:-10000px!important');
