@@ -1,6 +1,7 @@
 import { buildVisitStatistics } from '../domain/visit-statistics';
 import type { VisitRecord } from '../domain/types';
 import { append, make } from './dom';
+import { renderVisitStatisticsImage, saveVisitStatisticsImage } from './visit-statistics-export';
 import './visit-statistics.css';
 
 function percentageLabel(value: number): string {
@@ -30,11 +31,15 @@ export class VisitStatisticsView {
   private readonly dialog = make('section', 'settings-modal');
   private readonly body = make('div');
   private readonly closeButton = make('button', 'close-btn', '×');
+  private readonly saveButton = make('button', 'visit-statistics-save-btn visit-statistics-export-exclude', '이미지 저장');
   private returnFocus?: HTMLElement;
   private previousBodyOverflow = '';
   private appWasInert = false;
 
-  constructor(private readonly onClose: () => void = () => undefined) {
+  constructor(
+    private readonly onClose: () => void = () => undefined,
+    private readonly onMessage: (message: string) => void = () => undefined,
+  ) {
     this.overlay.id = 'visit_statistics_overlay';
     this.overlay.hidden = true;
     this.dialog.id = 'visit_statistics_dialog';
@@ -45,11 +50,16 @@ export class VisitStatisticsView {
     const head = make('div', 'dialog-head');
     const title = make('h2', '', '방문 통계');
     title.id = 'visit_statistics_title';
+    this.saveButton.id = 'save_visit_statistics_image';
+    this.saveButton.type = 'button';
+    this.saveButton.setAttribute('aria-label', '방문 통계 전체 이미지 저장');
+    this.saveButton.addEventListener('click', () => { void this.saveImage(); });
     this.closeButton.id = 'close_visit_statistics';
     this.closeButton.type = 'button';
+    this.closeButton.classList.add('visit-statistics-export-exclude');
     this.closeButton.setAttribute('aria-label', '방문 통계 닫기');
     this.closeButton.addEventListener('click', () => this.close());
-    append(head, title, this.closeButton);
+    append(head, title, this.saveButton, this.closeButton);
     this.body.id = 'visit_statistics_body';
     this.body.tabIndex = 0;
     this.body.setAttribute('aria-label', '방문 통계 상세');
@@ -83,6 +93,34 @@ export class VisitStatisticsView {
 
   get isOpen(): boolean {
     return !this.overlay.hidden;
+  }
+
+  async createImageBlob(): Promise<Blob> {
+    if (!this.isOpen) throw new Error('방문 통계를 연 뒤 이미지를 저장할 수 있어요.');
+    return renderVisitStatisticsImage(this.dialog);
+  }
+
+  private async saveImage(): Promise<void> {
+    if (this.saveButton.disabled) return;
+    const originalLabel = this.saveButton.textContent || '이미지 저장';
+    this.saveButton.disabled = true;
+    this.saveButton.textContent = '저장 중…';
+
+    try {
+      const blob = await this.createImageBlob();
+      const result = await saveVisitStatisticsImage(blob);
+      this.onMessage(
+        result.target === 'native-gallery'
+          ? '방문 통계 이미지를 사진에 저장했어요.'
+          : '방문 통계 이미지를 저장했어요.',
+      );
+    } catch (error) {
+      console.error(error);
+      this.onMessage('방문 통계 이미지 저장에 실패했어요.');
+    } finally {
+      this.saveButton.disabled = false;
+      this.saveButton.textContent = originalLabel;
+    }
   }
 
   open(visits: readonly VisitRecord[]): void {
