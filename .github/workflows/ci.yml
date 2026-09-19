@@ -102,6 +102,9 @@ jobs:
           grep -o 'data-responsive[^>]*' /tmp/random-seoul-mobile-dom.html || true
           grep -q 'data-responsive="passed"' /tmp/random-seoul-mobile-dom.html
           grep -q 'data-responsive-columns="1"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-main-actions-aligned="true"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-utilities-aligned="true"' /tmp/random-seoul-mobile-dom.html
+          grep -q 'data-responsive-hero-primary="true"' /tmp/random-seoul-mobile-dom.html
 
       - name: Upload Web release build
         uses: actions/upload-artifact@v4
