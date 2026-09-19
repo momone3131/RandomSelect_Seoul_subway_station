@@ -37,12 +37,26 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
   }
   const dialogBounds = dialog.getBoundingClientRect();
   const close = document.getElementById('close_visit_statistics')!;
+  const saveImage = document.getElementById('save_visit_statistics_image') as HTMLButtonElement | null;
   const closeBounds = close.getBoundingClientRect();
-  if (dialogBounds.width > window.innerWidth || dialogBounds.height > window.innerHeight
-    || closeBounds.top < 0 || closeBounds.bottom > window.innerHeight) {
-    throw new Error('Statistics dialog or close control escaped the viewport.');
+  const saveBounds = saveImage?.getBoundingClientRect();
+  if (!saveImage || !saveBounds
+    || dialogBounds.width > window.innerWidth || dialogBounds.height > window.innerHeight
+    || closeBounds.top < 0 || closeBounds.bottom > window.innerHeight
+    || saveBounds.left < dialogBounds.left || saveBounds.right > dialogBounds.right
+    || saveBounds.top < dialogBounds.top || saveBounds.bottom > dialogBounds.bottom
+    || getComputedStyle(saveImage).display === 'none'
+    || getComputedStyle(saveImage).visibility === 'hidden') {
+    throw new Error('Statistics dialog controls escaped or were hidden from the viewport.');
   }
-  close.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
+  const saveCenterX = saveBounds.left + saveBounds.width / 2;
+  const saveCenterY = saveBounds.top + saveBounds.height / 2;
+  const saveHit = document.elementFromPoint(saveCenterX, saveCenterY);
+  if (saveHit !== saveImage && !saveImage.contains(saveHit)) {
+    throw new Error('Statistics image save action is visually covered.');
+  }
+  saveImage.focus();
+  saveImage.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
   if (document.activeElement?.tagName !== 'SUMMARY') throw new Error('Statistics focus trap failed.');
   dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
   if (view.isOpen || (app?.inert ?? false) !== originallyInert || document.body.style.overflow !== originalOverflow) {
