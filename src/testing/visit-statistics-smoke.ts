@@ -1,5 +1,6 @@
 import { SUBWAY_LINES } from '../data/subway-lines';
 import type { VisitRecord } from '../domain/types';
+import { prepareVisitStatisticsExport } from '../ui/visit-statistics-export';
 import type { VisitStatisticsView } from '../ui/visit-statistics-view';
 
 /** Browser-only checks inside the existing isolated ?selftest=1 CI run. No writes. */
@@ -35,6 +36,7 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
     || !app?.inert) {
     throw new Error('Visit statistics count, line rows, date or modal isolation failed.');
   }
+
   const dialogBounds = dialog.getBoundingClientRect();
   const close = document.getElementById('close_visit_statistics')!;
   const saveImage = document.getElementById('save_visit_statistics_image') as HTMLButtonElement | null;
@@ -49,12 +51,40 @@ export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
     || getComputedStyle(saveImage).visibility === 'hidden') {
     throw new Error('Statistics dialog controls escaped or were hidden from the viewport.');
   }
+
   const saveCenterX = saveBounds.left + saveBounds.width / 2;
   const saveCenterY = saveBounds.top + saveBounds.height / 2;
   const saveHit = document.elementFromPoint(saveCenterX, saveCenterY);
   if (saveHit !== saveImage && !saveImage.contains(saveHit)) {
     throw new Error('Statistics image save action is visually covered.');
   }
+
+  const prepared = prepareVisitStatisticsExport(dialog);
+  try {
+    const cloneBounds = prepared.clone.getBoundingClientRect();
+    const exportBody = prepared.clone.querySelector<HTMLElement>('#visit_statistics_body');
+    const exportControls = prepared.clone.querySelector<HTMLElement>('.visit-statistics-export-exclude');
+    if (!exportBody
+      || cloneBounds.left < -1 || cloneBounds.top < -1
+      || Math.abs(cloneBounds.width - dialogBounds.width) > 2
+      || prepared.clone.querySelectorAll('.visit-statistics-line').length !== SUBWAY_LINES.length
+      || !prepared.clone.textContent?.includes('방문 통계')
+      || !prepared.clone.textContent?.includes('다이아몬드')
+      || getComputedStyle(prepared.clone).position !== 'static'
+      || getComputedStyle(exportBody).overflowY !== 'visible'
+      || exportBody.scrollHeight > exportBody.clientHeight + 2
+      || (exportControls && getComputedStyle(exportControls).display !== 'none')) {
+      throw new Error('Statistics export layout is clipped, shifted or missing content.');
+    }
+  } finally {
+    prepared.cleanup();
+  }
+
+  if (document.querySelector('[data-statistics-export-host="true"]')
+    || document.querySelector('[data-statistics-export-clone="true"]')) {
+    throw new Error('Statistics export leaked its temporary DOM.');
+  }
+
   saveImage.focus();
   saveImage.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
   if (document.activeElement?.tagName !== 'SUMMARY') throw new Error('Statistics focus trap failed.');
