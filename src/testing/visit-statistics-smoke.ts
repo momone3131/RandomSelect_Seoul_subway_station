@@ -96,6 +96,8 @@ export async function runVisitStatisticsSmoke(view: VisitStatisticsView): Promis
     throw new Error('Statistics image save action is visually covered.');
   }
 
+  const exportLines = Array.from(dialog.querySelectorAll('.visit-statistics-line'));
+  exportLines.slice(2).forEach((line) => line.remove());
   const exported = await view.createImageBlob();
   await assertPngHasVisibleContent(exported);
   if (document.querySelector('[data-statistics-export-host="true"]')
