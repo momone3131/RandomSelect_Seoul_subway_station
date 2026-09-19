@@ -103,7 +103,7 @@ Phase 1 + Phase 2 + Phase 4 are implemented and verified on Web + Android. Phase
 Phase 1:
 - visits are persisted separately from recent draw history
 - first registration is available from both recent-history `발자취 등록하기` and completed-course hero `등록`
-- completed-course hero action sits to the right of `이 코스로 가자!`; after save it becomes `발자취` and opens the footprint map
+- completed-course hero action sits to the right of `이 코스로 가자!`; it uses the same lime/dark-border interaction language as `새 코스` at a compact size, then becomes `발자취` after save and opens the footprint map
 - station is always saved
 - drawn food is user-confirmed optional
 - shown attractions are user-confirmed optional multi-select
@@ -136,7 +136,7 @@ Phase 3 decision:
 - repeated draws remain user-controlled via the existing redraw flow; visit history never changes random probability
 
 Phase 4:
-- main `발자취` hub has sibling `발자취 노선도 보기` + `방문 통계` buttons
+- station-list 아래 quiet utility row has sibling `발자취 노선도` + `방문 통계` buttons
 - statistics are derived only from durable `VisitRecord`
 - physical-station overall coverage dedupes interchanges
 - **per-line progress credits every line belonging to a visited interchange**; e.g. a Line 1 신도림 visit also counts 신도림 on Line 2
@@ -155,7 +155,7 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 - deployment commit `9c4bbb70fcde5f6ca5dc2b7ac27df9dfe5379411`
 - Pages `35371297273` — success
 - bundle `assets/modular-CaV-K9e8.js`
-- `새 코스` / restaurant discovery restored to original flow
+- `새 코스` / restaurant discovery restored to original flow; both completed primary CTA boxes share 14px side inset, 52px height and exact left/right alignment
 - hero state action: `등록` → visit picker, saved `발자취` → footprint map
 - no separate 발자취 module; quiet footprint/statistics utilities sit below station list
 
