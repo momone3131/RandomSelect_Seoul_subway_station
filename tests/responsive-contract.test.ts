@@ -142,9 +142,15 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('.restaurant-map-link{min-height:42px;margin-top:2px');
   });
 
-  it('uses a dedicated touch-sized restaurant discovery CTA', () => {
-    expect(styles).toContain('.restaurant-request-btn{width:100%;min-height:48px');
-    expect(styles).toContain('.restaurant-request{padding:0 14px 12px}');
+  it('keeps restaurant discovery exactly aligned with the completed new-course CTA', () => {
+    expect(styles).toContain('--main-action-inset:14px');
+    expect(styles).toContain('--main-action-height:52px');
+    expect(styles).toContain('.draw-shell[data-stage="done"] .draw-btn,');
+    expect(styles).toContain('.restaurant-request-btn{');
+    expect(styles).toContain('height:var(--main-action-height)');
+    expect(styles).toContain('padding-left:var(--main-action-inset)!important');
+    expect(main).toContain("document.body.dataset.selftestLayoutAlignment = 'true'");
+    expect(main).toContain('Primary CTA alignment mismatch');
   });
 
   it('moves redraw actions into completed result cards with larger icon glyphs', () => {
@@ -181,12 +187,12 @@ describe('Random Seoul responsive visual contract', () => {
     expect(styles).toContain('grid-template-columns:repeat(3,minmax(0,1fr))');
   });
 
-  it('keeps the hero visit action compact and the visit utilities visually quiet', () => {
+  it('uses the new-course visual language for the compact hero visit action', () => {
     expect(styles).toContain('.hero-title-row{display:flex');
     expect(styles).toContain('.hero-visit-btn{');
-    expect(styles).toContain('padding:4px 6px;');
-    expect(styles).toContain('border:0;');
-    expect(styles).toContain('background:transparent;');
+    expect(styles).toContain('border:2px solid var(--dark)');
+    expect(styles).toContain('background:var(--lime)');
+    expect(styles).toContain('box-shadow:0 2px 0 #a7b66e');
     expect(styles).toContain('.visit-tools{');
     expect(styles).toContain('.visit-tool-btn{');
     expect(styles).not.toContain('.done-actions{');
