@@ -134,31 +134,32 @@ Current 12:
 
 DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체는 일반 추천/기존 tier는 유지하지만 Nightscape에서는 제외합니다.
 
-## Latest verified Web — statistics image export / blank-image fix
+## Latest verified Web — compact statistics export
 
-- PR #27 final CI `35423948838` — **success**
-- source merge `12ba3c25209326536d8efff4d6c1d2ac3fdcac24`
-- main CI `35423993757` — **success**
-- Web Release `35423993692` — **success**
-- deployment commit `7bafe6157f92fead723d4b7712b4940beb9fa925`
-- Pages `35424023058` — **success**
-- public bundle: `assets/modular-oFZhZMoJ.js` + `assets/modular-DeBIqKyu.css`
-- blank-PNG root cause fixed: captured dialog no longer carries a large negative left offset; parent host is hidden behind the app instead
-- browser smoke locks origin coordinates, all line rows, full-height unclipped statistics body, excluded controls and temporary-DOM cleanup
+- PR #29 final CI `35425218471` — **success**
+- source merge `feef6eed043d881f39d3d8446ecfd50a50133f33`
+- main CI `35425264337` — **success**
+- Web Release `35425264330` — **success**
+- deployment commit `98c9468974295d63e4b33ff5e90d43a21cc6c402`
+- Pages `35425287239` — **success**
+- public bundle: `assets/modular-CuQ0RdaE.js` + `assets/modular-8Qj5uNTE.css`
+- live statistics modal remains unchanged
+- saved image only: 720px export canvas / metric 4 columns / tier 4 columns / line progress 2 columns
+- browser smoke verifies export-only compact geometry while live metric layout remains 2 columns
 
-## Latest verified Android — statistics image export / blank-image fix
+## Latest verified Android — compact statistics export
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- source head: `7dd3b9803770ed80e98c7bc3579fc77e50fa4222`
-- Android CI `35424081669` — **success**
+- source head: `a7aa21724f19ebe56f7dd2a4831206bdce12928a`
+- Android CI `35425286104` — **success**
 - shared tests / native Web build / Capacitor sync — success
 - Gradle debug APK assembly — success
 - fixed latest-development APK republished successfully
 - APK `random-seoul-latest.apk`
-- size: `11,536,769` bytes
+- size: `11,537,461` bytes
 - asset updated: 2026-09-19 KST
 
 Direct download:
@@ -255,7 +256,7 @@ Status: **IMPLEMENTED / VERIFIED WEB + ANDROID**
 - current prominence breakdown: Diamond / Gold / Silver / Standard unique visited places + revisit-inclusive counts
 - no new visit/statistics persistence schema; all metrics derive from `VisitRecord` and update after edits/deletes
 - independent viewport-safe modal, sibling main button, Escape/backdrop/focus restoration support
-- header `이미지 저장` exports the existing full statistics UI as one long PNG; Web downloads it and Android saves it to Pictures/Random Seoul via native MediaStore bridge
+- header `이미지 저장` exports the statistics as a compact PNG; live modal stays unchanged while saved image uses a 720px canvas, 4-column summary/tier rows and a 2-column line-progress grid. Web downloads it and Android saves it to Pictures/Random Seoul via native MediaStore bridge
 
 Verification:
 - explicit 신도림 cross-line regression test — passed on Web and Android CI

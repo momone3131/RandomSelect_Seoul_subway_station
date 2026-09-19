@@ -189,7 +189,8 @@ Phase 4 is a read-only projection over `VisitRecord`.
 - prominence breakdown calls `attractionTierForId()` at render-time aggregation, producing Diamond/Gold/Silver/Standard unique-place counts plus revisit-inclusive counts
 - the quiet main utility row exposes a sibling statistics button below the station-list control; the statistics modal is independent from the footprint modal
 - no `VisitRecord` schema migration or statistics persistence key is introduced
-- `visit-statistics-export.ts` clones the rendered statistics dialog, removes viewport clipping and control chrome, then uses `html-to-image` to create a PNG
+- `visit-statistics-export.ts` clones the rendered statistics dialog, removes viewport clipping/control chrome, fixes export width to 720px, forces collection rules closed, and applies an export-only compact class before `html-to-image` creates the PNG
+- export-only CSS keeps the live modal untouched while changing summary metrics to 4 columns, attraction tiers to 4 columns, and line progress to 2 columns with tighter spacing
 - Web saves with a normal download; Android sends the same PNG bytes to `RandomSeoulPlatform.saveImage`, which writes to MediaStore `Pictures/Random Seoul` on Android 10+
 
 Phase 3 unvisited-aware/exclusion drawing is intentionally not implemented. Repeated stations remain a user redraw decision.

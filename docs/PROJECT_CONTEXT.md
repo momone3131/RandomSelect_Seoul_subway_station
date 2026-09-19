@@ -148,22 +148,22 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Statistics image export / blank-image fix — Web
-- PR #27 CI `35423948838` — success
-- source merge `12ba3c25209326536d8efff4d6c1d2ac3fdcac24`
-- main CI `35423993757` / Web Release `35423993692` — success
-- deployment commit `7bafe6157f92fead723d4b7712b4940beb9fa925`
-- bundle `assets/modular-oFZhZMoJ.js`
-- statistics `이미지 저장` exports the existing full-height statistics UI
-- blank-image fix: capture target stays at viewport origin; only its parent host is sent behind the app, preventing html-to-image from serializing the content outside the PNG canvas
+### Compact statistics export — Web
+- PR #29 CI `35425218471` — success
+- source merge `feef6eed043d881f39d3d8446ecfd50a50133f33`
+- main CI `35425264337` / Web Release `35425264330` — success
+- deployment commit `98c9468974295d63e4b33ff5e90d43a21cc6c402`
+- bundle `assets/modular-CuQ0RdaE.js`
+- live statistics modal stays unchanged
+- saved image uses a 720px compact export: metric 4-col / tier 4-col / line progress 2-col
 
-### Statistics image export / blank-image fix — Android
+### Compact statistics export — Android
 - branch `feature/random-seoul-android`, PR #3
-- source head `7dd3b9803770ed80e98c7bc3579fc77e50fa4222`
-- Android CI `35424081669` — success
+- source head `a7aa21724f19ebe56f7dd2a4831206bdce12928a`
+- Android CI `35425286104` — success
 - native save bridge remains `Pictures/Random Seoul` on Android 10+
-- shared export layout includes the blank-image fix
-- fixed `android-dev-latest` APK republished, size `11,536,769` bytes
+- shared export layout includes the compact 720px / 4-4-2 grid rules
+- fixed `android-dev-latest` APK republished, size `11,537,461` bytes
 
 ### Visit/statistics invariants
 - recent-history `발자취 등록하기` remains
