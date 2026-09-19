@@ -148,22 +148,21 @@ Source: `docs/VISIT_HISTORY_PLAN.md`.
 
 ## 7. Latest verified snapshot
 
-### Simplified main visit UX — Web
-- PR #20 CI `35371137305` — success
-- source merge `411c67d53d34e28ce0d161d41dead99ec563b38c`
-- main CI `35371239332` / Web Release `35371239392` — success
-- deployment commit `9c4bbb70fcde5f6ca5dc2b7ac27df9dfe5379411`
-- Pages `35371297273` — success
-- bundle `assets/modular-CaV-K9e8.js`
-- `새 코스` / restaurant discovery restored to original flow; both completed primary CTA boxes share 14px side inset, 52px height and exact left/right alignment
-- hero state action: `등록` → visit picker, saved `발자취` → footprint map
-- no separate 발자취 module; quiet footprint/statistics utilities sit below station list
+### Statistics image export — Web
+- PR #24 CI `35420011134` — success
+- source merge `259110cc363a0fac223d363b733873fddc69fdd1`
+- main CI `35420042578` / Web Release `35420042627` — success
+- deployment commit `39c1af0f4feb6ef63018a9e339bf85fdb201b021`
+- bundle `assets/modular-BBtFqxHC.js`
+- statistics `이미지 저장` exports a long PNG matching the current statistics modal; Web uses download
+- visit statistics header includes `이미지 저장`; export reuses the existing statistics UI and removes scroll clipping so all lines fit in one PNG
 
-### Simplified main visit UX — Android
+### Statistics image export — Android
 - branch `feature/random-seoul-android`, PR #3
-- source head `4a568e6caf9325c72f85bead1ea9f6b1de105b8a`
-- Android CI `35371313423` — success
-- fixed `android-dev-latest` APK republished, size `11,525,705` bytes
+- source head `49fc6fca089b52600a1bdc3b65875196752588d3`
+- Android CI `35420098838` — success
+- native save bridge writes PNG to `Pictures/Random Seoul` through MediaStore on Android 10+
+- fixed `android-dev-latest` APK republished, size `11,536,165` bytes
 
 ### Visit/statistics invariants
 - recent-history `발자취 등록하기` remains
