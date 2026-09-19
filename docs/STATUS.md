@@ -134,30 +134,31 @@ Current 12:
 
 DDP, 노들섬, 반포한강공원, 세빛섬, 석촌호수, 송도 센트럴파크, 광교호수공원, 라베니체는 일반 추천/기존 tier는 유지하지만 Nightscape에서는 제외합니다.
 
-## Latest verified Web — statistics image export
+## Latest verified Web — statistics image export / blank-image fix
 
-- PR #24 final CI `35420011134` — **success**
-- source merge `259110cc363a0fac223d363b733873fddc69fdd1`
-- main CI `35420042578` — **success**
-- Web Release `35420042627` — **success**
-- deployment commit `39c1af0f4feb6ef63018a9e339bf85fdb201b021`
-- public bundle: `assets/modular-BBtFqxHC.js`
-- bundle verified for statistics `이미지 저장`, full-height export clone, dated PNG filename and Web/native save split
+- PR #27 final CI `35423948838` — **success**
+- source merge `12ba3c25209326536d8efff4d6c1d2ac3fdcac24`
+- main CI `35423993757` — **success**
+- Web Release `35423993692` — **success**
+- deployment commit `7bafe6157f92fead723d4b7712b4940beb9fa925`
+- Pages `35424023058` — **success**
+- public bundle: `assets/modular-oFZhZMoJ.js` + `assets/modular-DeBIqKyu.css`
+- blank-PNG root cause fixed: captured dialog no longer carries a large negative left offset; parent host is hidden behind the app instead
+- browser smoke locks origin coordinates, all line rows, full-height unclipped statistics body, excluded controls and temporary-DOM cleanup
 
-## Latest verified Android — statistics image export
+## Latest verified Android — statistics image export / blank-image fix
 
 Branch: `feature/random-seoul-android`
 PR: `#3 android: build Random Seoul native shell`
 App id: `io.github.momone3131.randomseoul`
 
-- source head: `49fc6fca089b52600a1bdc3b65875196752588d3`
-- Android CI `35420098838` — **success**
+- source head: `7dd3b9803770ed80e98c7bc3579fc77e50fa4222`
+- Android CI `35424081669` — **success**
 - shared tests / native Web build / Capacitor sync — success
-- native `RandomSeoulPlatform.saveImage` Java compile — success
 - Gradle debug APK assembly — success
 - fixed latest-development APK republished successfully
 - APK `random-seoul-latest.apk`
-- size: `11,536,165` bytes
+- size: `11,536,769` bytes
 - asset updated: 2026-09-19 KST
 
 Direct download:
