@@ -662,8 +662,9 @@ async function runBrowserSelfTest(): Promise<void> {
       throw new Error('Self-test full restart did not return to the line-complete stage.');
     }
 
-    runVisitStatisticsSmoke(visitStatistics);
+    await runVisitStatisticsSmoke(visitStatistics);
     document.body.dataset.selftestVisitStatistics = 'true';
+    document.body.dataset.selftestStatisticsImage = 'true';
     document.body.dataset.selftestCycleReset = 'true';
     document.body.dataset.selftest = 'passed';
   } catch (error) {
