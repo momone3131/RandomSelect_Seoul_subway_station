@@ -595,6 +595,48 @@ async function runBrowserSelfTest(): Promise<void> {
     }
     document.body.dataset.selftestCurrentCourseVisit = 'true';
 
+    const drawButton = document.getElementById('draw_btn') as HTMLButtonElement | null;
+    const restaurantRequestButton = document.getElementById('restaurant_request_btn') as HTMLButtonElement | null;
+    const stationDetail = document.getElementById('station_detail');
+    const visitTools = document.getElementById('visit_tools');
+    if (!drawButton || !restaurantRequestButton || !stationDetail || !visitTools) {
+      throw new Error('Layout self-test could not find the main alignment targets.');
+    }
+
+    const near = (left: number, right: number, tolerance = 1.25): boolean =>
+      Math.abs(left - right) <= tolerance;
+    const sameBox = (left: DOMRect, right: DOMRect): boolean =>
+      near(left.left, right.left)
+      && near(left.right, right.right)
+      && near(left.width, right.width)
+      && near(left.height, right.height);
+
+    const drawRect = drawButton.getBoundingClientRect();
+    const restaurantRequestRect = restaurantRequestButton.getBoundingClientRect();
+    if (!sameBox(drawRect, restaurantRequestRect)) {
+      throw new Error(
+        `Primary CTA alignment mismatch: new-course=${drawRect.width.toFixed(1)}×${drawRect.height.toFixed(1)}, `
+        + `restaurant=${restaurantRequestRect.width.toFixed(1)}×${restaurantRequestRect.height.toFixed(1)}.`,
+      );
+    }
+
+    const stationDetailRect = stationDetail.getBoundingClientRect();
+    const visitToolsRect = visitTools.getBoundingClientRect();
+    if (!near(stationDetailRect.left, visitToolsRect.left) || !near(stationDetailRect.right, visitToolsRect.right)) {
+      throw new Error('Visit utility row does not align with the station-list panel.');
+    }
+
+    const attractionSection = document.getElementById('attraction_section');
+    if (attractionSection && !attractionSection.hidden) {
+      const linePanelRect = byId<HTMLElement>('line_panel').getBoundingClientRect();
+      const foodPanelRect = byId<HTMLElement>('food_panel').getBoundingClientRect();
+      const attractionRect = attractionSection.getBoundingClientRect();
+      if (!near(linePanelRect.left, attractionRect.left) || !near(foodPanelRect.right, attractionRect.right)) {
+        throw new Error('Attraction panel does not align with the draw-card content edges.');
+      }
+    }
+    document.body.dataset.selftestLayoutAlignment = 'true';
+
     if (beforeRestaurants.recommendations.length !== 0) {
       throw new Error('Restaurant lookup ran before the user requested it.');
     }
