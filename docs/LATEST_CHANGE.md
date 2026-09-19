@@ -13,12 +13,12 @@ Date: 2026-09-19
 그 오른쪽에 작은 상태 버튼 하나만 표시합니다.
 
 - 미등록: `등록`
-  - 테두리/배경 없는 낮은 강조의 보조 action
+  - `새 코스`와 같은 lime + dark border + 눌림 shadow 언어를 작은 크기로 사용
   - 누르면 최근 기록의 `발자취 등록하기`와 동일한 visit picker를 엶
 - 등록 완료: `발자취`
   - 누르면 해당 방문을 포함한 발자취 노선도를 바로 엶
 
-`새 코스`는 다시 원래 단독 primary action 위치로 복귀했고, `추천 식당 보기 / 추천 술집 보기` 흐름도 기존 위치를 유지합니다.
+`새 코스`는 다시 원래 단독 primary action 위치로 복귀했고, `추천 식당 보기 / 추천 술집 보기` 흐름도 기존 위치를 유지합니다. 메인 CTA 정렬 기준은 `새 코스`로 통일하여 추천 장소 CTA도 동일한 좌우 inset과 52px 높이를 사용합니다.
 
 ## Footprint / statistics entry
 
@@ -29,7 +29,7 @@ Date: 2026-09-19
 - `발자취 노선도`
 - `방문 통계`
 
-두 버튼은 역 목록과 비슷한 낮은 시각 강조를 사용합니다. 발자취 노선도는 방문 기록이 없으면 disabled이고 방문 통계는 항상 열 수 있습니다.
+두 버튼은 역 목록과 비슷한 낮은 시각 강조를 사용하며 역 목록 panel의 좌우 edge와 정확히 맞춥니다. 발자취 노선도는 방문 기록이 없으면 disabled이고 방문 통계는 항상 열 수 있습니다.
 
 ## Preserved behavior
 
@@ -59,3 +59,14 @@ Android:
 - Android CI `35371313423` — success
 - shared tests, native Web build, Capacitor sync, APK assembly and fixed latest-development release all passed
 - `random-seoul-latest.apk` size `11,525,705` bytes
+
+
+## Layout alignment audit
+
+메인 화면 정렬은 다음 anchor를 기준으로 다시 점검했습니다.
+
+- `추천 식당 보기 / 추천 술집 보기` ↔ `새 코스`: 같은 좌우 edge / 같은 width / 같은 52px height
+- 추천 명소 section ↔ 노선/역/음식 card content edge: 동일 좌우선 유지
+- `XX선 역 목록` ↔ `발자취 노선도 / 방문 통계`: 동일 좌우 edge
+- mobile breakpoint에서도 recommendation CTA가 더 넓어지던 11px/9px inset override 제거; `새 코스`의 14px inset을 기준으로 통일
+- CI browser smoke가 desktop main flow와 390px mobile fixture에서 실제 `getBoundingClientRect()` 값을 비교해 정렬 회귀를 차단
