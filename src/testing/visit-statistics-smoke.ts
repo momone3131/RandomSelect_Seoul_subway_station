@@ -1,49 +1,10 @@
 import { SUBWAY_LINES } from '../data/subway-lines';
 import type { VisitRecord } from '../domain/types';
+import { prepareVisitStatisticsExport } from '../ui/visit-statistics-export';
 import type { VisitStatisticsView } from '../ui/visit-statistics-view';
 
-async function assertPngHasVisibleContent(blob: Blob): Promise<void> {
-  if (blob.type !== 'image/png' || blob.size < 1_000) {
-    throw new Error('Statistics export did not produce a valid PNG.');
-  }
-
-  const bitmap = await createImageBitmap(blob);
-  try {
-    if (bitmap.width < 200 || bitmap.height < 500) {
-      throw new Error(`Statistics PNG dimensions are implausible: ${bitmap.width}×${bitmap.height}.`);
-    }
-
-    const sampleWidth = Math.min(160, bitmap.width);
-    const sampleHeight = Math.min(640, Math.max(320, Math.round(bitmap.height * sampleWidth / bitmap.width)));
-    const canvas = document.createElement('canvas');
-    canvas.width = sampleWidth;
-    canvas.height = sampleHeight;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context) throw new Error('Statistics PNG smoke could not create a 2D canvas.');
-
-    context.drawImage(bitmap, 0, 0, sampleWidth, sampleHeight);
-    const pixels = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
-    const background = [pixels[0], pixels[1], pixels[2]];
-    let distinct = 0;
-    const total = sampleWidth * sampleHeight;
-
-    for (let i = 0; i < pixels.length; i += 4) {
-      const delta = Math.abs(pixels[i] - background[0])
-        + Math.abs(pixels[i + 1] - background[1])
-        + Math.abs(pixels[i + 2] - background[2]);
-      if (delta > 24) distinct += 1;
-    }
-
-    if (distinct / total < 0.02) {
-      throw new Error('Statistics PNG is effectively blank.');
-    }
-  } finally {
-    bitmap.close();
-  }
-}
-
 /** Browser-only checks inside the existing isolated ?selftest=1 CI run. No writes. */
-export async function runVisitStatisticsSmoke(view: VisitStatisticsView): Promise<void> {
+export function runVisitStatisticsSmoke(view: VisitStatisticsView): void {
   const app = document.getElementById('app');
   const originallyInert = app?.inert ?? false;
   const originalOverflow = document.body.style.overflow;
@@ -75,6 +36,7 @@ export async function runVisitStatisticsSmoke(view: VisitStatisticsView): Promis
     || !app?.inert) {
     throw new Error('Visit statistics count, line rows, date or modal isolation failed.');
   }
+
   const dialogBounds = dialog.getBoundingClientRect();
   const close = document.getElementById('close_visit_statistics')!;
   const saveImage = document.getElementById('save_visit_statistics_image') as HTMLButtonElement | null;
@@ -89,6 +51,7 @@ export async function runVisitStatisticsSmoke(view: VisitStatisticsView): Promis
     || getComputedStyle(saveImage).visibility === 'hidden') {
     throw new Error('Statistics dialog controls escaped or were hidden from the viewport.');
   }
+
   const saveCenterX = saveBounds.left + saveBounds.width / 2;
   const saveCenterY = saveBounds.top + saveBounds.height / 2;
   const saveHit = document.elementFromPoint(saveCenterX, saveCenterY);
@@ -96,10 +59,27 @@ export async function runVisitStatisticsSmoke(view: VisitStatisticsView): Promis
     throw new Error('Statistics image save action is visually covered.');
   }
 
-  const exportLines = Array.from(dialog.querySelectorAll('.visit-statistics-line'));
-  exportLines.slice(2).forEach((line) => line.remove());
-  const exported = await view.createImageBlob();
-  await assertPngHasVisibleContent(exported);
+  const prepared = prepareVisitStatisticsExport(dialog);
+  try {
+    const cloneBounds = prepared.clone.getBoundingClientRect();
+    const exportBody = prepared.clone.querySelector<HTMLElement>('#visit_statistics_body');
+    const exportControls = prepared.clone.querySelector<HTMLElement>('.visit-statistics-export-exclude');
+    if (!exportBody
+      || cloneBounds.left < -1 || cloneBounds.top < -1
+      || Math.abs(cloneBounds.width - dialogBounds.width) > 2
+      || prepared.clone.querySelectorAll('.visit-statistics-line').length !== SUBWAY_LINES.length
+      || !prepared.clone.textContent?.includes('방문 통계')
+      || !prepared.clone.textContent?.includes('다이아몬드')
+      || getComputedStyle(prepared.clone).position !== 'static'
+      || getComputedStyle(exportBody).overflowY !== 'visible'
+      || exportBody.scrollHeight > exportBody.clientHeight + 2
+      || (exportControls && getComputedStyle(exportControls).display !== 'none')) {
+      throw new Error('Statistics export layout is clipped, shifted or missing content.');
+    }
+  } finally {
+    prepared.cleanup();
+  }
+
   if (document.querySelector('[data-statistics-export-host="true"]')
     || document.querySelector('[data-statistics-export-clone="true"]')) {
     throw new Error('Statistics export leaked its temporary DOM.');
