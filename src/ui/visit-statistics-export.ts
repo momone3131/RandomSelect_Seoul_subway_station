@@ -56,6 +56,12 @@ export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<B
   const bounds = dialog.getBoundingClientRect();
   if (bounds.width <= 0) throw new Error('방문 통계 화면 크기를 확인하지 못했어요.');
 
+  const exportWidth = Math.ceil(bounds.width);
+  const host = document.createElement('div');
+  host.className = 'visit-statistics-export-host';
+  host.dataset.statisticsExportHost = 'true';
+  host.style.width = `${exportWidth}px`;
+
   const clone = dialog.cloneNode(true) as HTMLElement;
   clone.classList.add('visit-statistics-export');
   clone.dataset.statisticsExportClone = 'true';
@@ -64,9 +70,10 @@ export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<B
   clone.removeAttribute('aria-modal');
   clone.removeAttribute('aria-labelledby');
   clone.tabIndex = -1;
-  clone.style.width = `${Math.ceil(bounds.width)}px`;
+  clone.style.width = `${exportWidth}px`;
 
-  document.body.appendChild(clone);
+  host.appendChild(clone);
+  document.body.appendChild(host);
   try {
     await document.fonts?.ready;
     await nextFrame();
@@ -81,7 +88,7 @@ export async function renderVisitStatisticsImage(dialog: HTMLElement): Promise<B
     if (!blob) throw new Error('방문 통계 이미지를 만들지 못했어요.');
     return blob;
   } finally {
-    clone.remove();
+    host.remove();
   }
 }
 
