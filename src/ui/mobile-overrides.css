@@ -224,9 +224,13 @@ body{background:var(--bg)}
   padding-left:var(--main-action-inset);
   padding-right:var(--main-action-inset);
 }
+.draw-shell[data-stage="done"] .action-zone{
+  padding-top:0;
+}
 .restaurant-request{
   padding-left:var(--main-action-inset)!important;
   padding-right:var(--main-action-inset)!important;
+  padding-bottom:8px!important;
 }
 .draw-shell[data-stage="done"] .draw-btn,
 .restaurant-request-btn{
